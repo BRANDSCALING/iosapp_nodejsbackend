@@ -1,0 +1,37 @@
+# Dependencies (will be installed fresh in container)
+node_modules
+npm-debug.log
+
+# Environment files (secrets should be set via App Runner)
+.env
+.env.*
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# OS files
+.DS_Store
+
+# Testing
+coverage
+.nyc_output
+tests
+
+# IDE
+.vscode
+.idea
+
+# Temporary files
+tmp
+temp
+*.tmp
+*.temp
+
+# Misc
+Untitled
+
