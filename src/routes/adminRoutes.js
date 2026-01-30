@@ -73,5 +73,9 @@ router.get('/users/:userId/workbooks/progress', adminWorkbookController.getUserW
 // GET /api/admin/workbooks/instances/:instanceId
 router.get('/workbooks/instances/:instanceId', adminWorkbookController.getWorkbookInstanceDetails);
 
+// Get complete workbook structure with user's progress and answers
+// GET /api/admin/users/:userId/workbooks/:workbookId/full
+router.get('/users/:userId/workbooks/:workbookId/full', adminWorkbookController.getFullWorkbookWithUserData);
+
 module.exports = router;
 

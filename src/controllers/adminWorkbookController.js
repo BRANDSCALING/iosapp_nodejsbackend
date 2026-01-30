@@ -418,7 +418,205 @@ exports.getWorkbookInstanceDetails = async (req, res) => {
   }
 };
 
+/**
+ * Get complete workbook structure with user's progress and answers
+ * GET /api/admin/users/:userId/workbooks/:workbookId/full
+ * 
+ * Similar to what iOS gets, but accessible by admin for monitoring
+ * Returns the complete workbook structure + user's instance data + answers
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+exports.getFullWorkbookWithUserData = async (req, res) => {
+  try {
+    const { userId, workbookId } = req.params;
 
+    console.log(`📚 [Admin] Getting full workbook ${workbookId} for user ${userId}`);
+
+    // Validate UUID formats
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i;
+    
+    if (!uuidRegex.test(userId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid user ID format. Must be a valid UUID.'
+      });
+    }
+    
+    if (!uuidRegex.test(workbookId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid workbook ID format. Must be a valid UUID.'
+      });
+    }
+
+    // 1. Get workbook structure from workbooks table
+    const workbookResult = await query(`
+      SELECT 
+        id,
+        name,
+        title,
+        type_id,
+        tier,
+        json_structure,
+        created_at,
+        original_filename
+      FROM workbooks
+      WHERE id = $1
+    `, [workbookId]);
+    
+    if (workbookResult.rows.length === 0) {
+      console.log(`❌ [Admin] Workbook not found: ${workbookId}`);
+      return res.status(404).json({
+        success: false,
+        error: 'Workbook not found'
+      });
+    }
+
+    const workbook = workbookResult.rows[0];
+
+    // 2. Check if user exists
+    const userResult = await query(
+      'SELECT id, email, name, type_id, tier FROM users WHERE LOWER(id::text) = LOWER($1)',
+      [userId]
+    );
+    
+    if (userResult.rows.length === 0) {
+      console.log(`❌ [Admin] User not found: ${userId}`);
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    const user = userResult.rows[0];
+
+    // 3. Get user's workbook instance (if exists)
+    const instanceResult = await query(`
+      SELECT 
+        id,
+        user_id,
+        workbook_id,
+        data,
+        last_saved_at
+      FROM workbook_instances
+      WHERE LOWER(user_id::text) = LOWER($1) AND workbook_id = $2
+    `, [userId, workbookId]);
+    
+    let userInstance = null;
+    let userProgress = null;
+    let answers = {};
+    
+    if (instanceResult.rows.length > 0) {
+      userInstance = instanceResult.rows[0];
+      userProgress = userInstance.data; // This contains modules with progress
+      
+      // 4. Get all answers for this instance from workbook_answers table
+      const answersResult = await query(`
+        SELECT 
+          field_key,
+          value,
+          created_at,
+          updated_at
+        FROM workbook_answers
+        WHERE instance_id = $1
+        ORDER BY updated_at DESC
+      `, [userInstance.id]);
+      
+      // Convert answers array to object { fieldKey: value }
+      answersResult.rows.forEach(row => {
+        answers[row.field_key] = row.value;
+      });
+    }
+
+    // 5. Calculate overall progress
+    let overallProgress = 0;
+    let isCompleted = false;
+    
+    if (userProgress && userProgress.modules && userProgress.modules.length > 0) {
+      const totalProgress = userProgress.modules.reduce((sum, module) => {
+        return sum + (module.progress || 0);
+      }, 0);
+      overallProgress = (totalProgress / userProgress.modules.length) * 100;
+      
+      // Check if all modules are completed
+      isCompleted = userProgress.modules.every(module => module.completed === true);
+    }
+    
+    // Also check the top-level completed flag
+    if (userProgress && userProgress.completed === true) {
+      isCompleted = true;
+    }
+
+    // 6. Parse workbook structure
+    let structure = null;
+    if (workbook.json_structure) {
+      try {
+        structure = typeof workbook.json_structure === 'string' 
+          ? JSON.parse(workbook.json_structure) 
+          : workbook.json_structure;
+      } catch (e) {
+        console.error('Error parsing workbook structure:', e);
+        structure = workbook.json_structure;
+      }
+    }
+
+    // 7. Build response
+    const fullWorkbook = {
+      workbook: {
+        id: workbook.id,
+        name: workbook.name,
+        title: workbook.title,
+        typeId: workbook.type_id,
+        tier: workbook.tier,
+        structure: structure, // Complete workbook structure (modules, sections, questions)
+        createdAt: workbook.created_at,
+        originalFilename: workbook.original_filename
+      },
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        typeId: user.type_id,
+        tier: user.tier
+      },
+      instance: userInstance ? {
+        id: userInstance.id,
+        userId: userInstance.user_id,
+        workbookId: userInstance.workbook_id,
+        lastSavedAt: userInstance.last_saved_at,
+        progressData: userProgress // User's module-level progress
+      } : null,
+      answers: answers, // User's answers from workbook_answers table
+      answersCount: Object.keys(answers).length,
+      hasStarted: userInstance !== null,
+      overallProgress: Math.round(overallProgress * 100) / 100, // Round to 2 decimals
+      isCompleted: isCompleted
+    };
+
+    console.log(`✅ [Admin] Successfully retrieved full workbook for user ${userId}`);
+    console.log(`   Workbook: ${workbook.title}`);
+    console.log(`   User: ${user.email}`);
+    console.log(`   Has Started: ${userInstance !== null}`);
+    console.log(`   Progress: ${fullWorkbook.overallProgress}%`);
+    console.log(`   Answers: ${fullWorkbook.answersCount}`);
+    console.log(`   Completed: ${isCompleted}`);
+
+    res.json({
+      success: true,
+      data: fullWorkbook
+    });
+
+  } catch (error) {
+    console.error('❌ [Admin] Get full workbook error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get full workbook data',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
 
 
 // /**
