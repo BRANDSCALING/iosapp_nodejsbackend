@@ -654,26 +654,49 @@ exports.getUserSessions = async (req, res) => {
     
     console.log(`💬 [Agent] Getting sessions for user: ${userId}`);
     
-    let whereClause = 'WHERE LOWER(s.user_id::text) = LOWER($1)';
-    const params = [userId];
-    
-    if (active !== undefined) {
-      params.push(active === 'true');
-      whereClause += ` AND s.is_active = $${params.length}`;
+    // Validate userId
+    if (!userId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'userId is required' 
+      });
     }
     
-    params.push(limit);
+    // Build query based on whether active filter is provided
+    let queryText;
+    let params;
     
-    const result = await query(
-      `SELECT 
-        s.id, s.title, s.is_active, s.started_at, s.ended_at,
-        (SELECT COUNT(*) FROM agent_messages m WHERE m.session_id = s.id) as message_count
-       FROM agent_sessions s
-       ${whereClause}
-       ORDER BY s.started_at DESC
-       LIMIT $${params.length}`,
-      params
-    );
+    if (active !== undefined) {
+      // Filter by user_id AND is_active
+      const isActive = active === 'true';
+      queryText = `
+        SELECT 
+          s.id, s.title, s.is_active, s.started_at, s.ended_at,
+          (SELECT COUNT(*) FROM agent_messages m WHERE m.session_id = s.id) as message_count
+        FROM agent_sessions s
+        WHERE LOWER(s.user_id::text) = LOWER($1)
+          AND s.is_active = $2
+        ORDER BY s.started_at DESC
+        LIMIT $3
+      `;
+      params = [userId, isActive, limit];
+      console.log(`   Filter: user_id=${userId}, is_active=${isActive}, limit=${limit}`);
+    } else {
+      // Filter by user_id only
+      queryText = `
+        SELECT 
+          s.id, s.title, s.is_active, s.started_at, s.ended_at,
+          (SELECT COUNT(*) FROM agent_messages m WHERE m.session_id = s.id) as message_count
+        FROM agent_sessions s
+        WHERE LOWER(s.user_id::text) = LOWER($1)
+        ORDER BY s.started_at DESC
+        LIMIT $2
+      `;
+      params = [userId, limit];
+      console.log(`   Filter: user_id=${userId}, limit=${limit}`);
+    }
+    
+    const result = await query(queryText, params);
     
     const sessions = result.rows.map(s => ({
       id: s.id,
@@ -684,10 +707,12 @@ exports.getUserSessions = async (req, res) => {
       messageCount: parseInt(s.message_count)
     }));
     
-    console.log(`✅ [Agent] Retrieved ${sessions.length} sessions`);
+    console.log(`✅ [Agent] Retrieved ${sessions.length} sessions for user: ${userId}`);
     
     res.json({
       success: true,
+      userId: userId,
+      sessionsCount: sessions.length,
       sessions: sessions
     });
     
