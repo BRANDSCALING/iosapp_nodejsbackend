@@ -1,81 +1,71 @@
 /**
  * Admin Routes
- * Protected routes for admin portal functionality
- * All routes require admin authentication
+ * GET /lms/programs and related UCWS read routes use isAdminOrUcws; all other routes use adminAuth (admin only).
  */
 
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const adminWorkbookController = require('../controllers/adminWorkbookController');
-const adminAuth = require('../middleware/adminAuth');
-
-// ============================================
-// All admin routes require authentication
-// ============================================
-router.use(adminAuth);
+const lmsController = require('../controllers/lmsController');
+const { adminAuth, isAdminOrUcws } = require('../middleware/adminAuth');
 
 // ============================================
 // Dashboard
 // ============================================
 
-// Get dashboard statistics
-router.get('/stats', adminController.getStats);
+router.get('/stats', adminAuth, adminController.getStats);
 
 // ============================================
 // User Management
 // ============================================
 
-// Get all users (with pagination and filtering)
-router.get('/users', adminController.getUsers);
-
-// Get user details
-router.get('/users/:id', adminController.getUserDetails);
-
-// Get user E-DNA profile
-router.get('/users/:id/edna', adminController.getUserEdnaProfile);
-
-// Get user workbooks
-router.get('/users/:id/workbooks', adminController.getUserWorkbooks);
-
-// Get user full quiz results with answers
-router.get('/users/:id/quiz-results', adminController.getUserQuizResults);
-
-// Update user tier
-router.put('/users/:id/tier', adminController.updateUserTier);
+router.get('/users', adminAuth, adminController.getUsers);
+router.get('/users/:id', adminAuth, adminController.getUserDetails);
+router.get('/users/:id/edna', adminAuth, adminController.getUserEdnaProfile);
+router.get('/users/:id/workbooks', adminAuth, adminController.getUserWorkbooks);
+router.get('/users/:id/quiz-results', adminAuth, adminController.getUserQuizResults);
+router.put('/users/:id/tier', adminAuth, adminController.updateUserTier);
 
 // ============================================
 // Workbook Management
 // ============================================
 
-// Get all workbooks
-router.get('/workbooks', adminController.getWorkbooks);
-
-// Upload/Create a new workbook
-router.post('/workbooks/upload', adminController.uploadWorkbook);
-
-// Delete a workbook
-router.delete('/workbooks/:id', adminController.deleteWorkbook);
+router.get('/workbooks', adminAuth, adminController.getWorkbooks);
+router.post('/workbooks/upload', adminAuth, adminController.uploadWorkbook);
+router.put('/workbooks/:id', adminAuth, adminController.updateWorkbook);
+router.delete('/workbooks/:id', adminAuth, adminController.deleteWorkbook);
 
 // ============================================
 // Workbook Progress Monitoring (Admin)
 // ============================================
 
-// Get all users' workbook progress overview
-// GET /api/admin/workbooks/progress?limit=50&offset=0&completed=true
-router.get('/workbooks/progress', adminWorkbookController.getAllUsersProgress);
+router.get('/workbooks/progress', adminAuth, adminWorkbookController.getAllUsersProgress);
+router.get('/users/:userId/workbooks/progress', adminAuth, adminWorkbookController.getUserWorkbooksProgress);
+router.get('/workbooks/instances/:instanceId', adminAuth, adminWorkbookController.getWorkbookInstanceDetails);
+router.get('/users/:userId/workbooks/:workbookId/full', adminAuth, adminWorkbookController.getFullWorkbookWithUserData);
 
-// Get specific user's detailed workbook progress
-// GET /api/admin/users/:userId/workbooks/progress
-router.get('/users/:userId/workbooks/progress', adminWorkbookController.getUserWorkbooksProgress);
+// ============================================
+// UCWS Content Management
+// ============================================
 
-// Get workbook instance details with all answers
-// GET /api/admin/workbooks/instances/:instanceId
-router.get('/workbooks/instances/:instanceId', adminWorkbookController.getWorkbookInstanceDetails);
+router.get('/lms/programs', isAdminOrUcws, adminController.getPrograms);
+router.post('/lms/programs', adminAuth, adminController.createProgram);
 
-// Get complete workbook structure with user's progress and answers
-// GET /api/admin/users/:userId/workbooks/:workbookId/full
-router.get('/users/:userId/workbooks/:workbookId/full', adminWorkbookController.getFullWorkbookWithUserData);
+router.get('/lms/programs/:programId/modules', isAdminOrUcws, adminController.getModules);
+router.get('/lms/modules', adminAuth, adminController.getModules);
+router.post('/lms/modules', adminAuth, adminController.createModule);
+
+router.get('/lms/modules/:moduleId/lessons', isAdminOrUcws, adminController.getLessons);
+router.get('/lms/lessons', adminAuth, adminController.getLessons);
+router.post('/lms/lessons', adminAuth, adminController.createLesson);
+
+router.get('/lms/lessons/:lessonId/content-items', isAdminOrUcws, adminController.getContentItems);
+router.get('/lms/content-items', adminAuth, adminController.getContentItems);
+router.post('/lms/content-items', adminAuth, adminController.createContentItem);
+
+router.post('/lms/lessons/:lessonId/complete', isAdminOrUcws, lmsController.markLessonComplete);
+
+router.post('/lms/users/ucws', adminAuth, adminController.createUcwsUser);
 
 module.exports = router;
-

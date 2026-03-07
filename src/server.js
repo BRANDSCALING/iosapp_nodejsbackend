@@ -21,6 +21,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const agentAuthRoutes = require('./routes/agentAuthRoutes');
 const agentRoutes = require('./routes/agentRoutes');
 const userRoutes = require('./routes/userRoutes');
+const lmsRoutes = require('./routes/lmsRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const rateLimiter = require('./middleware/rateLimiter');
 
@@ -92,6 +93,7 @@ app.get('/', (req, res) => {
       quiz: `/api/${API_VERSION}/quiz`,
       userProfile: '/api/user/sync-profile',
       workbooks: '/api/user/workbooks',
+      lms: `/api/${API_VERSION}/lms`,
       adminAuth: '/api/admin/auth',
       admin: '/api/admin',
       agentAuth: '/api/agent/auth',
@@ -104,7 +106,9 @@ app.get('/', (req, res) => {
 // API Routes
 app.use(`/api/${API_VERSION}/quiz`, quizRoutes);
 app.use('/api/user/workbooks', workbooksRoutes);
+app.use(`/api/${API_VERSION}/lms`, lmsRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/users', userRoutes);
 
 // Admin Routes
 app.use('/api/admin/auth', adminAuthRoutes);
@@ -143,6 +147,7 @@ const server = app.listen(PORT, () => {
   console.log(`   Health Check: http://localhost:${PORT}/health`);
   console.log(`   Quiz API: http://localhost:${PORT}/api/${API_VERSION}/quiz`);
   console.log(`   Workbooks API: http://localhost:${PORT}/api/user/workbooks`);
+  console.log(`   LMS API: http://localhost:${PORT}/api/${API_VERSION}/lms`);
   console.log(`   Admin Auth: http://localhost:${PORT}/api/admin/auth`);
   console.log(`   Admin API: http://localhost:${PORT}/api/admin`);
   console.log(`   Agent Auth: http://localhost:${PORT}/api/agent/auth`);

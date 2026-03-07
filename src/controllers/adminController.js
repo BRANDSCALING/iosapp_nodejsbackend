@@ -67,6 +67,7 @@ exports.getUsers = async (req, res) => {
         u.id, 
         u.email, 
         u.name, 
+        u.user_type,
         u.type_id, 
         u.tier, 
         u.created_at,
@@ -118,7 +119,7 @@ exports.getUserDetails = async (req, res) => {
     // Get user info with E-DNA profile
     const userResult = await query(
       `SELECT 
-        u.id, u.email, u.name, u.type_id, u.tier, u.created_at, u.updated_at,
+        u.id, u.email, u.name, u.user_type, u.type_id, u.tier, u.created_at, u.updated_at,
         e.core_type, e.subtype, e.confidence, e.completion_percentage, e.updated_at as profile_updated_at
        FROM users u
        LEFT JOIN edna_profiles e ON LOWER(u.id::text) = LOWER(e.user_id::text)
@@ -807,6 +808,142 @@ exports.uploadWorkbook = async (req, res) => {
 };
 
 /**
+ * Update workbook metadata
+ * PUT /api/admin/workbooks/:id
+ * 
+ * Allows admins to update workbook type_id, tier, title, name
+ */
+exports.updateWorkbook = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, title, type_id, tier } = req.body;
+    
+    console.log(`📝 [Admin] Updating workbook: ${id}`);
+    console.log(`   Updates: name=${name}, title=${title}, type_id=${type_id}, tier=${tier}`);
+    
+    // Check if workbook exists
+    const checkResult = await query(
+      'SELECT id, name, title, type_id, tier FROM workbooks WHERE id = $1::uuid',
+      [id]
+    );
+    
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Workbook not found'
+      });
+    }
+    
+    const currentWorkbook = checkResult.rows[0];
+    
+    // Build update query dynamically
+    const updates = [];
+    const params = [];
+    let paramCount = 0;
+    
+    if (name !== undefined && name !== currentWorkbook.name) {
+      // Check if new name already exists
+      const nameCheck = await query(
+        'SELECT id FROM workbooks WHERE LOWER(name) = LOWER($1) AND id != $2::uuid',
+        [name, id]
+      );
+      if (nameCheck.rows.length > 0) {
+        return res.status(409).json({
+          success: false,
+          error: `Workbook with name "${name}" already exists`
+        });
+      }
+      paramCount++;
+      updates.push(`name = $${paramCount}`);
+      params.push(name);
+    }
+    
+    if (title !== undefined) {
+      paramCount++;
+      updates.push(`title = $${paramCount}`);
+      params.push(title);
+    }
+    
+    if (type_id !== undefined) {
+      const validTypes = ['architect', 'alchemist', 'mixed'];
+      if (!validTypes.includes(type_id)) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid type_id. Must be one of: ${validTypes.join(', ')}`
+        });
+      }
+      paramCount++;
+      updates.push(`type_id = $${paramCount}`);
+      params.push(type_id);
+    }
+    
+    if (tier !== undefined) {
+      const validTiers = ['free', 'basic', 'standard', 'pro', 'elite'];
+      if (!validTiers.includes(tier)) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid tier. Must be one of: ${validTiers.join(', ')}`
+        });
+      }
+      paramCount++;
+      updates.push(`tier = $${paramCount}`);
+      params.push(tier);
+    }
+    
+    if (updates.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No updates provided. Send name, title, type_id, or tier to update.'
+      });
+    }
+    
+    // Add workbook ID as the last parameter
+    paramCount++;
+    params.push(id);
+    
+    const result = await query(
+      `UPDATE workbooks 
+       SET ${updates.join(', ')}
+       WHERE id = $${paramCount}::uuid
+       RETURNING id, name, title, type_id, tier, created_at`,
+      params
+    );
+    
+    const updatedWorkbook = result.rows[0];
+    
+    console.log(`✅ [Admin] Workbook updated: ${updatedWorkbook.name}`);
+    console.log(`   New type_id: ${updatedWorkbook.type_id}`);
+    console.log(`   New tier: ${updatedWorkbook.tier}`);
+    
+    res.json({
+      success: true,
+      message: 'Workbook updated successfully',
+      workbook: {
+        id: updatedWorkbook.id,
+        name: updatedWorkbook.name,
+        title: updatedWorkbook.title,
+        typeId: updatedWorkbook.type_id,
+        tier: updatedWorkbook.tier,
+        createdAt: updatedWorkbook.created_at
+      },
+      changes: {
+        name: name !== undefined ? { from: currentWorkbook.name, to: name } : undefined,
+        title: title !== undefined ? { from: currentWorkbook.title, to: title } : undefined,
+        typeId: type_id !== undefined ? { from: currentWorkbook.type_id, to: type_id } : undefined,
+        tier: tier !== undefined ? { from: currentWorkbook.tier, to: tier } : undefined
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ [Admin] Update workbook error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update workbook'
+    });
+  }
+};
+
+/**
  * Get user's full quiz results with answers
  * GET /api/admin/users/:id/quiz-results
  */
@@ -943,6 +1080,543 @@ exports.getUserQuizResults = async (req, res) => {
       success: false, 
       error: 'Failed to get quiz results'
     });
+  }
+};
+
+/**
+ * ============================================
+ * UCWS Content Management
+ * ============================================
+ */
+
+/** Get all programs (admin) - GET /api/admin/lms/programs */
+exports.getPrograms = async (req, res) => {
+  try {
+    const { rows } = await query('SELECT * FROM programs ORDER BY display_order');
+    res.json({ success: true, programs: rows });
+  } catch (error) {
+    console.error('❌ [Admin] getPrograms error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch programs' });
+  }
+};
+
+/** POST /api/admin/lms/programs - action: create | update | delete */
+exports.createProgram = async (req, res) => {
+  const action = req.body?.action;
+  if (!action || !['create', 'update', 'delete'].includes(action)) {
+    return res.status(400).json({ success: false, error: 'Invalid action' });
+  }
+
+  try {
+    if (action === 'create') {
+      const { name, title, description, tier, display_order, is_active, icon_url } = req.body;
+      if (!name || !title) {
+        return res.status(400).json({ success: false, error: 'name and title are required' });
+      }
+      const { rows } = await query(
+        `INSERT INTO programs (name, title, description, tier, display_order, is_active, icon_url)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+        [
+          name,
+          title || null,
+          description ?? null,
+          tier ?? 'free',
+          display_order != null ? display_order : 0,
+          is_active !== false,
+          icon_url ?? null
+        ]
+      );
+      return res.status(201).json({ success: true, program: rows[0] });
+    }
+
+    if (action === 'update') {
+      const { id, name, title, description, tier, display_order, is_active, icon_url } = req.body;
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'id is required for update' });
+      }
+      const { rows } = await query(
+        `UPDATE programs SET
+           name = COALESCE($2, name),
+           title = COALESCE($3, title),
+           description = $4,
+           tier = COALESCE($5, tier),
+           display_order = COALESCE($6, display_order),
+           is_active = COALESCE($7, is_active),
+           icon_url = $8,
+           updated_at = NOW()
+         WHERE id = $1::uuid RETURNING *`,
+        [id, name, title, description ?? null, tier, display_order, is_active, icon_url ?? null]
+      );
+      if (rows.length === 0) {
+        return res.status(404).json({ success: false, error: 'Program not found' });
+      }
+      return res.json({ success: true, program: rows[0] });
+    }
+
+    if (action === 'delete') {
+      const { id } = req.body;
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'id is required for delete' });
+      }
+      await query(
+        `DELETE FROM content_items WHERE lesson_id IN
+         (SELECT id FROM lessons WHERE module_id IN
+          (SELECT id FROM modules WHERE program_id = $1::uuid))`,
+        [id]
+      );
+      await query(
+        `DELETE FROM lessons WHERE module_id IN
+         (SELECT id FROM modules WHERE program_id = $1::uuid)`,
+        [id]
+      );
+      await query('DELETE FROM modules WHERE program_id = $1::uuid', [id]);
+      await query('DELETE FROM programs WHERE id = $1::uuid', [id]);
+      return res.json({ success: true });
+    }
+  } catch (error) {
+    console.error('❌ [Admin] createProgram error:', error);
+    return res.status(500).json({ success: false, error: 'Failed to perform program action' });
+  }
+};
+
+/** POST /api/admin/lms/modules - action: create | update | delete */
+exports.createModule = async (req, res) => {
+  const action = req.body?.action;
+  if (!action || !['create', 'update', 'delete'].includes(action)) {
+    return res.status(400).json({ success: false, error: 'Invalid action' });
+  }
+
+  try {
+    if (action === 'create') {
+      const { program_id, title, description, display_order, is_active } = req.body;
+      if (!program_id || !title) {
+        return res.status(400).json({ success: false, error: 'program_id and title are required' });
+      }
+      const { rows } = await query(
+        `INSERT INTO modules (program_id, title, description, display_order, is_active)
+         VALUES ($1::uuid, $2, $3, $4, $5) RETURNING *`,
+        [program_id, title, description ?? null, display_order != null ? display_order : 0, is_active !== false]
+      );
+      return res.status(201).json({ success: true, module: rows[0] });
+    }
+
+    if (action === 'update') {
+      const { id, program_id, title, description, display_order, is_active } = req.body;
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'id is required for update' });
+      }
+      const { rows } = await query(
+        `UPDATE modules SET
+           program_id = COALESCE($2::uuid, program_id),
+           title = COALESCE($3, title),
+           description = $4,
+           display_order = COALESCE($5, display_order),
+           is_active = COALESCE($6, is_active),
+           updated_at = NOW()
+         WHERE id = $1::uuid RETURNING *`,
+        [id, program_id, title, description ?? null, display_order, is_active]
+      );
+      if (rows.length === 0) {
+        return res.status(404).json({ success: false, error: 'Module not found' });
+      }
+      return res.json({ success: true, module: rows[0] });
+    }
+
+    if (action === 'delete') {
+      const { id } = req.body;
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'id is required for delete' });
+      }
+      await query(
+        `DELETE FROM content_items WHERE lesson_id IN
+         (SELECT id FROM lessons WHERE module_id = $1::uuid)`,
+        [id]
+      );
+      await query('DELETE FROM lessons WHERE module_id = $1::uuid', [id]);
+      await query('DELETE FROM modules WHERE id = $1::uuid', [id]);
+      return res.json({ success: true });
+    }
+  } catch (error) {
+    console.error('❌ [Admin] createModule error:', error);
+    return res.status(500).json({ success: false, error: 'Failed to perform module action' });
+  }
+};
+
+/** POST /api/admin/lms/lessons - action: create | update | delete */
+exports.createLesson = async (req, res) => {
+  const action = req.body?.action;
+  if (!action || !['create', 'update', 'delete'].includes(action)) {
+    return res.status(400).json({ success: false, error: 'Invalid action' });
+  }
+
+  try {
+    if (action === 'create') {
+      const { module_id, title, description, display_order, is_active, icon_url } = req.body;
+      if (!module_id || !title) {
+        return res.status(400).json({ success: false, error: 'module_id and title are required' });
+      }
+      const { rows } = await query(
+        `INSERT INTO lessons (module_id, title, description, display_order, is_active, icon_url)
+         VALUES ($1::uuid, $2, $3, $4, $5, $6) RETURNING *`,
+        [module_id, title, description ?? null, display_order != null ? display_order : 0, is_active !== false, icon_url ?? null]
+      );
+      return res.status(201).json({ success: true, lesson: rows[0] });
+    }
+
+    if (action === 'update') {
+      const { id, module_id, title, description, display_order, is_active, icon_url } = req.body;
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'id is required for update' });
+      }
+      const { rows } = await query(
+        `UPDATE lessons SET
+           module_id = COALESCE($2::uuid, module_id),
+           title = COALESCE($3, title),
+           description = $4,
+           display_order = COALESCE($5, display_order),
+           is_active = COALESCE($6, is_active),
+           icon_url = $7,
+           updated_at = NOW()
+         WHERE id = $1::uuid RETURNING *`,
+        [id, module_id, title, description ?? null, display_order, is_active, icon_url ?? null]
+      );
+      if (rows.length === 0) {
+        return res.status(404).json({ success: false, error: 'Lesson not found' });
+      }
+      return res.json({ success: true, lesson: rows[0] });
+    }
+
+    if (action === 'delete') {
+      const { id } = req.body;
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'id is required for delete' });
+      }
+      await query('DELETE FROM content_items WHERE lesson_id = $1::uuid', [id]);
+      await query('DELETE FROM lessons WHERE id = $1::uuid', [id]);
+      return res.json({ success: true });
+    }
+  } catch (error) {
+    console.error('❌ [Admin] createLesson error:', error);
+    return res.status(500).json({ success: false, error: 'Failed to perform lesson action' });
+  }
+};
+
+/** POST /api/admin/lms/content-items - action: create | update | delete */
+exports.createContentItem = async (req, res) => {
+  const action = req.body?.action;
+  if (!action || !['create', 'update', 'delete'].includes(action)) {
+    return res.status(400).json({ success: false, error: 'Invalid action' });
+  }
+
+  try {
+    if (action === 'create') {
+      const { lesson_id, content_type, title, description, display_order, metadata } = req.body;
+      if (!lesson_id || !content_type || !title) {
+        return res.status(400).json({ success: false, error: 'lesson_id, content_type and title are required' });
+      }
+      const validTypes = ['video', 'workbook', 'textbook', 'file', 'quiz'];
+      if (!validTypes.includes(content_type)) {
+        return res.status(400).json({ success: false, error: `content_type must be one of: ${validTypes.join(', ')}` });
+      }
+      let finalMetadata = metadata;
+      if (typeof metadata === 'string') {
+        try {
+          finalMetadata = JSON.parse(metadata);
+        } catch (e) {
+          return res.status(400).json({ success: false, error: 'metadata must be valid JSON' });
+        }
+      }
+      if (finalMetadata === undefined) finalMetadata = {};
+      const { rows } = await query(
+        `INSERT INTO content_items (lesson_id, content_type, title, description, display_order, metadata)
+         VALUES ($1::uuid, $2, $3, $4, $5, $6) RETURNING *`,
+        [
+          lesson_id,
+          content_type,
+          title,
+          description ?? null,
+          display_order != null ? display_order : 0,
+          JSON.stringify(finalMetadata)
+        ]
+      );
+      return res.status(201).json({ success: true, contentItem: rows[0] });
+    }
+
+    if (action === 'update') {
+      const { id, lesson_id, title, description, display_order, metadata } = req.body;
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'id is required for update' });
+      }
+      const updates = [];
+      const params = [];
+      let p = 1;
+      if (req.body.hasOwnProperty('lesson_id')) {
+        updates.push(`lesson_id = $${p++}::uuid`);
+        params.push(lesson_id);
+      }
+      if (req.body.hasOwnProperty('title')) {
+        updates.push(`title = $${p++}`);
+        params.push(title);
+      }
+      if (req.body.hasOwnProperty('description')) {
+        updates.push(`description = $${p++}`);
+        params.push(description);
+      }
+      if (req.body.hasOwnProperty('display_order')) {
+        updates.push(`display_order = $${p++}`);
+        params.push(display_order);
+      }
+      if (req.body.hasOwnProperty('metadata')) {
+        updates.push(`metadata = $${p++}`);
+        const meta = typeof metadata === 'string' ? (() => { try { return JSON.parse(metadata); } catch (e) { return metadata; } })() : metadata;
+        params.push(meta !== undefined && meta !== null ? JSON.stringify(meta) : null);
+      }
+      if (updates.length === 0) {
+        const { rows } = await query(
+          'UPDATE content_items SET updated_at = NOW() WHERE id = $1::uuid RETURNING *',
+          [id]
+        );
+        if (rows.length === 0) {
+          return res.status(404).json({ success: false, error: 'Content item not found' });
+        }
+        return res.json({ success: true, contentItem: rows[0] });
+      }
+      updates.push('updated_at = NOW()');
+      params.push(id);
+      const { rows } = await query(
+        `UPDATE content_items SET ${updates.join(', ')} WHERE id = $${p}::uuid RETURNING *`,
+        params
+      );
+      if (rows.length === 0) {
+        return res.status(404).json({ success: false, error: 'Content item not found' });
+      }
+      return res.json({ success: true, contentItem: rows[0] });
+    }
+
+    if (action === 'delete') {
+      const { id } = req.body;
+      if (!id) {
+        return res.status(400).json({ success: false, error: 'id is required for delete' });
+      }
+      await query('DELETE FROM content_items WHERE id = $1::uuid', [id]);
+      return res.json({ success: true });
+    }
+  } catch (error) {
+    console.error('❌ [Admin] createContentItem error:', error);
+    return res.status(500).json({ success: false, error: 'Failed to perform content item action' });
+  }
+};
+
+/**
+ * Create UCWS user - POST /api/admin/lms/users/ucws
+ * Creates a user in the app users table with user_type = 'ucws'.
+ * When cognito_sub is provided (from admin portal after Cognito user creation), use it as the user id
+ * so the same id is used when the user logs in from the iOS app (Cognito sub), avoiding duplicate-email errors.
+ * Password is not stored in users (Cognito or separate auth); accepted in body for client compatibility.
+ * Optionally grants program access via user_program_access when program_id is provided.
+ *
+ * Body: email (required), name, password, program_id, cognito_sub (optional), user_type (optional; default 'ucws').
+ */
+exports.createUcwsUser = async (req, res) => {
+  try {
+    const { email, password, name, program_id, cognito_sub, user_type: bodyUserType } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'email is required' });
+    }
+    // name optional; password accepted but not stored in users table
+    const userType = bodyUserType || 'ucws';
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, error: 'Invalid email format' });
+    }
+
+    // If cognito_sub provided, validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (cognito_sub != null && cognito_sub !== '' && !uuidRegex.test(String(cognito_sub).trim())) {
+      return res.status(400).json({ success: false, error: 'cognito_sub must be a valid UUID' });
+    }
+
+    const useCognitoSub = cognito_sub != null && String(cognito_sub).trim() !== '';
+    let rows;
+
+    if (useCognitoSub) {
+      const sub = String(cognito_sub).trim();
+      const result = await query(
+        `INSERT INTO users (id, email, name, user_type, created_at, updated_at)
+         VALUES ($1::uuid, $2, $3, $4, NOW(), NOW())
+         ON CONFLICT (email) DO UPDATE SET
+           name = COALESCE(NULLIF(EXCLUDED.name, ''), users.name),
+           user_type = EXCLUDED.user_type,
+           updated_at = NOW()
+         RETURNING id, email, name, user_type, type_id, tier, created_at, updated_at`,
+        [sub, email, name || '', userType]
+      );
+      rows = result.rows;
+    } else {
+      const result = await query(
+        `INSERT INTO users (id, email, name, user_type, created_at, updated_at)
+         VALUES (gen_random_uuid(), $1, $2, $3, NOW(), NOW())
+         ON CONFLICT (email) DO UPDATE SET
+           name = COALESCE(NULLIF(EXCLUDED.name, ''), users.name),
+           user_type = EXCLUDED.user_type,
+           updated_at = NOW()
+         RETURNING id, email, name, user_type, type_id, tier, created_at, updated_at`,
+        [email, name || '', userType]
+      );
+      rows = result.rows;
+    }
+
+    const user = rows[0];
+
+    if (program_id) {
+      await query(
+        `INSERT INTO user_program_access (user_id, program_id) VALUES ($1::uuid, $2::uuid)
+         ON CONFLICT (user_id, program_id) DO NOTHING`,
+        [user.id, program_id]
+      );
+    }
+
+    console.log(`✅ [Admin] UCWS user created: ${user.email} (${user.id}), user_type=${user.user_type}${useCognitoSub ? ', id=cognito_sub' : ''}`);
+    res.status(201).json({
+      success: true,
+      message: 'UCWS user created',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        userType: user.user_type,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at
+      }
+    });
+  } catch (error) {
+    console.error('❌ [Admin] createUcwsUser error:', error);
+    res.status(500).json({ success: false, error: 'Failed to create UCWS user' });
+  }
+};
+
+/** Get modules for a program - GET .../modules?programId=<uuid> OR GET .../programs/:programId/modules */
+exports.getModules = async (req, res) => {
+  const programId = req.params.programId || req.query.programId;
+
+  if (!programId) {
+    return res.status(400).json({ success: false, error: 'programId is required (path or query)' });
+  }
+
+  try {
+    const result = await query(
+      `SELECT * FROM modules
+       WHERE program_id = $1::uuid
+       ORDER BY display_order`,
+      [programId]
+    );
+
+    res.json({
+      success: true,
+      modules: result.rows
+    });
+  } catch (error) {
+    console.error('❌ [Admin] getModules error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch modules' });
+  }
+};
+
+/** Get lessons for a module - GET .../lessons?moduleId=<uuid> OR GET .../modules/:moduleId/lessons */
+exports.getLessons = async (req, res) => {
+  const moduleId = req.params.moduleId || req.query.moduleId;
+
+  if (!moduleId) {
+    return res.status(400).json({ success: false, error: 'moduleId is required (path or query)' });
+  }
+
+  try {
+    const userId = req.userId || req.user?.id;
+    let result;
+    if (userId) {
+      result = await query(
+        `SELECT
+          l.*,
+          (ulc.user_id IS NOT NULL) AS is_completed,
+          COALESCE(l.icon_url, ci.metadata->>'icon_url') AS icon_url
+         FROM lessons l
+         LEFT JOIN user_lesson_completions ulc ON ulc.lesson_id = l.id AND ulc.user_id = $2::uuid
+         LEFT JOIN (
+           SELECT DISTINCT ON (lesson_id) lesson_id, metadata
+           FROM content_items
+           WHERE content_type = 'video' AND metadata->>'icon_url' IS NOT NULL
+           ORDER BY lesson_id, display_order
+         ) ci ON ci.lesson_id = l.id
+         WHERE l.module_id = $1::uuid
+         ORDER BY l.display_order`,
+        [moduleId, userId]
+      );
+    } else {
+      result = await query(
+        `SELECT l.*, false AS is_completed,
+          COALESCE(l.icon_url, ci.metadata->>'icon_url') AS icon_url
+         FROM lessons l
+         LEFT JOIN (
+           SELECT DISTINCT ON (lesson_id) lesson_id, metadata
+           FROM content_items
+           WHERE content_type = 'video' AND metadata->>'icon_url' IS NOT NULL
+           ORDER BY lesson_id, display_order
+         ) ci ON ci.lesson_id = l.id
+         WHERE l.module_id = $1::uuid
+         ORDER BY l.display_order`,
+        [moduleId]
+      );
+    }
+
+    const lessons = result.rows.map((row) => {
+      const { is_completed, ...lesson } = row;
+      return { ...lesson, is_completed: Boolean(is_completed) };
+    });
+
+    res.json({
+      success: true,
+      lessons
+    });
+  } catch (error) {
+    console.error('❌ [Admin] getLessons error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch lessons' });
+  }
+};
+
+/** Get content items for a lesson - GET .../content-items?lessonId=<uuid> OR GET .../lessons/:lessonId/content-items */
+exports.getContentItems = async (req, res) => {
+  const lessonId = req.params.lessonId || req.query.lessonId;
+
+  if (!lessonId) {
+    return res.status(400).json({ success: false, error: 'lessonId is required (path or query)' });
+  }
+
+  try {
+    const result = await query(
+      `SELECT * FROM content_items
+       WHERE lesson_id = $1::uuid
+       ORDER BY display_order`,
+      [lessonId]
+    );
+
+    const items = result.rows.map((row) => {
+      const meta = typeof row.metadata === 'object' ? row.metadata : (row.metadata ? (typeof row.metadata === 'string' ? (() => { try { return JSON.parse(row.metadata); } catch (_) { return {}; } })() : {}) : {});
+      return {
+        ...row,
+        metadata: meta,
+        icon_url: meta?.icon_url ?? null,
+      };
+    });
+    console.log(`✅ [Admin] getContentItems: lessonId=${lessonId}, count=${items.length}`);
+
+    res.json({
+      success: true,
+      contentItems: items,
+      content_items: items
+    });
+  } catch (error) {
+    console.error('❌ [Admin] getContentItems error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch content items' });
   }
 };
 
