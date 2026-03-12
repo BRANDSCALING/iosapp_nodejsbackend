@@ -22,6 +22,7 @@ router.get('/stats', adminAuth, adminController.getStats);
 
 router.get('/users', adminAuth, adminController.getUsers);
 router.get('/users/:id', adminAuth, adminController.getUserDetails);
+router.delete('/users/:id', adminAuth, adminController.deleteUser);
 router.get('/users/:id/edna', adminAuth, adminController.getUserEdnaProfile);
 router.get('/users/:id/workbooks', adminAuth, adminController.getUserWorkbooks);
 router.get('/users/:id/quiz-results', adminAuth, adminController.getUserQuizResults);

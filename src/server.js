@@ -109,6 +109,7 @@ app.use('/api/user/workbooks', workbooksRoutes);
 app.use(`/api/${API_VERSION}/lms`, lmsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/users', userRoutes);
+app.use(`/api/${API_VERSION}/users`, userRoutes);
 
 // Admin Routes
 app.use('/api/admin/auth', adminAuthRoutes);

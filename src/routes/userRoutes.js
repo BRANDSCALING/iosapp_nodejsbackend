@@ -28,7 +28,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const { query } = require('../config/database');
+const { query, getClient } = require('../config/database');
 
 /**
  * Auth for "current user" endpoints.
@@ -62,6 +62,64 @@ const requireAuth = (req, res, next) => {
 };
 
 // ========== /me/... routes MUST be first (before any /:param routes) ==========
+
+/**
+ * DELETE /api/v1/users/me (also /api/user/me and /api/users/me)
+ * Permanently delete the authenticated user's account and all associated data.
+ * Requires auth. Returns 200 OK on success.
+ */
+router.delete('/me', requireAuth, async (req, res) => {
+  const userId = req.userId;
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+    // Quiz and E-DNA data (no FK CASCADE from users): delete by user_id
+    await client.query(
+      `DELETE FROM user_quiz_progress WHERE session_id IN (SELECT id FROM quiz_sessions WHERE LOWER(user_id::text) = LOWER($1))`,
+      [userId]
+    );
+    await client.query(
+      `DELETE FROM user_quiz_results WHERE session_id IN (SELECT id FROM quiz_sessions WHERE LOWER(user_id::text) = LOWER($1))`,
+      [userId]
+    );
+    await client.query(
+      'DELETE FROM quiz_sessions WHERE LOWER(user_id::text) = LOWER($1)',
+      [userId]
+    );
+    try {
+      await client.query(
+        'DELETE FROM edna_profiles WHERE LOWER(user_id::text) = LOWER($1)',
+        [userId]
+      );
+    } catch (err) {
+      if (err.code !== '42P01') throw err; // 42P01 = undefined_table, ignore if missing
+    }
+    // User row: CASCADE will remove user_program_access, lesson_progress, user_lesson_completions, workbook_instances, agent_sessions
+    const deleteUser = await client.query(
+      'DELETE FROM users WHERE LOWER(id::text) = LOWER($1) RETURNING id',
+      [userId]
+    );
+    if (deleteUser.rowCount === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({
+        success: false,
+        error: 'User not found.',
+      });
+    }
+    await client.query('COMMIT');
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    console.error('❌ [Delete Account] Error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to delete account',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  } finally {
+    client.release();
+  }
+});
 
 /**
  * GET /api/user/me/quiz-status (also /api/users/me/quiz-status)

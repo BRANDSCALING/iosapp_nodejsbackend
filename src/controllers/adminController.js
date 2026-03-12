@@ -3,7 +3,7 @@
  * Handles user management and dashboard stats for admin portal
  */
 
-const { query } = require('../config/database');
+const { query, getClient } = require('../config/database');
 
 /**
  * Get all users with pagination and filtering
@@ -193,6 +193,65 @@ exports.getUserDetails = async (req, res) => {
       success: false,
       error: 'Failed to get user details'
     });
+  }
+};
+
+/**
+ * Delete a user and all associated data (admin only).
+ * DELETE /api/admin/users/:id
+ */
+exports.deleteUser = async (req, res) => {
+  const userId = req.params.id;
+  if (!userId) {
+    return res.status(400).json({ success: false, error: 'User id is required' });
+  }
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+    await client.query(
+      `DELETE FROM user_quiz_progress WHERE session_id IN (SELECT id FROM quiz_sessions WHERE LOWER(user_id::text) = LOWER($1))`,
+      [userId]
+    );
+    await client.query(
+      `DELETE FROM user_quiz_results WHERE session_id IN (SELECT id FROM quiz_sessions WHERE LOWER(user_id::text) = LOWER($1))`,
+      [userId]
+    );
+    await client.query(
+      'DELETE FROM quiz_sessions WHERE LOWER(user_id::text) = LOWER($1)',
+      [userId]
+    );
+    try {
+      await client.query(
+        'DELETE FROM edna_profiles WHERE LOWER(user_id::text) = LOWER($1)',
+        [userId]
+      );
+    } catch (err) {
+      if (err.code !== '42P01') throw err;
+    }
+    const deleteUserResult = await client.query(
+      'DELETE FROM users WHERE LOWER(id::text) = LOWER($1) RETURNING id',
+      [userId]
+    );
+    if (deleteUserResult.rowCount === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({
+        success: false,
+        error: 'User not found.',
+      });
+    }
+    await client.query('COMMIT');
+    console.log(`✅ [Admin] User deleted: ${userId}`);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
+    console.error('❌ [Admin] deleteUser error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to delete user',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  } finally {
+    client.release();
   }
 };
 
