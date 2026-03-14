@@ -1378,79 +1378,39 @@ exports.getResults = async (req, res, next) => {
       });
     }
 
-    const data = result.rows[0];
+    const dbResult = result.rows[0];
+
+    // Parse JSON string fields back into objects before sending to client
+    const layerResultFields = ['layer3_result', 'layer4_result', 'layer5_result', 'layer6_result', 'layer7_result'];
+
+    const finalResult = { ...dbResult };
+
+    layerResultFields.forEach(field => {
+      if (finalResult[field] && typeof finalResult[field] === 'string') {
+        try {
+          finalResult[field] = JSON.parse(finalResult[field]);
+          console.log(`✅ [API] Successfully parsed ${field} into object.`);
+        } catch (e) {
+          console.error(`❌ [API] Failed to parse ${field}:`, e.message);
+          // Leave as string if parsing fails, do not crash
+        }
+      }
+    });
 
     // Log what layers have data
     console.log(`✅ [API] Returning complete results for user: ${userId}`);
-    console.log(`   Layer 1: ${data.layer1_core_type || 'N/A'} (${data.layer1_strength || 'N/A'})`);
-    console.log(`   Layer 2: ${data.layer2_subtype || 'N/A'}`);
-    console.log(`   Layer 3: ${data.layer3_integration || 'N/A'} (${data.layer3_integration_percent || 0}%)`);
-    console.log(`   Layer 4: ${data.layer4_modality_preference || 'N/A'}`);
-    console.log(`   Layer 5: ${data.layer5_status || 'N/A'}`);
-    console.log(`   Layer 6: Mindset=${data.layer6_mindset ? 'Present' : 'N/A'}`);
-    console.log(`   Layer 7: Faith=${data.layer7_faith_orientation || 'N/A'}`);
+    console.log(`   Layer 1: ${finalResult.layer1_core_type || 'N/A'} (${finalResult.layer1_strength || 'N/A'})`);
+    console.log(`   Layer 2: ${finalResult.layer2_subtype || 'N/A'}`);
+    console.log(`   Layer 3: ${finalResult.layer3_integration || 'N/A'} (${finalResult.layer3_integration_percent || 0}%)`);
+    console.log(`   Layer 4: ${finalResult.layer4_modality_preference || 'N/A'}`);
+    console.log(`   Layer 5: ${finalResult.layer5_status || 'N/A'}`);
+    console.log(`   Layer 6: Mindset=${finalResult.layer6_mindset ? 'Present' : 'N/A'}`);
+    console.log(`   Layer 7: Faith=${finalResult.layer7_faith_orientation || 'N/A'}`);
 
-    // Format response with all 7 layers in camelCase for iOS
     res.json({
       success: true,
       userId,
-      results: {
-        id: data.id,
-        sessionId: data.session_id,
-        
-        // Layer 1: Core Identity
-        layer1CoreType: data.layer1_core_type,
-        layer1Strength: data.layer1_strength,
-        layer1ArchitectScore: data.layer1_architect_score,
-        layer1AlchemistScore: data.layer1_alchemist_score,
-        layer1DecisionLoop: data.layer1_decision_loop,
-        layer1DecisionProcess: data.layer1_decision_process,
-        
-        // Layer 2: Subtype
-        layer2Subtype: data.layer2_subtype,
-        layer2Description: data.layer2_description,
-        layer2Strength: data.layer2_strength,
-        layer2BlindSpot: data.layer2_blind_spot,
-        
-        // Layer 3: Mirror Awareness
-        layer3Integration: data.layer3_integration,
-        layer3IntegrationPercent: data.layer3_integration_percent,
-        layer3Description: data.layer3_description,
-        layer3Result: data.layer3_result,
-        
-        // Layer 4: Learning Style
-        layer4ModalityPreference: data.layer4_modality_preference,
-        layer4Approach: data.layer4_approach,
-        layer4ConceptProcessing: data.layer4_concept_processing,
-        layer4WorkingEnvironment: data.layer4_working_environment,
-        layer4Pace: data.layer4_pace,
-        layer4Result: data.layer4_result,
-        
-        // Layer 5: Neurodiversity
-        layer5Status: data.layer5_status,
-        layer5Description: data.layer5_description,
-        layer5Traits: data.layer5_traits,
-        layer5Result: data.layer5_result,
-        
-        // Layer 6: Mindset & Personality
-        layer6Mindset: data.layer6_mindset,
-        layer6Personality: data.layer6_personality,
-        layer6Communication: data.layer6_communication,
-        layer6Result: data.layer6_result,
-        
-        // Layer 7: Meta-Beliefs
-        layer7FaithOrientation: data.layer7_faith_orientation,
-        layer7ControlOrientation: data.layer7_control_orientation,
-        layer7Fairness: data.layer7_fairness,
-        layer7Integrity: data.layer7_integrity,
-        layer7Growth: data.layer7_growth,
-        layer7Impact: data.layer7_impact,
-        layer7Result: data.layer7_result,
-        
-        // Metadata
-        completedAt: data.completed_at,
-        retakeAvailableAt: data.retake_available_at
-      }
+      results: finalResult
     });
 
   } catch (error) {
