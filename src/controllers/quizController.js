@@ -802,7 +802,8 @@ exports.syncAnswers = async (req, res, next) => {
   try {
     if (handleValidationErrors(req, res)) return;
 
-    const { userId, sessionId, answers } = req.body;
+    const { userId, pendingAnswers, sessionId } = req.body;
+    const answers = pendingAnswers || [];
 
     let synced = 0;
     let failed = 0;
@@ -821,7 +822,7 @@ exports.syncAnswers = async (req, res, next) => {
 
         await query(queryText, [
           userId,
-          sessionId,
+          answer.sessionId || sessionId,
           answer.questionId,
           answer.selectedOptionId,
           answer.layerNumber,
@@ -1361,7 +1362,7 @@ exports.getResults = async (req, res, next) => {
         layer7_result,
         
         -- Metadata
-        completed_at, retake_available_at
+        completed_at, retake_available_at, full_result_purchased
       FROM user_quiz_results
       WHERE LOWER(user_id::text) = LOWER($1)
       ORDER BY completed_at DESC
@@ -1458,7 +1459,8 @@ exports.getResults = async (req, res, next) => {
         
         // Metadata
         completedAt: data.completed_at,
-        retakeAvailableAt: data.retake_available_at
+        retakeAvailableAt: data.retake_available_at,
+        fullResultPurchased: data.full_result_purchased || false
       }
     });
 

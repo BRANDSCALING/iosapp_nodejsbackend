@@ -56,11 +56,7 @@ const validateProgressSave = [
 
 const validateSync = [
   body('userId').notEmpty().withMessage('User ID is required'),
-  body('sessionId').notEmpty().withMessage('Session ID is required'),
-  body('answers').isArray().withMessage('Answers must be an array'),
-  body('answers.*.questionId').isInt().withMessage('Question ID must be an integer'),
-  body('answers.*.selectedOptionId').isInt().withMessage('Selected option ID must be an integer'),
-  body('answers.*.layerNumber').isInt({ min: 1, max: 7 }).withMessage('Layer number must be between 1 and 7')
+  body('pendingAnswers').isArray().withMessage('Pending answers must be an array')
 ];
 
 const validateResultsSave = [
