@@ -96,7 +96,8 @@ exports.getProgramContent = async (req, res) => {
           p.icon_url AS program_icon_url, p.tier AS program_tier, p.display_order AS program_order,
           m.id AS module_id, m.title AS module_title, m.display_order AS module_order,
           l.id AS lesson_id, l.title AS lesson_title, l.display_order AS lesson_order,
-          l.icon_url AS lesson_icon_url,
+          l.icon_url AS lesson_icon_url, l.video_url AS lesson_video_url,
+          l.downloadable_files AS lesson_downloadable_files,
           ci.id AS item_id, ci.title AS item_title, ci.content_type AS item_content_type,
           ci.metadata AS item_metadata, ci.display_order AS item_order,
           (CASE WHEN ulc.user_id IS NOT NULL THEN true ELSE false END) AS is_completed
@@ -167,6 +168,16 @@ exports.getProgramContent = async (req, res) => {
             displayOrder: r.lesson_order,
             iconUrl: r.lesson_icon_url ?? null,
             isCompleted: Boolean(r.is_completed),
+            videoURL: r.lesson_video_url ?? null,
+            downloadableFiles: (() => {
+              const raw = r.lesson_downloadable_files;
+              if (!raw) return [];
+              if (Array.isArray(raw)) return raw;
+              if (typeof raw === 'string') {
+                try { return JSON.parse(raw); } catch (_) { return []; }
+              }
+              return [];
+            })(),
             contentItems: [],
           });
         }
