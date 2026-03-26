@@ -23,6 +23,7 @@ const agentRoutes = require('./routes/agentRoutes');
 const userRoutes = require('./routes/userRoutes');
 const lmsRoutes = require('./routes/lmsRoutes');
 const webhooksRoutes = require('./routes/webhooksRoutes');
+const complianceRoutes = require('./routes/complianceRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const rateLimiter = require('./middleware/rateLimiter');
 
@@ -112,6 +113,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/users', userRoutes);
 app.use(`/api/${API_VERSION}/users`, userRoutes);
 app.use(`/api/${API_VERSION}/webhooks`, webhooksRoutes);
+app.use('/api/internal/compliance', complianceRoutes);
 
 // Admin Routes
 app.use('/api/admin/auth', adminAuthRoutes);
