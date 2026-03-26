@@ -95,7 +95,7 @@ app.get('/', (req, res) => {
       quiz: `/api/${API_VERSION}/quiz`,
       userProfile: '/api/user/sync-profile',
       workbooks: '/api/user/workbooks',
-      lms: `/api/${API_VERSION}/lms`,
+      lms: '/api/user/lms',
       adminAuth: '/api/admin/auth',
       admin: '/api/admin',
       agentAuth: '/api/agent/auth',
@@ -152,7 +152,7 @@ const server = app.listen(PORT, () => {
   console.log(`   Health Check: http://localhost:${PORT}/health`);
   console.log(`   Quiz API: http://localhost:${PORT}/api/${API_VERSION}/quiz`);
   console.log(`   Workbooks API: http://localhost:${PORT}/api/user/workbooks`);
-  console.log(`   LMS API: http://localhost:${PORT}/api/${API_VERSION}/lms`);
+  console.log(`   LMS API: http://localhost:${PORT}/api/user/lms`);
   console.log(`   Admin Auth: http://localhost:${PORT}/api/admin/auth`);
   console.log(`   Admin API: http://localhost:${PORT}/api/admin`);
   console.log(`   Agent Auth: http://localhost:${PORT}/api/agent/auth`);
