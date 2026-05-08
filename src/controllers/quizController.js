@@ -364,8 +364,8 @@ exports.createSession = async (req, res, next) => {
         console.log(`👤 [Quiz] User not found, creating new user: ${userId}`);
         
         await query(`
-          INSERT INTO users (id, email, name, tier, created_at, updated_at)
-          VALUES ($1, $2, $3, 'free', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          INSERT INTO users (id, email, name, user_type, tier, created_at, updated_at)
+          VALUES ($1, $2, $3, 'brandscaling', 'free', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
           ON CONFLICT (id) DO NOTHING
         `, [userId, email || null, name || null]);
         

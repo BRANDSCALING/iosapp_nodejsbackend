@@ -227,10 +227,10 @@ router.get('/profile', requireAuth, async (req, res) => {
  *   "userId": "cognito-user-id",
  *   "email": "user@example.com",
  *   "name": "User Name",
- *   "source": "ios"   // optional: "ios" → user_type = 'brandscaling'; missing or other → 'ucws'. Only applied on INSERT.
+ *   "source": "ios"   // optional; ignored for user_type (always 'brandscaling' on INSERT).
  * }
  *
- * Rule: user_type is set once (on INSERT from source) and NEVER overwritten on UPDATE.
+ * Rule: user_type is always 'brandscaling' on INSERT and NEVER overwritten on UPDATE.
  */
 router.post('/sync-profile', async (req, res) => {
   const startTime = Date.now();
@@ -272,8 +272,8 @@ router.post('/sync-profile', async (req, res) => {
       });
     }
 
-    // Determine user_type for INSERT only. It will be ignored on UPDATE.
-    const userTypeForInsert = req.body.source === 'ios' ? 'brandscaling' : 'ucws';
+    // user_type for INSERT only; ignored on UPDATE (existing row keeps prior user_type).
+    const userTypeForInsert = 'brandscaling';
 
     const result = await query(
       `INSERT INTO users (id, email, name, user_type, created_at, updated_at)
@@ -415,8 +415,8 @@ router.post('/bulk-sync-profiles', async (req, res) => {
         }
         
         await query(`
-          INSERT INTO users (id, email, name, created_at, updated_at)
-          VALUES ($1::uuid, $2, $3, NOW(), NOW())
+          INSERT INTO users (id, email, name, user_type, created_at, updated_at)
+          VALUES ($1::uuid, $2, $3, 'brandscaling', NOW(), NOW())
           ON CONFLICT (id) 
           DO UPDATE SET 
             email = EXCLUDED.email,

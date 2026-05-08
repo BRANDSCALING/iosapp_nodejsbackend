@@ -1468,22 +1468,22 @@ exports.createContentItem = async (req, res) => {
 
 /**
  * Create UCWS user - POST /api/admin/lms/users/ucws
- * Creates a user in the app users table with user_type = 'ucws'.
+ * Creates a user in the app users table with user_type = 'brandscaling'.
  * When cognito_sub is provided (from admin portal after Cognito user creation), use it as the user id
  * so the same id is used when the user logs in from the iOS app (Cognito sub), avoiding duplicate-email errors.
  * Password is not stored in users (Cognito or separate auth); accepted in body for client compatibility.
  * Optionally grants program access via user_program_access when program_id is provided.
  *
- * Body: email (required), name, password, program_id, cognito_sub (optional), user_type (optional; default 'ucws').
+ * Body: email (required), name, password, program_id, cognito_sub (optional).
  */
 exports.createUcwsUser = async (req, res) => {
   try {
-    const { email, password, name, program_id, cognito_sub, user_type: bodyUserType } = req.body;
+    const { email, password, name, program_id, cognito_sub } = req.body;
     if (!email) {
       return res.status(400).json({ success: false, error: 'email is required' });
     }
     // name optional; password accepted but not stored in users table
-    const userType = bodyUserType || 'ucws';
+    const userType = 'brandscaling';
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
