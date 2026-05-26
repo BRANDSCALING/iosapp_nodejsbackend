@@ -25,6 +25,7 @@ const lmsRoutes = require('./routes/lmsRoutes');
 const webhooksRoutes = require('./routes/webhooksRoutes');
 const authRoutes = require('./routes/authRoutes');
 const complianceRoutes = require('./routes/complianceRoutes');
+const appConfigRoutes = require('./routes/appConfigRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const rateLimiter = require('./middleware/rateLimiter');
 
@@ -101,6 +102,7 @@ app.get('/', (req, res) => {
       admin: '/api/admin',
       agentAuth: '/api/agent/auth',
       agent: '/api/agent',
+      appConfig: '/api/app-config',
       docs: '/api/docs'
     }
   });
@@ -116,6 +118,7 @@ app.use(`/api/${API_VERSION}/users`, userRoutes);
 app.use(`/api/${API_VERSION}/webhooks`, webhooksRoutes);
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
 app.use('/api/internal/compliance', complianceRoutes);
+app.use('/api/app-config', appConfigRoutes);
 
 // Admin Routes
 app.use('/api/admin/auth', adminAuthRoutes);
@@ -159,6 +162,7 @@ const server = app.listen(PORT, () => {
   console.log(`   Admin API: http://localhost:${PORT}/api/admin`);
   console.log(`   Agent Auth: http://localhost:${PORT}/api/agent/auth`);
   console.log(`   Agent API: http://localhost:${PORT}/api/agent`);
+  console.log(`   App Config (iOS): http://localhost:${PORT}/api/app-config/ios`);
   console.log('   ============================================');
   console.log('');
 });
