@@ -26,9 +26,22 @@
  */
 
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { query, getClient } = require('../config/database');
+
+/**
+ * Rate limiter for the unauthenticated email-existence check.
+ * 5 requests per minute per IP. Reveals account existence, so it must be limited.
+ */
+const existsLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'too many requests' },
+});
 
 /**
  * Auth for "current user" endpoints.
@@ -543,6 +556,39 @@ router.put('/profile/:userId', async (req, res) => {
       success: false,
       error: 'Failed to update profile'
     });
+  }
+});
+
+/**
+ * GET /api/users/exists?email=<url-encoded email>
+ *
+ * Pre-login email existence check used by the mobile app before starting a
+ * Cognito password reset. Cognito has "Prevent user existence errors" enabled,
+ * so it cannot distinguish registered from unregistered emails; we use our own
+ * DB as the source of truth.
+ *
+ * No auth (called pre-login). Rate-limited to 5 req/min per IP.
+ * Always returns HTTP 200 for valid lookups so the client never treats a
+ * "not found" as inconclusive. Validation errors → 400, DB errors → 500.
+ */
+router.get('/exists', existsLimiter, async (req, res) => {
+  const rawEmail = req.query.email;
+
+  if (typeof rawEmail !== 'string' || rawEmail.trim() === '') {
+    return res.status(400).json({ error: 'email is required' });
+  }
+
+  const email = rawEmail.trim().toLowerCase();
+
+  try {
+    const result = await query(
+      'SELECT 1 FROM users WHERE LOWER(email) = $1 LIMIT 1',
+      [email]
+    );
+    return res.status(200).json({ exists: result.rows.length > 0 });
+  } catch (error) {
+    console.error('❌ [Users Exists] Error:', error.message);
+    return res.status(500).json({ error: 'internal error' });
   }
 });
 
