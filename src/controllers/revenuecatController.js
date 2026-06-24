@@ -17,19 +17,14 @@ const handleWebhook = async (req, res) => {
         if (event.entitlement_ids && event.entitlement_ids.includes(entitlementId)) {
             console.log(`✅ [RevenueCat] Entitlement '${entitlementId}' granted to user: ${appUserId}`);
 
-            // Update the user's tier in the 'users' table to 'basic'
-            const updateUserTierResult = await query(
-                `UPDATE users SET tier = 'basic', updated_at = NOW() WHERE id = $1`,
-                [appUserId]
-            );
-
-            if (updateUserTierResult.rowCount > 0) {
-                console.log(`💾 [DB] User ${appUserId} tier updated to 'basic'.`);
-            } else {
-                console.warn(`⚠️ [DB] User with ID ${appUserId} not found in 'users' table for tier update.`);
-            }
-
-            // Also update the 'user_quiz_results' table for consistency
+            // NOTE: This is the £9.99 one-time "Full Detailed Report" purchase — a NON-CONSUMABLE
+            // unlock, NOT a subscription. It must ONLY set full_result_purchased; it must NOT grant
+            // the 'basic' subscription tier (that's sold separately on the website). Setting tier here
+            // would unintentionally unlock tier-gated content the user didn't pay for. The previous
+            // `UPDATE users SET tier = 'basic'` was intentionally removed for this reason.
+            //
+            // appUserId is the RevenueCat app user id, which the iOS app sets to the user's UPPERCASED
+            // cognito id — the same value stored in user_quiz_results.user_id — so this match works.
             const updateQuizResult = await query(
                 `UPDATE user_quiz_results SET full_result_purchased = true WHERE user_id = $1`,
                 [appUserId]
@@ -37,6 +32,8 @@ const handleWebhook = async (req, res) => {
 
             if (updateQuizResult.rowCount > 0) {
                 console.log(`💾 [DB] user_quiz_results.full_result_purchased set for user ${appUserId}.`);
+            } else {
+                console.warn(`⚠️ [DB] No user_quiz_results row found for user_id ${appUserId} (report unlock not persisted).`);
             }
 
         } else {
