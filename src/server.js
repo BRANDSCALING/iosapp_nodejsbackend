@@ -27,6 +27,7 @@ const authRoutes = require('./routes/authRoutes');
 const complianceRoutes = require('./routes/complianceRoutes');
 const appConfigRoutes = require('./routes/appConfigRoutes');
 const zoomRoutes = require('./routes/zoomRoutes');
+const { startVimeoSyncScheduler } = require('./services/vimeoSyncService');
 const errorHandler = require('./middleware/errorHandler');
 const rateLimiter = require('./middleware/rateLimiter');
 
@@ -165,8 +166,12 @@ const server = app.listen(PORT, () => {
   console.log(`   Agent Auth: http://localhost:${PORT}/api/agent/auth`);
   console.log(`   Agent API: http://localhost:${PORT}/api/agent`);
   console.log(`   App Config (iOS): http://localhost:${PORT}/api/app-config/ios`);
+  console.log(`   Zoom Recordings API: http://localhost:${PORT}/api/${API_VERSION}/zoom`);
   console.log('   ============================================');
   console.log('');
+
+  // Auto-publish new Vimeo uploads into Zoom Recordings (no-op without VIMEO_ACCESS_TOKEN).
+  startVimeoSyncScheduler();
 });
 
 // Graceful shutdown

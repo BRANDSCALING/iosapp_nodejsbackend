@@ -15,6 +15,7 @@
  */
 
 const { query } = require('../config/database');
+const { syncVimeo } = require('../services/vimeoSyncService');
 
 const CATEGORIES = ['deal_clinic', 'mastermind'];
 const CATEGORY_LABELS = {
@@ -544,5 +545,15 @@ exports.adminSaveItem = async (req, res) => {
     return res.status(400).json({ success: false, error: 'Invalid action. Use create, update, or delete.' });
   } catch (error) {
     return serverError(res, 'adminSaveItem', error);
+  }
+};
+
+// POST /api/admin/zoom/sync-vimeo — pull new videos from the Vimeo folders now.
+exports.adminSyncVimeo = async (req, res) => {
+  try {
+    const summary = await syncVimeo();
+    return res.json({ success: summary.errors.length === 0, ...summary });
+  } catch (error) {
+    return serverError(res, 'adminSyncVimeo', error);
   }
 };

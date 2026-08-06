@@ -83,5 +83,6 @@ router.post('/zoom/recordings', adminAuth, zoomController.adminSaveRecording);
 
 router.get('/zoom/recordings/:id/items', adminAuth, zoomController.adminListItems);
 router.post('/zoom/recording-items', adminAuth, zoomController.adminSaveItem);
+router.post('/zoom/sync-vimeo', adminAuth, zoomController.adminSyncVimeo);
 
 module.exports = router;
