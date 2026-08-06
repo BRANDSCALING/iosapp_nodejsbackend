@@ -8,6 +8,7 @@ const router = express.Router();
 const adminController = require('../controllers/adminController');
 const adminWorkbookController = require('../controllers/adminWorkbookController');
 const lmsController = require('../controllers/lmsController');
+const zoomController = require('../controllers/zoomController');
 const { adminAuth, isAdminOrUcws } = require('../middleware/adminAuth');
 
 // ============================================
@@ -68,5 +69,19 @@ router.post('/lms/content-items', adminAuth, adminController.createContentItem);
 router.post('/lms/lessons/:lessonId/complete', isAdminOrUcws, lmsController.markLessonComplete);
 
 router.post('/lms/users/ucws', adminAuth, adminController.createUcwsUser);
+
+// ============================================
+// Zoom Recordings Management (Deal Clinic / Mastermind Days)
+// POSTs dispatch on body.action = create | update | delete (UCWS convention)
+// ============================================
+
+router.get('/zoom/folders', adminAuth, zoomController.adminListFolders);
+router.post('/zoom/folders', adminAuth, zoomController.adminSaveFolder);
+
+router.get('/zoom/recordings', adminAuth, zoomController.adminListRecordings);
+router.post('/zoom/recordings', adminAuth, zoomController.adminSaveRecording);
+
+router.get('/zoom/recordings/:id/items', adminAuth, zoomController.adminListItems);
+router.post('/zoom/recording-items', adminAuth, zoomController.adminSaveItem);
 
 module.exports = router;

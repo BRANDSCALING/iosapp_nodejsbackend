@@ -26,6 +26,7 @@ const webhooksRoutes = require('./routes/webhooksRoutes');
 const authRoutes = require('./routes/authRoutes');
 const complianceRoutes = require('./routes/complianceRoutes');
 const appConfigRoutes = require('./routes/appConfigRoutes');
+const zoomRoutes = require('./routes/zoomRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const rateLimiter = require('./middleware/rateLimiter');
 
@@ -112,6 +113,7 @@ app.get('/', (req, res) => {
 app.use(`/api/${API_VERSION}/quiz`, quizRoutes);
 app.use('/api/user/workbooks', workbooksRoutes);
 app.use(`/api/${API_VERSION}/lms`, lmsRoutes);
+app.use(`/api/${API_VERSION}/zoom`, zoomRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/users', userRoutes);
 app.use(`/api/${API_VERSION}/users`, userRoutes);
