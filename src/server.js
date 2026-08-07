@@ -166,6 +166,7 @@ const server = app.listen(PORT, () => {
   console.log(`   Agent Auth: http://localhost:${PORT}/api/agent/auth`);
   console.log(`   Agent API: http://localhost:${PORT}/api/agent`);
   console.log(`   App Config (iOS): http://localhost:${PORT}/api/app-config/ios`);
+  console.log(`   App Config (Android): http://localhost:${PORT}/api/app-config/android`);
   console.log(`   Zoom Recordings API: http://localhost:${PORT}/api/${API_VERSION}/zoom`);
   console.log('   ============================================');
   console.log('');
