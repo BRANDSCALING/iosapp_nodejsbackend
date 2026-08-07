@@ -8,10 +8,16 @@
  *   Vimeo folder "Brandscaling_Deal Clinics"  -> category deal_clinic
  *   Vimeo folder "Brandscaling_Mastermind"    -> category mastermind
  *
- * For each new video it: finds/creates the month folder (e.g. "August 2026",
- * from the video's upload date, Europe/London), creates a recording titled
- * like the video, and attaches the video link (unlisted privacy hash is part
- * of Vimeo's `link`, so unlisted videos play correctly).
+ * Looks one level INSIDE each category folder too: the content team organises
+ * uploads into monthly subfolders (e.g. "June 2026_Deal Clinic"), so videos in
+ * a subfolder are published into an app folder derived from the SUBFOLDER name
+ * ("June 2026", period 2026-06-01). Videos sitting loose in the category folder
+ * fall back to a month folder from their upload date (Europe/London).
+ *
+ * The recording date comes from the video TITLE when it contains one (e.g.
+ * "June 23rd 2026", "04th Aug 2026"), else the upload date. The video link is
+ * attached as-is (unlisted privacy hash is part of Vimeo's `link`, so unlisted
+ * videos play correctly).
  *
  * Enabled only when VIMEO_ACCESS_TOKEN is set (personal access token with
  * `private` scope from the Vimeo account that owns the folders).
@@ -96,6 +102,53 @@ function monthInfo(isoTime) {
   };
 }
 
+const MONTH_NAMES = ['january', 'february', 'march', 'april', 'may', 'june',
+  'july', 'august', 'september', 'october', 'november', 'december'];
+
+/** "jun"/"June"/"sept" -> 6/6/9; 0 when the token is not a month. */
+function monthTokenToNum(token) {
+  const t = (token || '').toLowerCase();
+  if (t.length < 3) return 0;
+  return MONTH_NAMES.findIndex((m) => m.startsWith(t)) + 1;
+}
+
+/** "June 2026_Deal Clinic" -> { title: "June 2026", periodMonth: "2026-06-01" }; null if no month+year. */
+function parseMonthFromName(name) {
+  const re = /([a-zA-Z]{3,9})\.?\s+(20\d{2})/g;
+  let m;
+  while ((m = re.exec(name || '')) !== null) {
+    const num = monthTokenToNum(m[1]);
+    if (num) {
+      const monthName = MONTH_NAMES[num - 1];
+      return {
+        title: `${monthName[0].toUpperCase()}${monthName.slice(1)} ${m[2]}`,
+        periodMonth: `${m[2]}-${String(num).padStart(2, '0')}-01`,
+      };
+    }
+  }
+  return null;
+}
+
+/** "June 23rd 2026" / "04th Aug 2026" / "Aug 4, 2026" -> "2026-06-23" etc.; null if no date. */
+function parseDateFromText(text) {
+  const s = text || '';
+  const patterns = [
+    { re: /(\d{1,2})(?:st|nd|rd|th)?\s+([a-zA-Z]{3,9})\.?,?\s+(20\d{2})/g, day: 1, month: 2 }, // 04th Aug 2026
+    { re: /([a-zA-Z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(20\d{2})/g, day: 2, month: 1 }, // June 23rd 2026
+  ];
+  for (const p of patterns) {
+    let m;
+    while ((m = p.re.exec(s)) !== null) {
+      const num = monthTokenToNum(m[p.month]);
+      const day = parseInt(m[p.day], 10);
+      if (num && day >= 1 && day <= 31) {
+        return `${m[3]}-${String(num).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      }
+    }
+  }
+  return null;
+}
+
 /** Find or create the month folder for a category. */
 async function ensureMonthFolder(category, info) {
   const existing = await query(
@@ -124,21 +177,22 @@ async function videoAlreadySynced(vimeoId) {
   return result.rows.length > 0;
 }
 
-async function importVideo(category, video) {
+async function importVideo(category, video, folderInfo = null) {
   const vimeoId = (video.uri || '').split('/').filter(Boolean).pop();
   if (!vimeoId) return false;
   if (await videoAlreadySynced(vimeoId)) return false;
 
-  const info = monthInfo(video.created_time);
-  const folderId = await ensureMonthFolder(category, info);
-  const title = (video.name || `Recording ${info.dateOnly}`).slice(0, 200);
+  const uploadInfo = monthInfo(video.created_time);
+  const folderId = await ensureMonthFolder(category, folderInfo || uploadInfo);
+  const recordedOn = parseDateFromText(video.name) || uploadInfo.dateOnly;
+  const title = (video.name || `Recording ${recordedOn}`).slice(0, 200);
   const link = video.link || `https://vimeo.com/${vimeoId}`;
 
   const rec = await query(
     `INSERT INTO zoom_recordings (folder_id, title, recorded_on, display_order, is_active)
      VALUES ($1::uuid, $2, $3::date, (SELECT COALESCE(MAX(display_order), -1) + 1 FROM zoom_recordings WHERE folder_id = $1::uuid), TRUE)
      RETURNING id`,
-    [folderId, title, info.dateOnly]
+    [folderId, title, recordedOn]
   );
   await query(
     `INSERT INTO zoom_recording_items (recording_id, item_type, vimeo_url, metadata, display_order)
@@ -176,12 +230,32 @@ async function syncVimeo() {
           continue;
         }
         const projectId = (project.uri || '').split('/').filter(Boolean).pop();
-        const videos = await vimeoGetAll(`/me/projects/${projectId}/videos?per_page=100&fields=uri,name,link,created_time`);
-        summary.folders[mapping.folderName] = videos.length;
-        for (const video of videos) {
+
+        // Loose videos AND monthly subfolders (one level deep).
+        const items = await vimeoGetAll(`/me/projects/${projectId}/items?per_page=100&fields=type,folder.uri,folder.name,video.uri,video.name,video.link,video.created_time`);
+        const queue = items
+          .filter((i) => i.type === 'video' && i.video)
+          .map((i) => ({ video: i.video, folderInfo: null }));
+        for (const item of items.filter((i) => i.type === 'folder' && i.folder)) {
+          const subId = (item.folder.uri || '').split('/').filter(Boolean).pop();
+          if (!subId) continue;
+          const folderInfo = parseMonthFromName(item.folder.name) || {
+            title: (item.folder.name || 'Recordings').trim().slice(0, 200),
+            periodMonth: null,
+          };
+          const subVideos = await vimeoGetAll(`/me/projects/${subId}/videos?per_page=100&fields=uri,name,link,created_time`);
+          // Oldest session first, so display_order follows the calendar.
+          subVideos.sort((a, b) =>
+            (parseDateFromText(a.name) || a.created_time || '').localeCompare(parseDateFromText(b.name) || b.created_time || '')
+          );
+          for (const video of subVideos) queue.push({ video, folderInfo });
+        }
+
+        summary.folders[mapping.folderName] = queue.length;
+        for (const { video, folderInfo } of queue) {
           summary.checked += 1;
           try {
-            if (await importVideo(mapping.category, video)) summary.imported += 1;
+            if (await importVideo(mapping.category, video, folderInfo)) summary.imported += 1;
           } catch (err) {
             summary.errors.push(`Import failed for ${video.uri}: ${err.message}`);
           }
