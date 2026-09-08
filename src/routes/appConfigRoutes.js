@@ -3,6 +3,7 @@
  *
  * GET /api/app-config/ios
  * GET /api/app-config/android
+ * GET /api/app-config/uces-ios
  *
  * Drives each app's update behavior. The client compares its installed
  * version to the platform's `minimum_supported_*_version`:
@@ -21,6 +22,13 @@
  * be gated independently. Until ANDROID_* values are provisioned it falls back
  * to the IOS_* values, which preserves the historical behavior (Android builds
  * up to v1.3 read /ios directly).
+ *
+ * The /uces-ios endpoint serves the UCES app (formerly Allianz Housing,
+ * bundle com.brandscaling.edna, 2.x numbering) from UCES_IOS_* env vars.
+ * NEVER mix the two iOS apps' env vars: bumping IOS_* to a 2.x value would
+ * force-lock every Brandscaling work-app user (1.x), and vice versa. Unlike
+ * the work app, UCES DOES use optional updates: installed < latest shows a
+ * dismissible "Update Available" card (UCES 2.2+ clients only).
  *
  * No authentication. No database access. Driven entirely by env vars so values
  * can be flipped without a deploy of new code.
@@ -48,6 +56,34 @@ router.get('/ios', (req, res) => {
     force_update: process.env.IOS_FORCE_UPDATE === 'true',
     app_store_url: process.env.IOS_APP_STORE_URL || DEFAULT_APP_STORE_URL,
     update_message: process.env.IOS_UPDATE_MESSAGE || null,
+  });
+});
+
+// ---------------------------------------------------------------------------
+// UCES (formerly Allianz Housing) — separate app, separate 2.x numbering.
+// Defaults match the first gate-enabled release (2.2 build 9): no popup for
+// anyone until UCES_IOS_* env vars are raised for a newer release.
+// ---------------------------------------------------------------------------
+
+const DEFAULT_UCES_IOS_VERSION = '2.2';
+const DEFAULT_UCES_APP_STORE_URL = 'https://apps.apple.com/gb/app/id6758213803';
+
+router.get('/uces-ios', (req, res) => {
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0',
+  });
+
+  res.json({
+    minimum_supported_ios_version:
+      process.env.UCES_IOS_MINIMUM_SUPPORTED_VERSION || DEFAULT_UCES_IOS_VERSION,
+    latest_ios_version:
+      process.env.UCES_IOS_LATEST_VERSION || DEFAULT_UCES_IOS_VERSION,
+    force_update: process.env.UCES_IOS_FORCE_UPDATE === 'true',
+    app_store_url:
+      process.env.UCES_IOS_APP_STORE_URL || DEFAULT_UCES_APP_STORE_URL,
+    update_message: process.env.UCES_IOS_UPDATE_MESSAGE || null,
   });
 });
 
