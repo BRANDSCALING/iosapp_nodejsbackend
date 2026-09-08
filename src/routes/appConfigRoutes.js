@@ -48,6 +48,29 @@ router.get('/ios', (req, res) => {
     Expires: '0',
   });
 
+  // Legacy UCES clients: UCES/Allianz 2.1 predates the /uces-ios route and
+  // reads THIS route, but namespaces itself via the X-App-Version header
+  // (work app = 1.x, UCES = 2.x; both apps' gate-enabled builds send it).
+  // Serve 2.x callers UCES values so they are never judged against work-app
+  // numbers. UCES_LEGACY_IOS_MINIMUM stays at its ≤2.1 default (quiet) until
+  // a newer UCES version is LIVE on the store; flipping it to that version
+  // shows 2.1 installs the required-update modal (2.1 has no optional-card
+  // code, so minimum is the only lever it understands). IOS_FORCE_UPDATE is
+  // deliberately ignored here — it must never leak from the work app to UCES.
+  // Revisit the prefix test if the work app ever reaches 2.x numbering.
+  const callerVersion = String(req.get('X-App-Version') || '');
+  if (/^2\./.test(callerVersion)) {
+    const legacyMin = process.env.UCES_LEGACY_IOS_MINIMUM || '2.1';
+    return res.json({
+      minimum_supported_ios_version: legacyMin,
+      latest_ios_version: legacyMin,
+      force_update: false,
+      app_store_url:
+        process.env.UCES_IOS_APP_STORE_URL || DEFAULT_UCES_APP_STORE_URL,
+      update_message: process.env.UCES_IOS_UPDATE_MESSAGE || null,
+    });
+  }
+
   res.json({
     minimum_supported_ios_version:
       process.env.IOS_MINIMUM_SUPPORTED_VERSION || DEFAULT_IOS_VERSION,
