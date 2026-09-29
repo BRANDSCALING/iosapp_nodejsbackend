@@ -18,10 +18,14 @@
  * block even the latest installed version depending on client logic. For
  * normal required updates, use the minimum version instead.
  *
- * The /android endpoint has its OWN env vars (ANDROID_*) so each platform can
- * be gated independently. Until ANDROID_* values are provisioned it falls back
- * to the IOS_* values, which preserves the historical behavior (Android builds
- * up to v1.3 read /ios directly).
+ * The /android endpoint is shared by TWO production Android apps (both ship
+ * it hardcoded): UCES Android (com.allianzhousing.app, 2.x) and the
+ * Brandscaling work app (com.brandscaling.app, 1.x; builds up to v1.3 read
+ * /ios, v1.4+ read /android). The ANDROID_* env vars hold the UCES values —
+ * do NOT point them at work-app numbers. Work-app callers are recognised by
+ * their 1.x X-App-Version header and served BRANDSCALING_ANDROID_* values
+ * instead; /brandscaling-android serves the same values explicitly for
+ * future work-app builds. Callers with no header get the UCES values.
  *
  * The /uces-ios endpoint serves the UCES app (formerly Allianz Housing,
  * bundle com.brandscaling.edna, 2.x numbering) from UCES_IOS_* env vars.
@@ -113,12 +117,47 @@ router.get('/uces-ios', (req, res) => {
 const DEFAULT_PLAY_STORE_URL =
   'https://play.google.com/store/apps/details?id=com.brandscaling.app';
 
+// Brandscaling work app on Android (1.x line). Falls back to the IOS_* values
+// (the two work apps release in lockstep) so a missing env still serves sane
+// numbers; the message default is Play-flavored because the IOS_* one says
+// "App Store".
+const DEFAULT_BRANDSCALING_ANDROID_VERSION = '1.4';
+
+function brandscalingAndroidPayload() {
+  return {
+    minimum_supported_android_version:
+      process.env.BRANDSCALING_ANDROID_MINIMUM_SUPPORTED_VERSION ||
+      process.env.IOS_MINIMUM_SUPPORTED_VERSION ||
+      DEFAULT_BRANDSCALING_ANDROID_VERSION,
+    latest_android_version:
+      process.env.BRANDSCALING_ANDROID_LATEST_VERSION ||
+      process.env.IOS_LATEST_VERSION ||
+      DEFAULT_BRANDSCALING_ANDROID_VERSION,
+    force_update: process.env.BRANDSCALING_ANDROID_FORCE_UPDATE === 'true',
+    play_store_url:
+      process.env.BRANDSCALING_ANDROID_PLAY_STORE_URL ||
+      DEFAULT_PLAY_STORE_URL,
+    update_message:
+      process.env.BRANDSCALING_ANDROID_UPDATE_MESSAGE ||
+      'This version is no longer supported. Please update from Google Play to continue.',
+  };
+}
+
 router.get('/android', (req, res) => {
   res.set({
     'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
     Pragma: 'no-cache',
     Expires: '0',
   });
+
+  // Work-app callers (1.x) — see the header comment. UCES Android (2.x) and
+  // callers without the header fall through to the UCES values below, exactly
+  // as before this branch existed. Revisit the prefix test if the work app
+  // ever reaches 2.x numbering.
+  const callerVersion = String(req.get('X-App-Version') || '');
+  if (/^1\./.test(callerVersion)) {
+    return res.json(brandscalingAndroidPayload());
+  }
 
   res.json({
     minimum_supported_android_version:
@@ -137,6 +176,18 @@ router.get('/android', (req, res) => {
       process.env.IOS_UPDATE_MESSAGE ||
       null,
   });
+});
+
+// Explicit, unambiguous leaf for the Brandscaling work app on Android, so its
+// next release can stop sharing /android with UCES entirely.
+router.get('/brandscaling-android', (req, res) => {
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0',
+  });
+
+  res.json(brandscalingAndroidPayload());
 });
 
 module.exports = router;
