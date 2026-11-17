@@ -20,6 +20,13 @@ const express = require('express');
 const router = express.Router();
 const quizController = require('../controllers/quizController');
 const { body, param, query } = require('express-validator');
+const { userScopedAuth } = require('../middleware/cognitoVerify');
+
+// 17 Nov 2026: these routes had no authentication — any caller could read or write any user's
+// quiz data by naming their id. userScopedAuth verifies the Cognito Bearer token and (in
+// AUTH_MODE=verify) requires it and pins the userId to the token's sub. In the default legacy
+// mode behaviour is unchanged for deployed iOS builds; mismatches are only logged.
+router.use(userScopedAuth);
 
 // ============================================
 // Validation Middleware
@@ -137,7 +144,7 @@ router.get('/results/:userId', validateUserId, quizController.getResults);
 
 /**
  * GET /api/v1/quiz/retake-check/:userId
- * Check if user can retake the quiz (7-day restriction)
+ * Check if user can retake the quiz (QUIZ_RETAKE_DAYS window, default 28 days)
  */
 router.get('/retake-check/:userId', validateUserId, quizController.checkRetake);
 
@@ -290,7 +297,7 @@ module.exports = router;
 
 // /**
 //  * GET /api/v1/quiz/retake-check/:userId
-//  * Check if user can retake the quiz (7-day restriction)
+//  * Check if user can retake the quiz (QUIZ_RETAKE_DAYS window, default 28 days)
 //  */
 // router.get('/retake-check/:userId', validateUserId, quizController.checkRetake);
 

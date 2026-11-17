@@ -25,8 +25,9 @@ const handleWebhook = async (req, res) => {
             //
             // appUserId is the RevenueCat app user id, which the iOS app sets to the user's UPPERCASED
             // cognito id — the same value stored in user_quiz_results.user_id — so this match works.
+            // UPPER() on both sides: iOS writes the sub UPPERCASED, the website will not.
             const updateQuizResult = await query(
-                `UPDATE user_quiz_results SET full_result_purchased = true WHERE user_id = $1`,
+                `UPDATE user_quiz_results SET full_result_purchased = true WHERE UPPER(user_id) = UPPER($1)`,
                 [appUserId]
             );
 

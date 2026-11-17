@@ -17,6 +17,63 @@ const router = express.Router();
 const { query } = require('../config/database');
 const { body, param } = require('express-validator');
 const { validationResult } = require('express-validator');
+const { entitledWorkbooks } = require('../services/edna/workbookSelect');
+const { substitutePlaceholders } = require('../services/edna/placeholders');
+
+// ============================================
+// E-DNA v2 workbooks (BS-DI-009, 17 Nov 2026)
+// ============================================
+
+/* Access rule while BS-DI-009.1 decision 2 is open (Fariza, 17 Nov 2026: basic report free,
+ * detailed report £99, workbook comes with it): every v2 workbook needs the £99 purchase.
+ * Adjust here when the WB2/WB3 access decision lands. */
+const V2_REQUIRES_PURCHASE = true;
+
+function unwrapLayer7(raw) {
+  let v = raw;
+  for (let i = 0; i < 3; i++) {
+    if (v && typeof v === 'object') return v;
+    if (typeof v !== 'string') return null;
+    try { v = JSON.parse(v); } catch (e) { return null; }
+  }
+  return typeof v === 'object' ? v : null;
+}
+
+/**
+ * The person's v2 E-DNA state: latest result envelope, purchase flag, retake count.
+ * Returns null when they have no stored v2 record (legacy behaviour applies then).
+ */
+async function loadEdnaV2State(userId) {
+  const r = await query(`
+    SELECT layer7_result, full_result_purchased, completed_at
+    FROM user_quiz_results
+    WHERE UPPER(user_id::text) = UPPER($1)
+    ORDER BY completed_at DESC
+  `, [userId]);
+  if (r.rows.length === 0) return null;
+  const latest = unwrapLayer7(r.rows[0].layer7_result);
+  if (!latest || !latest.ednaV2 || !latest.ednaV2.result) return null;
+  return {
+    v2: latest.ednaV2,
+    purchased: !!r.rows[0].full_result_purchased,
+    /* a second completed assessment = the retake (Mixed types, BS-DI-009 README) */
+    retaken: r.rows.length >= 2,
+  };
+}
+
+/** Instances for the given v2 file names: name -> { completed } */
+async function v2InstanceState(userId, names) {
+  if (!names.length) return {};
+  const r = await query(`
+    SELECT w.name, COALESCE((wi.data->>'completed')::boolean, false) AS completed
+    FROM workbooks w
+    JOIN workbook_instances wi ON wi.workbook_id = w.id AND UPPER(wi.user_id::text) = UPPER($1)
+    WHERE w.name = ANY($2)
+  `, [userId, names]);
+  const out = {};
+  r.rows.forEach((row) => { out[row.name] = { completed: row.completed }; });
+  return out;
+}
 
 // ============================================
 // Helper Functions
@@ -41,16 +98,33 @@ const handleValidationErrors = (req, res) => {
  * - req.headers['x-user-id'] (for testing)
  * - req.query.userId (for testing)
  */
-const requireAuth = (req, res, next) => {
+const { getAuthMode, verifyBearer } = require('../middleware/cognitoVerify');
+
+const requireAuth = async (req, res, next) => {
+  // 17 Nov 2026: prefer a VERIFIED Cognito Bearer token (the iOS app sends one alongside
+  // x-user-id). In AUTH_MODE=verify it is required; legacy mode keeps the old header fallback.
+  const payload = await verifyBearer(req);
+  if (payload && payload.sub) {
+    req.userId = payload.sub;
+    req.authVerified = true;
+    return next();
+  }
+  if (getAuthMode() === 'verify') {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required. Provide a valid Cognito Bearer token.',
+    });
+  }
+
   const userId = req.user?.id || req.headers['x-user-id'] || req.query.userId;
-  
+
   if (!userId) {
     return res.status(401).json({
       success: false,
       error: 'Authentication required. Provide userId via x-user-id header or userId query param.'
     });
   }
-  
+
   req.userId = userId;
   next();
 };
@@ -114,7 +188,64 @@ router.get('/', async (req, res) => {
     const userTier = user.tier || 'free';       // Default to free tier
     
     console.log(`📚 [Workbooks] User type: ${userTypeId}, tier: ${userTier}`);
-    
+
+    // ============================================
+    // v2 path (BS-DI-009): with a v2 result record AND v2 workbooks loaded, the person
+    // gets exactly the files their result entitles them to. Otherwise: legacy behaviour.
+    // ============================================
+    const v2State = await loadEdnaV2State(userId);
+    if (v2State) {
+      const entitled = entitledWorkbooks(v2State.v2.result, { wb2Completed: false, retaken: v2State.retaken });
+      const names = entitled.map((e) => e.name);
+      if (names.length) {
+        const v2Rows = await query(`
+          SELECT w.id, w.name, w.title, w.type_id, w.tier, w.workbook, w.subtype, w.created_at,
+                 CASE WHEN wi.id IS NOT NULL THEN true ELSE false END AS has_instance,
+                 wi.last_saved_at,
+                 COALESCE((wi.data->>'completed')::boolean, false) AS is_completed
+          FROM workbooks w
+          LEFT JOIN workbook_instances wi ON w.id = wi.workbook_id AND UPPER(wi.user_id::text) = UPPER($1)
+          WHERE w.name = ANY($2)
+        `, [userId, names]);
+        if (v2Rows.rows.length > 0) {
+          const byName = {};
+          v2Rows.rows.forEach((row) => { byName[row.name] = row; });
+          const wb2 = entitled.find((e) => e.workbook === 2);
+          const wb2Completed = !!(wb2 && byName[wb2.name] && byName[wb2.name].is_completed);
+          const finalEntitled = entitledWorkbooks(v2State.v2.result, { wb2Completed, retaken: v2State.retaken });
+
+          const workbooks = [];
+          const lockedWorkbooks = [];
+          finalEntitled.forEach((e) => {
+            const row = byName[e.name];
+            if (!row) return; /* file not uploaded yet */
+            const needsPurchase = V2_REQUIRES_PURCHASE && !v2State.purchased;
+            const item = {
+              id: row.id, name: row.name, title: row.title, typeId: row.type_id,
+              tier: row.tier, workbook: row.workbook, subtype: row.subtype,
+              createdAt: row.created_at, hasInstance: row.has_instance,
+              lastSavedAt: row.last_saved_at, isCompleted: row.is_completed,
+            };
+            if (needsPurchase) {
+              lockedWorkbooks.push({ ...item, lockedReason: 'Comes with the detailed report.' });
+            } else if (!e.available) {
+              lockedWorkbooks.push({ ...item, lockedReason: e.lockedReason });
+            } else {
+              workbooks.push(item);
+            }
+          });
+          console.log(`✅ [Workbooks] v2: ${workbooks.length} available, ${lockedWorkbooks.length} locked for ${userId}`);
+          return res.json({
+            success: true,
+            user: { typeId: userTypeId, tier: userTier, tierRank: null, ednaV2: true, purchased: v2State.purchased },
+            workbooks,
+            lockedWorkbooks,
+          });
+        }
+      }
+      /* no v2 workbooks uploaded yet — fall through to legacy */
+    }
+
     // Step 2: Get user's tier rank
     const tierRankResult = await query(
       'SELECT rank FROM tier_rank WHERE tier = $1',
@@ -142,6 +273,7 @@ router.get('/', async (req, res) => {
       LEFT JOIN workbook_instances wi ON w.id = wi.workbook_id AND wi.user_id = $1
       WHERE (w.type_id = $2 OR w.type_id = 'mixed' OR w.type_id IS NULL)
         AND (tr.rank IS NULL OR tr.rank <= $3)
+        AND w.workbook IS NULL  -- v2 files (BS-DI-009) are served by the v2 path above
       ORDER BY w.created_at DESC
     `, [userId, userTypeId, userTierRank]);
     
@@ -193,18 +325,53 @@ router.get('/:workbookId/instance', validateWorkbookId, async (req, res) => {
     
     // Step 1: Check if workbook exists
     const workbookResult = await query(
-      'SELECT id, name, title, json_structure, type_id, tier FROM workbooks WHERE id = $1',
+      'SELECT id, name, title, json_structure, type_id, tier, workbook, subtype FROM workbooks WHERE id = $1',
       [workbookId]
     );
-    
+
     if (workbookResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'Workbook not found'
       });
     }
-    
+
     const workbook = workbookResult.rows[0];
+
+    // v2 workbook (BS-DI-009): enforce entitlement and substitute the {{placeholders}}
+    // from the person's result record server-side, so every client renders real values.
+    let v2Structure = null;
+    if (workbook.workbook) {
+      const v2State = await loadEdnaV2State(userId);
+      if (!v2State) {
+        return res.status(403).json({ success: false, locked: true, error: 'Take the E-DNA assessment first.' });
+      }
+      if (V2_REQUIRES_PURCHASE && !v2State.purchased) {
+        return res.status(403).json({ success: false, locked: true, error: 'This workbook comes with the detailed report.' });
+      }
+      const probe = entitledWorkbooks(v2State.v2.result, { wb2Completed: false, retaken: v2State.retaken });
+      const mine = probe.find((e) => e.name === workbook.name);
+      if (!mine) {
+        return res.status(403).json({ success: false, locked: true, error: 'This workbook is not the one your E-DNA result gives you.' });
+      }
+      if (mine.workbook === 3) {
+        const wb2 = probe.find((e) => e.workbook === 2);
+        const inst = wb2 ? await v2InstanceState(userId, [wb2.name]) : {};
+        const wb2Completed = !!(wb2 && inst[wb2.name] && inst[wb2.name].completed);
+        const gated = entitledWorkbooks(v2State.v2.result, { wb2Completed, retaken: v2State.retaken })
+          .find((e) => e.name === workbook.name);
+        if (gated && !gated.available) {
+          return res.status(403).json({ success: false, locked: true, error: gated.lockedReason });
+        }
+      }
+      const raw = typeof workbook.json_structure === 'string'
+        ? JSON.parse(workbook.json_structure) : workbook.json_structure;
+      const subbed = substitutePlaceholders(raw, v2State.v2);
+      if (subbed.missing.length) {
+        console.warn(`⚠️ [Workbooks] ${workbook.name}: unresolved placeholders for ${userId}: ${subbed.missing.join(', ')}`);
+      }
+      v2Structure = subbed.structure;
+    }
     
     // Step 2: Get or create instance
     let instanceResult = await query(
@@ -261,7 +428,8 @@ router.get('/:workbookId/instance', validateWorkbookId, async (req, res) => {
         title: workbook.title,
         typeId: workbook.type_id,
         tier: workbook.tier,
-        structure: workbook.json_structure
+        /* v2: placeholders already substituted from the person's result record */
+        structure: v2Structure || workbook.json_structure
       },
       answers,
       answerCount: answersResult.rows.length

@@ -1083,9 +1083,11 @@ exports.saveResults = async (req, res, next) => {
       return res.status(400).json({ success: false, error: 'Session ID is required' });
     }
 
-    // Calculate retake date (7 days from now)
+    // Calculate retake date. 28 days per the redesigned E-DNA (BS-DI-003 §9.1, 16 Nov 2026);
+    // QUIZ_RETAKE_DAYS overrides. The iOS app (EDNAKit) uses the same 28-day window.
+    const retakeDays = parseInt(process.env.QUIZ_RETAKE_DAYS, 10) || 28;
     const retakeDate = new Date();
-    retakeDate.setDate(retakeDate.getDate() + 7);
+    retakeDate.setDate(retakeDate.getDate() + retakeDays);
 
     // Normalize core type to lowercase
     const normalizedCoreType = (layer1CoreType || 'mixed').toLowerCase();
@@ -1471,7 +1473,7 @@ exports.getResults = async (req, res, next) => {
 };
 
 /**
- * Check if user can retake the quiz (7-day restriction)
+ * Check if user can retake the quiz (QUIZ_RETAKE_DAYS window, default 28 days)
  * GET /api/v1/quiz/retake-check/:userId
  */
 exports.checkRetake = async (req, res, next) => {
@@ -1480,10 +1482,11 @@ exports.checkRetake = async (req, res, next) => {
 
     const { userId } = req.params;
 
+    // UPPER() on both sides: iOS writes the Cognito sub UPPERCASED, the website will not.
     const queryText = `
       SELECT completed_at, retake_available_at
       FROM user_quiz_results
-      WHERE user_id = $1
+      WHERE UPPER(user_id) = UPPER($1)
       ORDER BY completed_at DESC
       LIMIT 1
     `;
@@ -2251,7 +2254,7 @@ exports.getLayerIntro = async (req, res, next) => {
 // };
 
 // /**
-//  * Check if user can retake the quiz (7-day restriction)
+//  * Check if user can retake the quiz (QUIZ_RETAKE_DAYS window, default 28 days)
 //  * GET /api/v1/quiz/retake-check/:userId
 //  */
 // exports.checkRetake = async (req, res, next) => {

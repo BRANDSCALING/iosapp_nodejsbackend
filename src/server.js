@@ -15,6 +15,7 @@ const compression = require('compression');
 
 const { healthCheck } = require('./config/database');
 const quizRoutes = require('./routes/quizRoutes');
+const ednaV2Routes = require('./routes/ednaV2Routes'); // E-DNA v2 (website, 17 Nov 2026)
 const workbooksRoutes = require('./routes/workbooks');
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const adminRoutes = require('./routes/adminRoutes');
@@ -46,7 +47,7 @@ app.use(helmet());
 app.use(cors({
   origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'], /* the website sends x-user-id like the iOS app (18 Nov 2026) */
   credentials: true
 }));
 
@@ -112,6 +113,7 @@ app.get('/', (req, res) => {
 
 // API Routes
 app.use(`/api/${API_VERSION}/quiz`, quizRoutes);
+app.use('/api/v2/edna', ednaV2Routes); // website E-DNA: server-side scoring, strict Cognito auth
 app.use('/api/user/workbooks', workbooksRoutes);
 app.use(`/api/${API_VERSION}/lms`, lmsRoutes);
 app.use(`/api/${API_VERSION}/zoom`, zoomRoutes);

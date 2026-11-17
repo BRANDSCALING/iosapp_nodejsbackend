@@ -728,7 +728,8 @@ exports.uploadWorkbook = async (req, res) => {
       });
     }
     
-    const { name, title, description, type_id, tier, json_structure, is_active } = req.body;
+    const { name, title, description, type_id, tier, json_structure, is_active,
+            workbook, part, subtype } = req.body; // workbook/part/subtype: BS-DI-009 v2 files
     
     console.log(`📤 [Admin] Processing workbook: ${name}`);
     
@@ -750,8 +751,9 @@ exports.uploadWorkbook = async (req, res) => {
       });
     }
     
-    // Validate type_id
-    const validTypes = ['architect', 'alchemist', 'mixed'];
+    // Validate type_id — the two leaning values were added for the BS-DI-009 workbooks
+    // (five Part 1 results, 17 Nov 2026).
+    const validTypes = ['architect', 'alchemist', 'mixed', 'architect-leaning', 'alchemist-leaning'];
     if (!validTypes.includes(type_id)) {
       return res.status(400).json({
         success: false,
@@ -806,21 +808,27 @@ exports.uploadWorkbook = async (req, res) => {
     // Insert workbook with proper UUID casting for created_by
     const result = await query(
       `INSERT INTO workbooks (
-        name, 
-        title, 
-        json_structure, 
-        type_id, 
+        name,
+        title,
+        json_structure,
+        type_id,
         tier,
+        workbook,
+        part,
+        subtype,
         created_by,
         created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6::uuid, NOW())
-      RETURNING id, name, title, type_id, tier, created_by, created_at`,
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::uuid, NOW())
+      RETURNING id, name, title, type_id, tier, workbook, part, subtype, created_by, created_at`,
       [
         name,
         title,
         JSON.stringify(json_structure),
         type_id,
         tier,
+        workbook || null,
+        part || null,
+        subtype || null,
         adminId
       ]
     );

@@ -42,8 +42,8 @@ const pool = new Pool({
   max: parseInt(process.env.DB_MAX_CONNECTIONS || '20'),
   idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '60000'),
   connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT || '20000'),
-  // AWS Aurora requires SSL for all connections
-  ssl: { rejectUnauthorized: false }
+  // AWS Aurora requires SSL for all connections; DB_SSL=off is for a local dev database only
+  ssl: process.env.DB_SSL === 'off' ? false : { rejectUnauthorized: false }
 });
 
 // Test connection on startup

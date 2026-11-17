@@ -14,7 +14,24 @@ const { isAdminOrUcws } = require('../middleware/adminAuth');
  * User auth: same pattern as workbooks
  * Expects userId in: req.user.id (JWT), req.headers['x-user-id'], or req.query.userId
  */
-const requireAuth = (req, res, next) => {
+const { getAuthMode, verifyBearer } = require('../middleware/cognitoVerify');
+
+const requireAuth = async (req, res, next) => {
+  // 17 Nov 2026: prefer a VERIFIED Cognito Bearer token (the iOS app sends one alongside
+  // x-user-id). In AUTH_MODE=verify it is required; legacy mode keeps the old header fallback.
+  const payload = await verifyBearer(req);
+  if (payload && payload.sub) {
+    req.userId = payload.sub;
+    req.authVerified = true;
+    return next();
+  }
+  if (getAuthMode() === 'verify') {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required. Provide a valid Cognito Bearer token.',
+    });
+  }
+
   const userId = req.user?.id || req.userId || req.headers['x-user-id'] || req.query.userId;
 
   if (!userId) {

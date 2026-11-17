@@ -1,0 +1,1844 @@
+{
+ "architect": {
+  "p1": {
+   "result": "Architect",
+   "core": "architect",
+   "lean": "none",
+   "why": "",
+   "scenarios": 8,
+   "eithers": 0,
+   "normalPatterns": [
+    "Architect",
+    "Architect",
+    "Architect",
+    "Architect"
+   ],
+   "switched": [
+    {
+     "ctx": "Pricing",
+     "kind": "full"
+    }
+   ],
+   "fullSwitch": true,
+   "ctxIdx": {
+    "Investing money": 0.5,
+    "Pricing": 0,
+    "Choosing who to work with": 0.5,
+    "Launching": 0.625
+   },
+   "unstable": 1,
+   "overall": 0.41,
+   "pts": {
+    "1A": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "1B": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "2A": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "2B": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "3A": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "3B": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "4A": {
+     "A": 3.5,
+     "B": 0.5,
+     "pat": "Architect"
+    },
+    "4B": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    }
+   }
+  },
+  "p2": {
+   "scores": {
+    "MS": 10,
+    "SB": 1,
+    "IA": 1
+   },
+   "consistent": 3,
+   "flag": false,
+   "ultimate": {
+    "c1": false,
+    "c2": true,
+    "c3": false,
+    "c4": false,
+    "need": 10,
+    "experienced": false
+   },
+   "result": "MS"
+  },
+  "p3": {
+   "results": [
+    {
+     "k": "Dominant-loop awareness",
+     "v": 100,
+     "loop": "architect",
+     "capped": false,
+     "level": "Mastery"
+    },
+    {
+     "k": "Non-dominant-loop awareness",
+     "v": 66.66666666666667,
+     "loop": "alchemist",
+     "capped": false,
+     "level": "Moderate"
+    },
+    {
+     "k": "Same-loop awareness",
+     "v": 75,
+     "loop": "architect",
+     "capped": false,
+     "level": "High"
+    },
+    {
+     "k": "Alternate-loop awareness",
+     "v": 65.9090909090909,
+     "loop": "alchemist",
+     "capped": false,
+     "level": "Moderate"
+    }
+   ],
+   "area": [
+    [
+     {
+      "k": "Dominant-loop awareness",
+      "v": 100,
+      "loop": "architect",
+      "capped": false,
+      "level": "Mastery"
+     },
+     {
+      "k": "Non-dominant-loop awareness",
+      "v": 66.66666666666667,
+      "loop": "alchemist",
+      "capped": false,
+      "level": "Moderate"
+     }
+    ],
+    [
+     {
+      "k": "Same-loop awareness",
+      "v": 75,
+      "loop": "architect",
+      "capped": false,
+      "level": "High"
+     },
+     {
+      "k": "Alternate-loop awareness",
+      "v": 65.9090909090909,
+      "loop": "alchemist",
+      "capped": false,
+      "level": "Moderate"
+     }
+    ]
+   ],
+   "consistency": "not triggered"
+  },
+  "p4": {
+   "domains": [
+    {
+     "dom": "Modality",
+     "r": "Multimodal",
+     "clear": false
+    },
+    {
+     "dom": "Approach",
+     "r": "Structured",
+     "clear": true
+    },
+    {
+     "dom": "Concept processing",
+     "r": "Concrete",
+     "clear": true
+    },
+    {
+     "dom": "Working environment",
+     "r": "Individual",
+     "clear": true
+    },
+    {
+     "dom": "Pace",
+     "r": "Versatile",
+     "clear": false
+    }
+   ],
+   "profile": "clear"
+  },
+  "p5": {
+   "domains": [
+    {
+     "dom": "Attention and regulation",
+     "score": 63,
+     "level": "High",
+     "blocks": 3
+    },
+    {
+     "dom": "Language and processing",
+     "score": 25,
+     "level": "Low",
+     "blocks": 1
+    },
+    {
+     "dom": "Structure and routine",
+     "score": 100,
+     "level": "High",
+     "blocks": 3
+    },
+    {
+     "dom": "Sensory load",
+     "score": 50,
+     "level": "Moderate",
+     "blocks": 2
+    },
+    {
+     "dom": "Body chemistry and diet",
+     "score": 38,
+     "level": "Low",
+     "blocks": 1
+    }
+   ],
+   "patterns": [
+    [
+     "Fast-switching focus",
+     "Fast idea generation, creative leaps, energy under pressure"
+    ],
+    [
+     "Structure and clarity",
+     "Precision, sustained focus, deep understanding of systems"
+    ]
+   ],
+   "layered": true,
+   "strengths": [
+    {
+     "n": "depth of focus",
+     "score": 100
+    }
+   ],
+   "style": "Neurodivergent people with exceptional strengths",
+   "consent": true
+  },
+  "p6": [
+   {
+    "dom": "Mindset",
+    "score": 75,
+    "band": 2,
+    "labels": [
+     "Fixed",
+     "Situational",
+     "Growth"
+    ],
+    "result": "Growth"
+   },
+   {
+    "dom": "Confidence",
+    "score": 75,
+    "band": 2,
+    "labels": [
+     "Self-doubting",
+     "Situational",
+     "Confident"
+    ],
+    "result": "Confident"
+   },
+   {
+    "dom": "Patience",
+    "score": 69,
+    "band": 1,
+    "labels": [
+     "Impulsive",
+     "Balanced",
+     "Patient"
+    ],
+    "result": "Balanced"
+   },
+   {
+    "dom": "Risk style",
+    "score": 31,
+    "band": 0,
+    "labels": [
+     "Risk-averse",
+     "Risk-balanced",
+     "Risk-taking"
+    ],
+    "result": "Risk-averse"
+   },
+   {
+    "dom": "Energy",
+    "score": 25,
+    "band": 0,
+    "labels": [
+     "Inward",
+     "Balanced",
+     "Outward"
+    ],
+    "result": "Inward"
+   }
+  ],
+  "p7": {
+   "beliefs": [
+    {
+     "belief": "Success means",
+     "score": 13,
+     "band": 0,
+     "a": "Profit",
+     "c": "Purpose",
+     "both": "Profit and purpose",
+     "result": "Profit"
+    },
+    {
+     "belief": "Build for",
+     "score": 50,
+     "band": 1,
+     "a": "Speed",
+     "c": "Craft",
+     "both": "Speed and craft",
+     "result": "Both"
+    },
+    {
+     "belief": "Progress means",
+     "score": 83,
+     "band": 2,
+     "a": "New",
+     "c": "Proven",
+     "both": "New or proven",
+     "result": "Proven"
+    },
+    {
+     "belief": "Proof is",
+     "score": 0,
+     "band": 0,
+     "a": "Numbers",
+     "c": "Stories",
+     "both": "Numbers and stories",
+     "result": "Numbers"
+    },
+    {
+     "belief": "Others are seen as",
+     "score": 50,
+     "band": 1,
+     "a": "Collaborators",
+     "c": "Competitors",
+     "both": "Collaborators or competitors",
+     "result": "Both"
+    },
+    {
+     "belief": "Opportunity is",
+     "score": 83,
+     "band": 2,
+     "a": "Plenty",
+     "c": "Limited",
+     "both": "Plenty or limited",
+     "result": "Limited"
+    }
+   ],
+   "flagged": [],
+   "override": "Craft"
+  },
+  "example": {
+   "p1": true,
+   "p2": true,
+   "p3": true,
+   "p4": true,
+   "p5": true,
+   "p6": true,
+   "p7": true
+  }
+ },
+ "alchemist": {
+  "p1": {
+   "result": "Alchemist",
+   "core": "alchemist",
+   "lean": "none",
+   "why": "",
+   "scenarios": 8,
+   "eithers": 0,
+   "normalPatterns": [
+    "Alchemist",
+    "Alchemist",
+    "Alchemist",
+    "Alchemist"
+   ],
+   "switched": [
+    {
+     "ctx": "Pricing",
+     "kind": "full"
+    }
+   ],
+   "fullSwitch": true,
+   "ctxIdx": {
+    "Investing money": 0.5,
+    "Pricing": 0,
+    "Choosing who to work with": 0.5,
+    "Launching": 0.625
+   },
+   "unstable": 1,
+   "overall": -0.41,
+   "pts": {
+    "1A": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "1B": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "2A": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "2B": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "3A": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "3B": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "4A": {
+     "A": 0.5,
+     "B": 3.5,
+     "pat": "Alchemist"
+    },
+    "4B": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    }
+   }
+  },
+  "p2": {
+   "scores": {
+    "VO": 5,
+    "MP": 4.5,
+    "EE": 2.5
+   },
+   "consistent": 0,
+   "flag": true,
+   "ultimate": {
+    "c1": false,
+    "c2": true,
+    "c3": true,
+    "c4": false,
+    "need": 10,
+    "experienced": false
+   },
+   "result": "VO",
+   "second": "MP"
+  },
+  "p3": {
+   "results": [
+    {
+     "k": "Dominant-loop awareness",
+     "v": 100,
+     "loop": "alchemist",
+     "capped": false,
+     "level": "Mastery"
+    },
+    {
+     "k": "Non-dominant-loop awareness",
+     "v": 66.66666666666667,
+     "loop": "architect",
+     "capped": false,
+     "level": "Moderate"
+    },
+    {
+     "k": "Same-loop awareness",
+     "v": 75,
+     "loop": "alchemist",
+     "capped": false,
+     "level": "High"
+    },
+    {
+     "k": "Alternate-loop awareness",
+     "v": 65.9090909090909,
+     "loop": "architect",
+     "capped": false,
+     "level": "Moderate"
+    }
+   ],
+   "area": [
+    [
+     {
+      "k": "Dominant-loop awareness",
+      "v": 100,
+      "loop": "alchemist",
+      "capped": false,
+      "level": "Mastery"
+     },
+     {
+      "k": "Non-dominant-loop awareness",
+      "v": 66.66666666666667,
+      "loop": "architect",
+      "capped": false,
+      "level": "Moderate"
+     }
+    ],
+    [
+     {
+      "k": "Same-loop awareness",
+      "v": 75,
+      "loop": "alchemist",
+      "capped": false,
+      "level": "High"
+     },
+     {
+      "k": "Alternate-loop awareness",
+      "v": 65.9090909090909,
+      "loop": "architect",
+      "capped": false,
+      "level": "Moderate"
+     }
+    ]
+   ],
+   "consistency": "not triggered"
+  },
+  "p4": {
+   "domains": [
+    {
+     "dom": "Modality",
+     "r": "Multimodal",
+     "clear": false
+    },
+    {
+     "dom": "Approach",
+     "r": "Structured",
+     "clear": true
+    },
+    {
+     "dom": "Concept processing",
+     "r": "Concrete",
+     "clear": true
+    },
+    {
+     "dom": "Working environment",
+     "r": "Individual",
+     "clear": true
+    },
+    {
+     "dom": "Pace",
+     "r": "Versatile",
+     "clear": false
+    }
+   ],
+   "profile": "clear"
+  },
+  "p5": {
+   "domains": [
+    {
+     "dom": "Attention and regulation",
+     "score": 63,
+     "level": "High",
+     "blocks": 3
+    },
+    {
+     "dom": "Language and processing",
+     "score": 25,
+     "level": "Low",
+     "blocks": 1
+    },
+    {
+     "dom": "Structure and routine",
+     "score": 100,
+     "level": "High",
+     "blocks": 3
+    },
+    {
+     "dom": "Sensory load",
+     "score": 50,
+     "level": "Moderate",
+     "blocks": 2
+    },
+    {
+     "dom": "Body chemistry and diet",
+     "score": 38,
+     "level": "Low",
+     "blocks": 1
+    }
+   ],
+   "patterns": [
+    [
+     "Fast-switching focus",
+     "Fast idea generation, creative leaps, energy under pressure"
+    ],
+    [
+     "Structure and clarity",
+     "Precision, sustained focus, deep understanding of systems"
+    ]
+   ],
+   "layered": true,
+   "strengths": [
+    {
+     "n": "depth of focus",
+     "score": 100
+    }
+   ],
+   "style": "Neurodivergent people with exceptional strengths",
+   "consent": true
+  },
+  "p6": [
+   {
+    "dom": "Mindset",
+    "score": 75,
+    "band": 2,
+    "labels": [
+     "Fixed",
+     "Situational",
+     "Growth"
+    ],
+    "result": "Growth"
+   },
+   {
+    "dom": "Confidence",
+    "score": 75,
+    "band": 2,
+    "labels": [
+     "Self-doubting",
+     "Situational",
+     "Confident"
+    ],
+    "result": "Confident"
+   },
+   {
+    "dom": "Patience",
+    "score": 69,
+    "band": 1,
+    "labels": [
+     "Impulsive",
+     "Balanced",
+     "Patient"
+    ],
+    "result": "Balanced"
+   },
+   {
+    "dom": "Risk style",
+    "score": 31,
+    "band": 0,
+    "labels": [
+     "Risk-averse",
+     "Risk-balanced",
+     "Risk-taking"
+    ],
+    "result": "Risk-averse"
+   },
+   {
+    "dom": "Energy",
+    "score": 25,
+    "band": 0,
+    "labels": [
+     "Inward",
+     "Balanced",
+     "Outward"
+    ],
+    "result": "Inward"
+   }
+  ],
+  "p7": {
+   "beliefs": [
+    {
+     "belief": "Success means",
+     "score": 13,
+     "band": 0,
+     "a": "Profit",
+     "c": "Purpose",
+     "both": "Profit and purpose",
+     "result": "Profit"
+    },
+    {
+     "belief": "Build for",
+     "score": 50,
+     "band": 1,
+     "a": "Speed",
+     "c": "Craft",
+     "both": "Speed and craft",
+     "result": "Both"
+    },
+    {
+     "belief": "Progress means",
+     "score": 83,
+     "band": 2,
+     "a": "New",
+     "c": "Proven",
+     "both": "New or proven",
+     "result": "Proven"
+    },
+    {
+     "belief": "Proof is",
+     "score": 0,
+     "band": 0,
+     "a": "Numbers",
+     "c": "Stories",
+     "both": "Numbers and stories",
+     "result": "Numbers"
+    },
+    {
+     "belief": "Others are seen as",
+     "score": 50,
+     "band": 1,
+     "a": "Collaborators",
+     "c": "Competitors",
+     "both": "Collaborators or competitors",
+     "result": "Both"
+    },
+    {
+     "belief": "Opportunity is",
+     "score": 83,
+     "band": 2,
+     "a": "Plenty",
+     "c": "Limited",
+     "both": "Plenty or limited",
+     "result": "Limited"
+    }
+   ],
+   "flagged": [],
+   "override": "Craft"
+  },
+  "example": {
+   "p1": true,
+   "p2": true,
+   "p3": true,
+   "p4": true,
+   "p5": true,
+   "p6": true,
+   "p7": true
+  }
+ },
+ "mixedA": {
+  "p1": {
+   "result": "Mixed (Architect-leaning)",
+   "core": "mixed",
+   "lean": "architect",
+   "why": "Architect leads under normal conditions but 3 contexts are unstable",
+   "scenarios": 8,
+   "eithers": 0,
+   "normalPatterns": [
+    "Architect",
+    "Architect",
+    "Architect",
+    "Alchemist"
+   ],
+   "switched": [
+    {
+     "ctx": "Investing money",
+     "kind": "full"
+    },
+    {
+     "ctx": "Pricing",
+     "kind": "full"
+    }
+   ],
+   "fullSwitch": true,
+   "ctxIdx": {
+    "Investing money": 0,
+    "Pricing": 0,
+    "Choosing who to work with": 0.5,
+    "Launching": 0
+   },
+   "unstable": 3,
+   "overall": 0.13,
+   "pts": {
+    "1A": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "1B": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "2A": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "2B": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "3A": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "3B": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "4A": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "4B": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    }
+   }
+  },
+  "p2": {
+   "scores": {
+    "MS": 5,
+    "SB": 1,
+    "IA": 1,
+    "VO": 3,
+    "MP": 1,
+    "EE": 1
+   },
+   "consistent": 0,
+   "flag": true,
+   "sideA": 7,
+   "sideR": 5,
+   "picksA": 6,
+   "picksR": 4,
+   "lean1": "architect",
+   "lean": "architect",
+   "likely": "MS"
+  },
+  "p3": {
+   "results": [
+    {
+     "k": "Architect-loop awareness (your leaning and possible Dominant loop)",
+     "v": 62.5,
+     "loop": "architect",
+     "raw": 62.5,
+     "level": "Moderate"
+    },
+    {
+     "k": "Alchemist-loop awareness (your possible non-dominant loop)",
+     "v": 25,
+     "loop": "alchemist",
+     "raw": 25,
+     "level": "Very low"
+    },
+    {
+     "k": "Awareness of Architects",
+     "v": 62.5,
+     "loop": "architect",
+     "raw": 80.83333333333333,
+     "level": "Moderate"
+    },
+    {
+     "k": "Awareness of Alchemists",
+     "v": 62.5,
+     "loop": "alchemist",
+     "raw": 70.83333333333333,
+     "level": "Moderate"
+    }
+   ],
+   "area": [
+    [
+     {
+      "k": "Architect-loop awareness (your leaning and possible Dominant loop)",
+      "v": 62.5,
+      "loop": "architect",
+      "raw": 62.5,
+      "level": "Moderate"
+     },
+     {
+      "k": "Alchemist-loop awareness (your possible non-dominant loop)",
+      "v": 25,
+      "loop": "alchemist",
+      "raw": 25,
+      "level": "Very low"
+     }
+    ],
+    [
+     {
+      "k": "Awareness of Architects",
+      "v": 62.5,
+      "loop": "architect",
+      "raw": 80.83333333333333,
+      "level": "Moderate"
+     },
+     {
+      "k": "Awareness of Alchemists",
+      "v": 62.5,
+      "loop": "alchemist",
+      "raw": 70.83333333333333,
+      "level": "Moderate"
+     }
+    ]
+   ],
+   "consistency": "triggered: a result above Moderate before the cap"
+  },
+  "p4": {
+   "domains": [
+    {
+     "dom": "Modality",
+     "r": "Multimodal",
+     "clear": false
+    },
+    {
+     "dom": "Approach",
+     "r": "Structured",
+     "clear": true
+    },
+    {
+     "dom": "Concept processing",
+     "r": "Concrete",
+     "clear": true
+    },
+    {
+     "dom": "Working environment",
+     "r": "Individual",
+     "clear": true
+    },
+    {
+     "dom": "Pace",
+     "r": "Versatile",
+     "clear": false
+    }
+   ],
+   "profile": "clear"
+  },
+  "p5": {
+   "domains": [
+    {
+     "dom": "Attention and regulation",
+     "score": 63,
+     "level": "High",
+     "blocks": 3
+    },
+    {
+     "dom": "Language and processing",
+     "score": 25,
+     "level": "Low",
+     "blocks": 1
+    },
+    {
+     "dom": "Structure and routine",
+     "score": 100,
+     "level": "High",
+     "blocks": 3
+    },
+    {
+     "dom": "Sensory load",
+     "score": 50,
+     "level": "Moderate",
+     "blocks": 2
+    },
+    {
+     "dom": "Body chemistry and diet",
+     "score": 38,
+     "level": "Low",
+     "blocks": 1
+    }
+   ],
+   "patterns": [
+    [
+     "Fast-switching focus",
+     "Fast idea generation, creative leaps, energy under pressure"
+    ],
+    [
+     "Structure and clarity",
+     "Precision, sustained focus, deep understanding of systems"
+    ]
+   ],
+   "layered": true,
+   "strengths": [
+    {
+     "n": "depth of focus",
+     "score": 100
+    }
+   ],
+   "style": "Neurodivergent people with exceptional strengths",
+   "consent": true
+  },
+  "p6": [
+   {
+    "dom": "Mindset",
+    "score": 75,
+    "band": 2,
+    "labels": [
+     "Fixed",
+     "Situational",
+     "Growth"
+    ],
+    "result": "Growth"
+   },
+   {
+    "dom": "Confidence",
+    "score": 75,
+    "band": 2,
+    "labels": [
+     "Self-doubting",
+     "Situational",
+     "Confident"
+    ],
+    "result": "Confident"
+   },
+   {
+    "dom": "Patience",
+    "score": 69,
+    "band": 1,
+    "labels": [
+     "Impulsive",
+     "Balanced",
+     "Patient"
+    ],
+    "result": "Balanced"
+   },
+   {
+    "dom": "Risk style",
+    "score": 31,
+    "band": 0,
+    "labels": [
+     "Risk-averse",
+     "Risk-balanced",
+     "Risk-taking"
+    ],
+    "result": "Risk-averse"
+   },
+   {
+    "dom": "Energy",
+    "score": 25,
+    "band": 0,
+    "labels": [
+     "Inward",
+     "Balanced",
+     "Outward"
+    ],
+    "result": "Inward"
+   }
+  ],
+  "p7": {
+   "beliefs": [
+    {
+     "belief": "Success means",
+     "score": 13,
+     "band": 0,
+     "a": "Profit",
+     "c": "Purpose",
+     "both": "Profit and purpose",
+     "result": "Profit"
+    },
+    {
+     "belief": "Build for",
+     "score": 50,
+     "band": 1,
+     "a": "Speed",
+     "c": "Craft",
+     "both": "Speed and craft",
+     "result": "Both"
+    },
+    {
+     "belief": "Progress means",
+     "score": 83,
+     "band": 2,
+     "a": "New",
+     "c": "Proven",
+     "both": "New or proven",
+     "result": "Proven"
+    },
+    {
+     "belief": "Proof is",
+     "score": 0,
+     "band": 0,
+     "a": "Numbers",
+     "c": "Stories",
+     "both": "Numbers and stories",
+     "result": "Numbers"
+    },
+    {
+     "belief": "Others are seen as",
+     "score": 50,
+     "band": 1,
+     "a": "Collaborators",
+     "c": "Competitors",
+     "both": "Collaborators or competitors",
+     "result": "Both"
+    },
+    {
+     "belief": "Opportunity is",
+     "score": 83,
+     "band": 2,
+     "a": "Plenty",
+     "c": "Limited",
+     "both": "Plenty or limited",
+     "result": "Limited"
+    }
+   ],
+   "flagged": [],
+   "override": "Craft"
+  },
+  "example": {
+   "p1": true,
+   "p2": true,
+   "p3": true,
+   "p4": true,
+   "p5": true,
+   "p6": true,
+   "p7": true
+  }
+ },
+ "mixedR": {
+  "p1": {
+   "result": "Mixed (Alchemist-leaning)",
+   "core": "mixed",
+   "lean": "alchemist",
+   "why": "Alchemist leads under normal conditions but 3 contexts are unstable",
+   "scenarios": 8,
+   "eithers": 0,
+   "normalPatterns": [
+    "Alchemist",
+    "Alchemist",
+    "Alchemist",
+    "Architect"
+   ],
+   "switched": [
+    {
+     "ctx": "Investing money",
+     "kind": "full"
+    },
+    {
+     "ctx": "Pricing",
+     "kind": "full"
+    }
+   ],
+   "fullSwitch": true,
+   "ctxIdx": {
+    "Investing money": 0,
+    "Pricing": 0,
+    "Choosing who to work with": 0.5,
+    "Launching": 0
+   },
+   "unstable": 3,
+   "overall": -0.12,
+   "pts": {
+    "1A": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "1B": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "2A": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "2B": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "3A": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "3B": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "4A": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "4B": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    }
+   }
+  },
+  "p2": {
+   "scores": {
+    "MS": 3,
+    "SB": 1,
+    "IA": 1,
+    "VO": 5,
+    "MP": 1,
+    "EE": 1
+   },
+   "consistent": 0,
+   "flag": true,
+   "sideA": 5,
+   "sideR": 7,
+   "picksA": 4,
+   "picksR": 6,
+   "lean1": "alchemist",
+   "lean": "alchemist",
+   "likely": "VO"
+  },
+  "p3": {
+   "results": [
+    {
+     "k": "Architect-loop awareness (your possible non-dominant loop)",
+     "v": 25,
+     "loop": "architect",
+     "raw": 25,
+     "level": "Very low"
+    },
+    {
+     "k": "Alchemist-loop awareness (your leaning and possible Dominant loop)",
+     "v": 62.5,
+     "loop": "alchemist",
+     "raw": 62.5,
+     "level": "Moderate"
+    },
+    {
+     "k": "Awareness of Architects",
+     "v": 62.5,
+     "loop": "architect",
+     "raw": 80.83333333333333,
+     "level": "Moderate"
+    },
+    {
+     "k": "Awareness of Alchemists",
+     "v": 62.5,
+     "loop": "alchemist",
+     "raw": 70.83333333333333,
+     "level": "Moderate"
+    }
+   ],
+   "area": [
+    [
+     {
+      "k": "Alchemist-loop awareness (your leaning and possible Dominant loop)",
+      "v": 62.5,
+      "loop": "alchemist",
+      "raw": 62.5,
+      "level": "Moderate"
+     },
+     {
+      "k": "Architect-loop awareness (your possible non-dominant loop)",
+      "v": 25,
+      "loop": "architect",
+      "raw": 25,
+      "level": "Very low"
+     }
+    ],
+    [
+     {
+      "k": "Awareness of Alchemists",
+      "v": 62.5,
+      "loop": "alchemist",
+      "raw": 70.83333333333333,
+      "level": "Moderate"
+     },
+     {
+      "k": "Awareness of Architects",
+      "v": 62.5,
+      "loop": "architect",
+      "raw": 80.83333333333333,
+      "level": "Moderate"
+     }
+    ]
+   ],
+   "consistency": "triggered: a result above Moderate before the cap"
+  },
+  "p4": {
+   "domains": [
+    {
+     "dom": "Modality",
+     "r": "Multimodal",
+     "clear": false
+    },
+    {
+     "dom": "Approach",
+     "r": "Structured",
+     "clear": true
+    },
+    {
+     "dom": "Concept processing",
+     "r": "Concrete",
+     "clear": true
+    },
+    {
+     "dom": "Working environment",
+     "r": "Individual",
+     "clear": true
+    },
+    {
+     "dom": "Pace",
+     "r": "Versatile",
+     "clear": false
+    }
+   ],
+   "profile": "clear"
+  },
+  "p5": {
+   "domains": [
+    {
+     "dom": "Attention and regulation",
+     "score": 63,
+     "level": "High",
+     "blocks": 3
+    },
+    {
+     "dom": "Language and processing",
+     "score": 25,
+     "level": "Low",
+     "blocks": 1
+    },
+    {
+     "dom": "Structure and routine",
+     "score": 100,
+     "level": "High",
+     "blocks": 3
+    },
+    {
+     "dom": "Sensory load",
+     "score": 50,
+     "level": "Moderate",
+     "blocks": 2
+    },
+    {
+     "dom": "Body chemistry and diet",
+     "score": 38,
+     "level": "Low",
+     "blocks": 1
+    }
+   ],
+   "patterns": [
+    [
+     "Fast-switching focus",
+     "Fast idea generation, creative leaps, energy under pressure"
+    ],
+    [
+     "Structure and clarity",
+     "Precision, sustained focus, deep understanding of systems"
+    ]
+   ],
+   "layered": true,
+   "strengths": [
+    {
+     "n": "depth of focus",
+     "score": 100
+    }
+   ],
+   "style": "Neurodivergent people with exceptional strengths",
+   "consent": true
+  },
+  "p6": [
+   {
+    "dom": "Mindset",
+    "score": 75,
+    "band": 2,
+    "labels": [
+     "Fixed",
+     "Situational",
+     "Growth"
+    ],
+    "result": "Growth"
+   },
+   {
+    "dom": "Confidence",
+    "score": 75,
+    "band": 2,
+    "labels": [
+     "Self-doubting",
+     "Situational",
+     "Confident"
+    ],
+    "result": "Confident"
+   },
+   {
+    "dom": "Patience",
+    "score": 69,
+    "band": 1,
+    "labels": [
+     "Impulsive",
+     "Balanced",
+     "Patient"
+    ],
+    "result": "Balanced"
+   },
+   {
+    "dom": "Risk style",
+    "score": 31,
+    "band": 0,
+    "labels": [
+     "Risk-averse",
+     "Risk-balanced",
+     "Risk-taking"
+    ],
+    "result": "Risk-averse"
+   },
+   {
+    "dom": "Energy",
+    "score": 25,
+    "band": 0,
+    "labels": [
+     "Inward",
+     "Balanced",
+     "Outward"
+    ],
+    "result": "Inward"
+   }
+  ],
+  "p7": {
+   "beliefs": [
+    {
+     "belief": "Success means",
+     "score": 13,
+     "band": 0,
+     "a": "Profit",
+     "c": "Purpose",
+     "both": "Profit and purpose",
+     "result": "Profit"
+    },
+    {
+     "belief": "Build for",
+     "score": 50,
+     "band": 1,
+     "a": "Speed",
+     "c": "Craft",
+     "both": "Speed and craft",
+     "result": "Both"
+    },
+    {
+     "belief": "Progress means",
+     "score": 83,
+     "band": 2,
+     "a": "New",
+     "c": "Proven",
+     "both": "New or proven",
+     "result": "Proven"
+    },
+    {
+     "belief": "Proof is",
+     "score": 0,
+     "band": 0,
+     "a": "Numbers",
+     "c": "Stories",
+     "both": "Numbers and stories",
+     "result": "Numbers"
+    },
+    {
+     "belief": "Others are seen as",
+     "score": 50,
+     "band": 1,
+     "a": "Collaborators",
+     "c": "Competitors",
+     "both": "Collaborators or competitors",
+     "result": "Both"
+    },
+    {
+     "belief": "Opportunity is",
+     "score": 83,
+     "band": 2,
+     "a": "Plenty",
+     "c": "Limited",
+     "both": "Plenty or limited",
+     "result": "Limited"
+    }
+   ],
+   "flagged": [],
+   "override": "Craft"
+  },
+  "example": {
+   "p1": true,
+   "p2": true,
+   "p3": true,
+   "p4": true,
+   "p5": true,
+   "p6": true,
+   "p7": true
+  }
+ },
+ "mixed": {
+  "p1": {
+   "result": "Mixed",
+   "core": "mixed",
+   "lean": "none",
+   "why": "no pattern dominates; overall index 0.00",
+   "scenarios": 8,
+   "eithers": 0,
+   "normalPatterns": [
+    "Architect",
+    "Alchemist",
+    "Architect",
+    "Alchemist"
+   ],
+   "switched": [],
+   "fullSwitch": false,
+   "ctxIdx": {
+    "Investing money": 0.5,
+    "Pricing": 0.5,
+    "Choosing who to work with": 0,
+    "Launching": 0
+   },
+   "unstable": 2,
+   "overall": 0,
+   "pts": {
+    "1A": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "1B": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "2A": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "2B": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "3A": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    },
+    "3B": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "4A": {
+     "A": 1,
+     "B": 3,
+     "pat": "Alchemist"
+    },
+    "4B": {
+     "A": 3,
+     "B": 1,
+     "pat": "Architect"
+    }
+   }
+  },
+  "p2": {
+   "scores": {
+    "MS": 1,
+    "SB": 0,
+    "IA": 5,
+    "VO": 1,
+    "MP": 5,
+    "EE": 0
+   },
+   "consistent": 0,
+   "flag": true,
+   "sideA": 6,
+   "sideR": 6,
+   "picksA": 5,
+   "picksR": 5,
+   "lean1": "none",
+   "lean": "none",
+   "pair": [
+    "IA",
+    "MP"
+   ]
+  },
+  "p3": {
+   "results": [
+    {
+     "k": "Architect-loop awareness",
+     "v": 62.5,
+     "loop": "architect",
+     "raw": 62.5,
+     "level": "Moderate"
+    },
+    {
+     "k": "Alchemist-loop awareness",
+     "v": 25,
+     "loop": "alchemist",
+     "raw": 25,
+     "level": "Very low"
+    },
+    {
+     "k": "Awareness of Architects",
+     "v": 62.5,
+     "loop": "architect",
+     "raw": 80.83333333333333,
+     "level": "Moderate"
+    },
+    {
+     "k": "Awareness of Alchemists",
+     "v": 62.5,
+     "loop": "alchemist",
+     "raw": 70.83333333333333,
+     "level": "Moderate"
+    }
+   ],
+   "area": [
+    [
+     {
+      "k": "Architect-loop awareness",
+      "v": 62.5,
+      "loop": "architect",
+      "raw": 62.5,
+      "level": "Moderate"
+     },
+     {
+      "k": "Alchemist-loop awareness",
+      "v": 25,
+      "loop": "alchemist",
+      "raw": 25,
+      "level": "Very low"
+     }
+    ],
+    [
+     {
+      "k": "Awareness of Architects",
+      "v": 62.5,
+      "loop": "architect",
+      "raw": 80.83333333333333,
+      "level": "Moderate"
+     },
+     {
+      "k": "Awareness of Alchemists",
+      "v": 62.5,
+      "loop": "alchemist",
+      "raw": 70.83333333333333,
+      "level": "Moderate"
+     }
+    ]
+   ],
+   "consistency": "triggered: a result above Moderate before the cap"
+  },
+  "p4": {
+   "domains": [
+    {
+     "dom": "Modality",
+     "r": "Multimodal",
+     "clear": false
+    },
+    {
+     "dom": "Approach",
+     "r": "Structured",
+     "clear": true
+    },
+    {
+     "dom": "Concept processing",
+     "r": "Concrete",
+     "clear": true
+    },
+    {
+     "dom": "Working environment",
+     "r": "Individual",
+     "clear": true
+    },
+    {
+     "dom": "Pace",
+     "r": "Versatile",
+     "clear": false
+    }
+   ],
+   "profile": "clear"
+  },
+  "p5": {
+   "domains": [
+    {
+     "dom": "Attention and regulation",
+     "score": 63,
+     "level": "High",
+     "blocks": 3
+    },
+    {
+     "dom": "Language and processing",
+     "score": 25,
+     "level": "Low",
+     "blocks": 1
+    },
+    {
+     "dom": "Structure and routine",
+     "score": 100,
+     "level": "High",
+     "blocks": 3
+    },
+    {
+     "dom": "Sensory load",
+     "score": 50,
+     "level": "Moderate",
+     "blocks": 2
+    },
+    {
+     "dom": "Body chemistry and diet",
+     "score": 38,
+     "level": "Low",
+     "blocks": 1
+    }
+   ],
+   "patterns": [
+    [
+     "Fast-switching focus",
+     "Fast idea generation, creative leaps, energy under pressure"
+    ],
+    [
+     "Structure and clarity",
+     "Precision, sustained focus, deep understanding of systems"
+    ]
+   ],
+   "layered": true,
+   "strengths": [
+    {
+     "n": "depth of focus",
+     "score": 100
+    }
+   ],
+   "style": "Neurodivergent people with exceptional strengths",
+   "consent": true
+  },
+  "p6": [
+   {
+    "dom": "Mindset",
+    "score": 75,
+    "band": 2,
+    "labels": [
+     "Fixed",
+     "Situational",
+     "Growth"
+    ],
+    "result": "Growth"
+   },
+   {
+    "dom": "Confidence",
+    "score": 75,
+    "band": 2,
+    "labels": [
+     "Self-doubting",
+     "Situational",
+     "Confident"
+    ],
+    "result": "Confident"
+   },
+   {
+    "dom": "Patience",
+    "score": 69,
+    "band": 1,
+    "labels": [
+     "Impulsive",
+     "Balanced",
+     "Patient"
+    ],
+    "result": "Balanced"
+   },
+   {
+    "dom": "Risk style",
+    "score": 31,
+    "band": 0,
+    "labels": [
+     "Risk-averse",
+     "Risk-balanced",
+     "Risk-taking"
+    ],
+    "result": "Risk-averse"
+   },
+   {
+    "dom": "Energy",
+    "score": 25,
+    "band": 0,
+    "labels": [
+     "Inward",
+     "Balanced",
+     "Outward"
+    ],
+    "result": "Inward"
+   }
+  ],
+  "p7": {
+   "beliefs": [
+    {
+     "belief": "Success means",
+     "score": 13,
+     "band": 0,
+     "a": "Profit",
+     "c": "Purpose",
+     "both": "Profit and purpose",
+     "result": "Profit"
+    },
+    {
+     "belief": "Build for",
+     "score": 50,
+     "band": 1,
+     "a": "Speed",
+     "c": "Craft",
+     "both": "Speed and craft",
+     "result": "Both"
+    },
+    {
+     "belief": "Progress means",
+     "score": 83,
+     "band": 2,
+     "a": "New",
+     "c": "Proven",
+     "both": "New or proven",
+     "result": "Proven"
+    },
+    {
+     "belief": "Proof is",
+     "score": 0,
+     "band": 0,
+     "a": "Numbers",
+     "c": "Stories",
+     "both": "Numbers and stories",
+     "result": "Numbers"
+    },
+    {
+     "belief": "Others are seen as",
+     "score": 50,
+     "band": 1,
+     "a": "Collaborators",
+     "c": "Competitors",
+     "both": "Collaborators or competitors",
+     "result": "Both"
+    },
+    {
+     "belief": "Opportunity is",
+     "none": true,
+     "a": "Plenty",
+     "c": "Limited"
+    }
+   ],
+   "flagged": [],
+   "override": "Craft"
+  },
+  "example": {
+   "p1": true,
+   "p2": true,
+   "p3": true,
+   "p4": true,
+   "p5": true,
+   "p6": true,
+   "p7": true
+  }
+ }
+}

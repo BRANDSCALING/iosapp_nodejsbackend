@@ -45,12 +45,30 @@ const existsLimiter = rateLimit({
 
 /**
  * Auth for "current user" endpoints.
- * PRIMARY: Bearer token in Authorization header (Cognito JWT) — decode and use sub as userId.
- * FALLBACK: req.user.id, req.userId, x-user-id header, userId query.
+ * PRIMARY: a VERIFIED Cognito Bearer token (signature + expiry, see middleware/cognitoVerify.js).
+ * FALLBACK (AUTH_MODE=legacy only): unverified decode, req.user.id, req.userId, x-user-id
+ * header, userId query — kept so deployed iOS builds keep working during the transition.
  * Sets req.userId for the route handler.
  */
-const requireAuth = (req, res, next) => {
-  // 1. Try Bearer token first (Cognito JWT)
+const { getAuthMode, verifyBearer, userScopedAuth } = require('../middleware/cognitoVerify');
+
+const requireAuth = async (req, res, next) => {
+  // 1. Verified Cognito token
+  const payload = await verifyBearer(req);
+  if (payload && payload.sub) {
+    req.userId = payload.sub;
+    req.authVerified = true;
+    return next();
+  }
+
+  if (getAuthMode() === 'verify') {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required. Provide a valid Cognito Bearer token.',
+    });
+  }
+
+  // 2. LEGACY fallbacks (AUTH_MODE=legacy only)
   const authHeader = req.headers.authorization || req.headers.Authorization;
   if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
     const token = authHeader.replace(/^\s*Bearer\s+/i, '').trim();
@@ -61,7 +79,6 @@ const requireAuth = (req, res, next) => {
     }
   }
 
-  // 2. Fallbacks
   const userId = req.user?.id || req.userId || req.headers['x-user-id'] || req.query.userId;
   if (userId) {
     req.userId = userId;
@@ -245,7 +262,7 @@ router.get('/profile', requireAuth, async (req, res) => {
  *
  * Rule: user_type is always 'brandscaling' on INSERT and NEVER overwritten on UPDATE.
  */
-router.post('/sync-profile', async (req, res) => {
+router.post('/sync-profile', userScopedAuth, async (req, res) => {
   const startTime = Date.now();
 
   try {
@@ -339,7 +356,7 @@ router.post('/sync-profile', async (req, res) => {
  * GET /api/user/profile/:userId
  * Get user profile data
  */
-router.get('/profile/:userId', async (req, res) => {
+router.get('/profile/:userId', userScopedAuth, async (req, res) => {
   try {
     const { userId } = req.params;
     
@@ -398,7 +415,7 @@ router.get('/profile/:userId', async (req, res) => {
  *   ]
  * }
  */
-router.post('/bulk-sync-profiles', async (req, res) => {
+router.post('/bulk-sync-profiles', userScopedAuth, async (req, res) => {
   try {
     const { users } = req.body;
     
@@ -470,7 +487,7 @@ router.post('/bulk-sync-profiles', async (req, res) => {
  * PUT /api/user/profile/:userId
  * Update user profile data
  */
-router.put('/profile/:userId', async (req, res) => {
+router.put('/profile/:userId', userScopedAuth, async (req, res) => {
   try {
     const { userId } = req.params;
     const { email, name, tier } = req.body;

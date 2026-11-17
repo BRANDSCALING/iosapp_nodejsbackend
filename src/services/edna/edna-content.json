@@ -1,0 +1,3996 @@
+{
+ "scenarios": [
+  {
+   "id": "1A",
+   "title": "Investing money",
+   "when": "Normal conditions. Over several weeks, paused while you compare options.",
+   "text": "Imagine you are deciding whether to spend a sum that matters to you on something that should help you earn more: equipment, a course, a tool or stock. You have a few weeks, and the decision pauses while you compare options.",
+   "q": [
+    {
+     "id": "P1-Q01",
+     "lead": "I begin with",
+     "ask": "Where did the decision start?",
+     "opts": [
+      "I build the case: what it costs, what it should bring back and how long until it pays for itself.",
+      "With a sense of whether it is the right next step for me."
+     ]
+    },
+    {
+     "id": "P1-Q02",
+     "lead": "Then I turn to",
+     "ask": "When you come back to it after comparing the options, what do you turn to?",
+     "opts": [
+      "How it would feel to have it, and what the people around me would think.",
+      "Whether the prices and the payback numbers support what I first felt."
+     ]
+    },
+    {
+     "id": "P1-Q03",
+     "lead": "I end and validate with",
+     "ask": "What finally lets you commit?",
+     "opts": [
+      "The numbers add up and it makes sense.",
+      "It feels right for where I am going."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "1B",
+   "title": "Investing money",
+   "when": "Under stress: money at risk and time pressure. Decided today.",
+   "text": "Imagine the same thing is offered at 40% off, today only. Taking it would use most of what you have put aside for the next two months.",
+   "q": [
+    {
+     "id": "P1-Q04",
+     "lead": "I begin with",
+     "ask": "What happens first for you?",
+     "opts": [
+      "I calculate what the saving is worth against two months with nothing in reserve.",
+      "I read the offer: whether it feels like a real win or a trap, and what I feel about the seller."
+     ]
+    },
+    {
+     "id": "P1-Q05",
+     "lead": "Then I turn to",
+     "ask": "What do you check before deciding?",
+     "opts": [
+      "How it would feel to run two months with no cushion, and what the people close to me would say.",
+      "Whether the saving and the money I have really support the move."
+     ]
+    },
+    {
+     "id": "P1-Q06",
+     "lead": "I end and validate with",
+     "ask": "What settles it?",
+     "opts": [
+      "What the saving and my money add up to.",
+      "Whether the deal is good for me and feels right."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2A",
+   "title": "Pricing",
+   "when": "Normal conditions. Over a week.",
+   "text": "Imagine you are putting a price on something you are offering: your work, a product, a service or something you are selling. You know what it costs you, what others charge and what two or three interested people have said. You have a week.",
+   "q": [
+    {
+     "id": "P1-Q07",
+     "lead": "I begin with",
+     "ask": "Where do you start?",
+     "opts": [
+      "With what it costs me, what I need to keep and what others charge.",
+      "With what it is worth to the buyer and what price feels right to me."
+     ]
+    },
+    {
+     "id": "P1-Q08",
+     "lead": "Then I turn to",
+     "ask": "During the week, what do you keep coming back to?",
+     "opts": [
+      "How buyers will react to the price.",
+      "Whether the figures back up the price I have in mind."
+     ]
+    },
+    {
+     "id": "P1-Q09",
+     "lead": "I end and validate with",
+     "ask": "What finally fixes the price?",
+     "opts": [
+      "The figures work: it should be profitable.",
+      "It feels right: it is the best offering out there."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2B",
+   "title": "Pricing",
+   "when": "Under stress: conflict and money. Decided today.",
+   "text": "Imagine the buyer who matters most to you says they will walk away unless you drop the price by 15%. They want an answer by the end of the day.",
+   "q": [
+    {
+     "id": "P1-Q10",
+     "lead": "I begin with",
+     "ask": "What happens first for you?",
+     "opts": [
+      "I work out what 15% does to what I keep, and what losing them would cost.",
+      "I get a sense of whether they mean it, and what I want this relationship to be."
+     ]
+    },
+    {
+     "id": "P1-Q11",
+     "lead": "Then I turn to",
+     "ask": "What do you check before you answer?",
+     "opts": [
+      "How the relationship would feel at the lower price.",
+      "Whether I can actually carry the cut."
+     ]
+    },
+    {
+     "id": "P1-Q12",
+     "lead": "I end and validate with",
+     "ask": "What settles your answer, whichever way it goes?",
+     "opts": [
+      "What the figures say: can I afford it?",
+      "What feels right: is it worth it?"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "3A",
+   "title": "Choosing who to work with",
+   "when": "Normal conditions. Over a month, in several conversations.",
+   "text": "Imagine someone you have known for two years proposes doing something together: a venture, a project or a joint piece of work. You have a month and several conversations before you answer.",
+   "q": [
+    {
+     "id": "P1-Q13",
+     "lead": "I begin with",
+     "ask": "What happens first for you?",
+     "opts": [
+      "I define what each of us would bring, how the roles and the money would work and what could go wrong.",
+      "I notice how the idea and the person feel: the energy of the conversations and whether I can see the story working."
+     ]
+    },
+    {
+     "id": "P1-Q14",
+     "lead": "Then I turn to",
+     "ask": "Between the conversations, what do you turn to?",
+     "opts": [
+      "How working with them every day would feel, and how the people around us would react.",
+      "Whether the facts support my first response: what they have done before, the market and the numbers."
+     ]
+    },
+    {
+     "id": "P1-Q15",
+     "lead": "I end and validate with",
+     "ask": "What finally settles it?",
+     "opts": [
+      "The structure adds up: roles, money and risks are clear and I can defend each one.",
+      "It feels right: the partnership and the vision sit well with me."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "3B",
+   "title": "Disagreeing with the person you build with",
+   "when": "Under stress: conflict. Decided in minutes.",
+   "text": "Imagine a meeting with the person you are building something with: a partner, a collaborator or someone whose backing you need. They argue strongly for a direction you disagree with. Others are watching. The decision has to be made before you leave the room.",
+   "q": [
+    {
+     "id": "P1-Q16",
+     "lead": "I begin with",
+     "ask": "What happens first for you?",
+     "opts": [
+      "I go to the facts: which option the numbers and constraints support, and where their argument has gaps.",
+      "I go to my sense of the room and the direction: what feels right for the work, the relationship and everyone."
+     ]
+    },
+    {
+     "id": "P1-Q17",
+     "lead": "Then I turn to",
+     "ask": "Before you speak, what do you check?",
+     "opts": [
+      "How each option would feel to them and to the others, and what it would do to trust.",
+      "Whether the evidence actually supports the option I am drawn to."
+     ]
+    },
+    {
+     "id": "P1-Q18",
+     "lead": "I end and validate with",
+     "ask": "What settles the decision for you?",
+     "opts": [
+      "The data that adds up, and I explain the reasoning.",
+      "The story that feels right, and I explain why it matters."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "4A",
+   "title": "Launching",
+   "when": "Normal conditions. Over a month, in and out of other work.",
+   "text": "Imagine you are deciding when to put something out: an offer, a website, a product or an announcement. The decision runs over a month, alongside everything else.",
+   "q": [
+    {
+     "id": "P1-Q19",
+     "lead": "I begin with",
+     "ask": "Where do you start?",
+     "opts": [
+      "I set the criteria: what must be ready, tested and measurable before it goes out.",
+      "I can tell when it and its story will be ready, and what moment the people I want to reach are in."
+     ]
+    },
+    {
+     "id": "P1-Q20",
+     "lead": "Then I turn to",
+     "ask": "As the month goes on, what do you keep checking?",
+     "opts": [
+      "How it would land with the people I want to reach at each possible date.",
+      "Whether the checklist and the numbers support the date I have in mind."
+     ]
+    },
+    {
+     "id": "P1-Q21",
+     "lead": "I end and validate with",
+     "ask": "What finally sets the date?",
+     "opts": [
+      "The criteria are met and the plan adds up.",
+      "It looks ready and the story is right."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "4B",
+   "title": "Launching",
+   "when": "Under stress: time pressure. Decided in minutes.",
+   "text": "Imagine it is the day. An hour before it goes live, something breaks: a payment page, a link, a file. People have been told the time. Go ahead or delay, needs to be decided in the next few minutes.",
+   "q": [
+    {
+     "id": "P1-Q22",
+     "lead": "I begin with",
+     "ask": "What happens first for you?",
+     "opts": [
+      "I size the problem: how many people it affects, what a fix takes and what a delay costs.",
+      "I read the moment: what going ahead or delaying would feel like for the people waiting and for me."
+     ]
+    },
+    {
+     "id": "P1-Q23",
+     "lead": "Then I turn to",
+     "ask": "What do you check next?",
+     "opts": [
+      "How the people waiting would feel if we delayed, or went ahead as it is.",
+      "Whether the fix time and the numbers actually support delaying or going ahead."
+     ]
+    },
+    {
+     "id": "P1-Q24",
+     "lead": "I end and validate with",
+     "ask": "What settles it, go or delay?",
+     "opts": [
+      "The option that adds up, even if people get upset.",
+      "The option that feels right, even if it costs us."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "5A",
+   "reserve": true,
+   "title": "A personal decision",
+   "when": "Normal conditions. Over two months.",
+   "text": "Imagine you are deciding whether to move to another place. It would help what you are building and change daily life for you and the people close to you. The decision runs over two months.",
+   "q": [
+    {
+     "id": "P1-X01",
+     "lead": "I begin with",
+     "ask": "Where do you start?",
+     "opts": [
+      "I list the facts: costs, travel, what I gain and what we lose.",
+      "I notice how the move feels: whether I can see myself there and whether the next few years’ story fits."
+     ]
+    },
+    {
+     "id": "P1-X02",
+     "lead": "Then I turn to",
+     "ask": "Over the two months, what do you keep turning to?",
+     "opts": [
+      "How the people close to me feel about it, and how daily life would feel there.",
+      "Whether the costs and the case for moving support what I first felt."
+     ]
+    },
+    {
+     "id": "P1-X03",
+     "lead": "I end and validate with",
+     "ask": "What finally decides it?",
+     "opts": [
+      "The numbers and the practicalities add up.",
+      "It just feels right and is the best thing for me."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "5B",
+   "reserve": true,
+   "title": "A personal decision",
+   "when": "Under stress: money and a relationship. Decided in seconds.",
+   "text": "Imagine your closest friend rings tonight to ask to borrow money for something really important to them. The only money you have is what you had set aside for what you are building. They need an answer now.",
+   "q": [
+    {
+     "id": "P1-X04",
+     "lead": "I begin with",
+     "ask": "What happens first for you?",
+     "opts": [
+      "I work out what I can afford, what that money was for and when I would get it back.",
+      "I focus on the relationship and what feels right between us."
+     ]
+    },
+    {
+     "id": "P1-X05",
+     "lead": "Then I turn to",
+     "ask": "Before you answer, what do you check?",
+     "opts": [
+      "How saying yes or no would feel for both of us.",
+      "Whether the money actually works, whatever I feel."
+     ]
+    },
+    {
+     "id": "P1-X06",
+     "lead": "I end and validate with",
+     "ask": "What settles your answer?",
+     "opts": [
+      "What adds up and makes sense.",
+      "What feels like the right thing to do."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "6A",
+   "reserve": true,
+   "title": "Accepting an offer",
+   "when": "Normal conditions. Over three weeks.",
+   "text": "Imagine an offer that would change your plans: a contract, a customer, a role or a collaboration. You have three weeks to answer.",
+   "q": [
+    {
+     "id": "P1-X07",
+     "lead": "I begin with",
+     "ask": "Where do you start?",
+     "opts": [
+      "I model what it takes: time, money, what I would have to give up and the risk if it falls through.",
+      "I notice whether this is the opening I have been waiting for and whether it feels like my next chapter."
+     ]
+    },
+    {
+     "id": "P1-X08",
+     "lead": "Then I turn to",
+     "ask": "Over the three weeks, what do you turn to?",
+     "opts": [
+      "The impact on the people around me: how they would feel about the change, and how I would feel living it.",
+      "Whether the time and the money numbers support the risk and sacrifice."
+     ]
+    },
+    {
+     "id": "P1-X09",
+     "lead": "I end and validate with",
+     "ask": "What finally lets you commit?",
+     "opts": [
+      "The case adds up: it is worth it.",
+      "It feels right: it would benefit me."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "6B",
+   "reserve": true,
+   "title": "Accepting an offer",
+   "when": "Under stress: time pressure and money. Decided within 24 hours.",
+   "text": "Imagine the same offer, but they need a yes within 24 hours, and saying yes would stretch your time and your money.",
+   "q": [
+    {
+     "id": "P1-X10",
+     "lead": "I begin with",
+     "ask": "What happens first for you?",
+     "opts": [
+      "I run what the stretch costs in time and money and whether I can cover it.",
+      "I read the opportunity: whether it feels right to stretch for this now."
+     ]
+    },
+    {
+     "id": "P1-X11",
+     "lead": "Then I turn to",
+     "ask": "Before you answer, what do you check?",
+     "opts": [
+      "How the people around me would feel about the stretch, and how they would feel about a no.",
+      "Whether the money and the time actually work."
+     ]
+    },
+    {
+     "id": "P1-X12",
+     "lead": "I end and validate with",
+     "ask": "What settles it?",
+     "opts": [
+      "What adds up: it is profitable.",
+      "What feels right: it is beneficial."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "7A",
+   "reserve": true,
+   "title": "Ending an arrangement",
+   "when": "Normal conditions. Over a month.",
+   "text": "Imagine ending something that no longer works for you: a supplier, a client, a subscription or a commitment. You are deciding over a month.",
+   "q": [
+    {
+     "id": "P1-X13",
+     "lead": "I begin with",
+     "ask": "Where do you start?",
+     "opts": [
+      "I lay out the numbers: what it costs me, what it gives me and what I could do instead.",
+      "I notice how it feels now, how it affects everyone, and what ending it would mean for my story and everyone involved."
+     ]
+    },
+    {
+     "id": "P1-X14",
+     "lead": "Then I turn to",
+     "ask": "Over the month, what do you keep coming back to?",
+     "opts": [
+      "How the other side and the people around me would feel about ending it.",
+      "Whether the figures and the alternatives support ending it."
+     ]
+    },
+    {
+     "id": "P1-X15",
+     "lead": "I end and validate with",
+     "ask": "What finally decides it?",
+     "opts": [
+      "The numbers add up.",
+      "What is best for everyone."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "7B",
+   "reserve": true,
+   "title": "Ending an arrangement",
+   "when": "Under stress: conflict. Decided in minutes.",
+   "text": "Imagine the other side says: drop your condition or we walk, now.",
+   "q": [
+    {
+     "id": "P1-X16",
+     "lead": "I begin with",
+     "ask": "What happens first for you?",
+     "opts": [
+      "I work out what dropping the condition costs and what losing them costs.",
+      "I feel the tension in the room straight away: whether they mean it, and what it does to the relationship."
+     ]
+    },
+    {
+     "id": "P1-X17",
+     "lead": "Then I turn to",
+     "ask": "Before you answer, what do you check?",
+     "opts": [
+      "How each answer would feel to them and to me.",
+      "Whether I can actually carry the change."
+     ]
+    },
+    {
+     "id": "P1-X18",
+     "lead": "I end and validate with",
+     "ask": "What settles your answer?",
+     "opts": [
+      "What the numbers support.",
+      "What’s the right thing to do."
+     ]
+    }
+   ]
+  }
+ ],
+ "P1_CODE": [
+  [
+   "L",
+   "F"
+  ],
+  [
+   "F",
+   "L"
+  ],
+  [
+   "L",
+   "F"
+  ]
+ ],
+ "P1_CTX": {
+  "1": "Investing money",
+  "2": "Pricing",
+  "3": "Choosing who to work with",
+  "4": "Launching",
+  "5": "A personal decision",
+  "6": "Accepting an offer",
+  "7": "Ending an arrangement"
+ },
+ "part2": [
+  {
+   "id": "P2-Q01",
+   "ctx": "Building something new",
+   "ask": "You are building something new and the time you had has just been cut. What do you protect first?",
+   "o": {
+    "MS": "The plan: the order of the steps and which moves come first.",
+    "SB": "The flow: the routine and the system that keep things running reliably.",
+    "IA": "The accuracy: the data and the assumptions the work rests on.",
+    "UA": "All three at once: the plan, the system and the data, adjusted together.",
+    "VO": "The vision: the story and where this is going.",
+    "MP": "The quality: what it looks and feels like, and the details that matter.",
+    "EE": "The people: the momentum and the relationships around it.",
+    "UAl": "All three at once: the vision, the quality and the people, kept in step."
+   }
+  },
+  {
+   "id": "P2-Q02",
+   "ctx": "Fixing something that has gone wrong",
+   "ask": "Something you depend on has broken and everyone is looking to you. What do you protect first?",
+   "o": {
+    "MS": "The priorities: what has to happen first, second and third.",
+    "SB": "The routine: keeping the parts that still work running reliably.",
+    "IA": "The facts: finding out exactly what happened before anything changes.",
+    "UA": "All three: the priorities, the routine and the facts, held together.",
+    "VO": "The direction: making sure the setback does not change where we are going.",
+    "MP": "The standard: not letting the fix lower the quality.",
+    "EE": "The people: keeping everyone steady and together.",
+    "UAl": "All three: the direction, the standard and the people, held together."
+   }
+  },
+  {
+   "id": "P2-Q03",
+   "ctx": "Building something new",
+   "ask": "When you build something new, how does your work naturally run?",
+   "o": {
+    "MS": "In blocks: I set a few moves, run them for a stretch, then review and re-plan.",
+    "SB": "Continuously: a weekly routine that keeps everything moving.",
+    "IA": "In test cycles: run a test, check the results, decide the next one.",
+    "UA": "All three: moves set in blocks, a weekly routine to run them, tests to prove them.",
+    "VO": "In rounds: show a working version, get reactions, show the next.",
+    "MP": "In polish cycles: refine until it is right, with a date to put it out.",
+    "EE": "In conversations: talk with the people involved until we are aligned, then move.",
+    "UAl": "All three: show it, refine it and bring people with it, in step."
+   }
+  },
+  {
+   "id": "P2-Q04",
+   "ctx": "Fixing something that has gone wrong",
+   "ask": "When you are fixing something that has gone wrong, how do you work through it?",
+   "o": {
+    "MS": "I step back, re-order the priorities and set the next few moves.",
+    "SB": "I put a routine on it: daily checks until it runs smoothly again.",
+    "IA": "I run tests to find the cause before I change anything.",
+    "UA": "All three: re-order the moves, put a routine on it and test the cause.",
+    "VO": "I re-tell where we are going and test the next step towards it.",
+    "MP": "I refine the part that failed until it is right, with a date to put it back out.",
+    "EE": "I get the people involved together and agree the way through.",
+    "UAl": "All three: re-tell the direction, refine what failed and bring people together."
+   }
+  },
+  {
+   "id": "P2-Q05",
+   "ctx": "Building something new",
+   "ask": "A new idea keeps growing. How do you keep it in bounds?",
+   "o": {
+    "MS": "I tie everything to the moves I chose and cut what does not serve them.",
+    "SB": "I standardise: once something works, it becomes the way we do it.",
+    "IA": "Nothing is added until the analysis says it should be.",
+    "UA": "All three: the chosen moves set the scope, standards hold it, analysis gates it.",
+    "VO": "I let it explore while the pattern becomes clear, then settle it.",
+    "MP": "I set the quality bar and cut everything that falls below it.",
+    "EE": "I agree the scope with the people involved and hold us to it.",
+    "UAl": "All three: explore, then set the bar, with everyone agreed."
+   }
+  },
+  {
+   "id": "P2-Q06",
+   "ctx": "Fixing something that has gone wrong",
+   "ask": "In a crisis, requests pile up. How do you decide what gets done?",
+   "o": {
+    "MS": "By the plan: what moves the chosen priorities first.",
+    "SB": "By the standard: what keeps the system running comes first.",
+    "IA": "By the numbers: what the data says matters most.",
+    "UA": "All three: the plan, the standard and the numbers together.",
+    "VO": "By the direction: what keeps us on the course we are on.",
+    "MP": "By the quality bar: what keeps the result right.",
+    "EE": "By the people: what keeps everyone moving and together.",
+    "UAl": "All three: the direction, the quality bar and the people together."
+   }
+  },
+  {
+   "id": "P2-Q07",
+   "ctx": "Building something new",
+   "ask": "Pick the one thing you would create first on a new project.",
+   "o": {
+    "MS": "A roadmap or a map of the options.",
+    "SB": "A checklist or a step-by-step procedure.",
+    "IA": "A dashboard or a test plan.",
+    "UA": "A one-page map that links the roadmap, the procedures and the tests.",
+    "VO": "A story brief or a short video of what it will become.",
+    "MP": "A quality bar: the standard the result must meet.",
+    "EE": "A list of the people involved and what each has committed to.",
+    "UAl": "A one-page vision that links the story, the standard and the people."
+   }
+  },
+  {
+   "id": "P2-Q08",
+   "ctx": "Fixing something that has gone wrong",
+   "ask": "Something has gone wrong. What is the first thing you write down?",
+   "o": {
+    "MS": "A re-ordered plan: what comes first now.",
+    "SB": "A procedure so it does not happen again.",
+    "IA": "A record of what happened, with the numbers.",
+    "UA": "One page with the new order, the procedure and the record together.",
+    "VO": "The story of where we go from here.",
+    "MP": "The standard the fix must meet.",
+    "EE": "Who is doing what, and who needs to hear from me.",
+    "UAl": "One page with the direction, the standard and the people together."
+   }
+  },
+  {
+   "id": "P2-Q09",
+   "ctx": "Building something new",
+   "ask": "You are building something new and the pressure rises. What do you reach for first?",
+   "o": {
+    "MS": "I re-plan: step back and re-order the moves.",
+    "SB": "I add process: more structure, more routine.",
+    "IA": "I go deeper into the detail and the data.",
+    "UA": "All three at once: re-plan, tighten the process and check the data.",
+    "VO": "I re-tell the story and test the next step.",
+    "MP": "I hold the quality bar, or raise it.",
+    "EE": "I rally the people around it.",
+    "UAl": "All three at once: re-tell the story, hold the quality and rally people."
+   }
+  },
+  {
+   "id": "P2-Q10",
+   "ctx": "Fixing something that has gone wrong",
+   "ask": "When a project or task starts breaking down (delays, confusion, errors or misalignment), what is your first instinct?",
+   "o": {
+    "MS": "Zoom out, rethink the overall plan and re-order the steps so everything makes sense again.",
+    "SB": "Tighten or redesign the workflow or routine so things run smoothly again.",
+    "IA": "Analyse what is causing the issue, look at the data, and test logical fixes.",
+    "UA": "Re-align everything at once: the plan, the process and the data behind it.",
+    "VO": "Reframe the story or direction so it feels aligned again.",
+    "MP": "Refine the quality: adjust the detail until it feels right.",
+    "EE": "Reset the energy: clear the tension, reconnect people, restore alignment.",
+    "UAl": "Re-harmonise everything at once: the idea, the quality and the people."
+   }
+  }
+ ],
+ "part3": [
+  {
+   "id": "P3-Q01",
+   "area": "Self-awareness",
+   "ability": "Dominant-loop understanding",
+   "ctx": "Looking back: investing money",
+   "recall": "1A",
+   "both": true,
+   "ask": "Looking back at how you answered this scenario, how did your decision run?",
+   "opts": [
+    {
+     "t": "It began with the numbers and was finally settled by the numbers.",
+     "k": "LL"
+    },
+    {
+     "t": "It began with a feeling and was finally settled by a feeling.",
+     "k": "FF"
+    },
+    {
+     "t": "It began with the numbers and was finally settled by a feeling.",
+     "k": "LF"
+    },
+    {
+     "t": "It began with a feeling and was finally settled by the numbers.",
+     "k": "FL"
+    }
+   ],
+   "scoring": "Compared with the stored Part 1 pattern for the scenario shown: both moments match 100; one moment matches 50; neither 0."
+  },
+  {
+   "id": "P3-Q02",
+   "area": "Self-awareness",
+   "ability": "Non-dominant-loop understanding",
+   "ctx": "Investing money, under stress",
+   "both": true,
+   "v": {
+    "architect": {
+     "text": "Imagine an entrepreneur who goes with their sense of things first and makes the final call on how it feels. The same offer is in front of them: 40% off, today only, using most of what they have put aside for the next two months.",
+     "ask": "What would they do first?",
+     "opts": [
+      {
+       "t": "Read the offer: whether it feels like a real win or a trap, and what they feel about the seller.",
+       "s": 100
+      },
+      {
+       "t": "Notice how it feels, then go straight to the figures to see if the feeling holds.",
+       "s": 50
+      },
+      {
+       "t": "Calculate what the saving is worth against two months with nothing in reserve.",
+       "s": 0
+      },
+      {
+       "t": "Put it off until the feeling and the figures agree.",
+       "s": 0
+      }
+     ]
+    },
+    "alchemist": {
+     "text": "Imagine an entrepreneur who works it out first and makes the final call on the facts. The same offer is in front of them: 40% off, today only, using most of what they have put aside for the next two months.",
+     "ask": "What would they do first?",
+     "opts": [
+      {
+       "t": "Calculate what the saving is worth against two months with nothing in reserve.",
+       "s": 100
+      },
+      {
+       "t": "Run the figures, then check how it feels to run two months with no cushion.",
+       "s": 50
+      },
+      {
+       "t": "Read the offer: whether it feels like a real win or a trap, and what they feel about the seller.",
+       "s": 0
+      },
+      {
+       "t": "Put it off until the feeling and the figures agree.",
+       "s": 0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "P3-Q03",
+   "area": "Self-awareness",
+   "ability": "Switch awareness",
+   "ctx": "Looking back: pricing under pressure",
+   "recall": "2B",
+   "ask": "Under that pressure, how did you decide?",
+   "v": {
+    "architect": {
+     "opts": [
+      {
+       "t": "I stayed in my usual way: it began with the figures and was settled by the figures.",
+       "k": "LL"
+      },
+      {
+       "t": "I switched: I decided on how it felt and did not come back to the figures.",
+       "k": "FF"
+      },
+      {
+       "t": "It began with the figures but was settled by how it felt.",
+       "k": "LF"
+      },
+      {
+       "t": "I am not sure how I decided it.",
+       "k": "NA"
+      }
+     ]
+    },
+    "alchemist": {
+     "opts": [
+      {
+       "t": "I stayed in my usual way: it began with how it felt and was settled by how it felt.",
+       "k": "FF"
+      },
+      {
+       "t": "I switched: I decided on the figures and did not come back to how it felt.",
+       "k": "LL"
+      },
+      {
+       "t": "It began with how it felt but was settled by the figures.",
+       "k": "FL"
+      },
+      {
+       "t": "I am not sure how I decided it.",
+       "k": "NA"
+      }
+     ]
+    }
+   },
+   "trigger": {
+    "ask": "What triggered it?",
+    "opts": [
+     "The time pressure",
+     "The money at risk",
+     "The conflict in the conversation",
+     "Other (tell us in your own words)"
+    ]
+   },
+   "scoring": "Compared with the stored Part 1 pattern for the scenario shown: match 100; one moment matches 50; no match or \"not sure\" 0. The trigger is shown only when the person reports a switch; it is recorded, not scored (BS-DI-003 9.3)."
+  },
+  {
+   "id": "P3-Q04",
+   "area": "Self-awareness",
+   "ability": "Recovery after switching",
+   "ctx": "Pricing, a week later",
+   "both": false,
+   "v": {
+    "architect": {
+     "text": "Imagine you agreed to the 15% cut on the spot because the conversation felt tense, and did not go back to the figures. A week later the numbers show you cannot carry it.",
+     "ask": "What do you do next?",
+     "opts": [
+      {
+       "t": "Go back to the figures, work out what you can carry, and return to the buyer with a revised offer.",
+       "s": 100
+      },
+      {
+       "t": "Carry it for this one order while you re-cost the next.",
+       "s": 50
+      },
+      {
+       "t": "Honour it and avoid the subject; the relationship matters more.",
+       "s": 0
+      },
+      {
+       "t": "Wait a month and see whether it settles.",
+       "s": 0
+      }
+     ]
+    },
+    "alchemist": {
+     "text": "Imagine you held the price on the spot because the spreadsheet said so, and did not go back to how it felt. A week later the buyer has gone quiet and the reason they chose you has been lost.",
+     "ask": "What do you do next?",
+     "opts": [
+      {
+       "t": "Go back to what the relationship means and why they chose you, then find a version of the price that holds both.",
+       "s": 100
+      },
+      {
+       "t": "Reach out to the buyer now and re-cost the next order once you know where they stand.",
+       "s": 50
+      },
+      {
+       "t": "Stand by the figures; if they come back, they come back.",
+       "s": 0
+      },
+      {
+       "t": "Wait a month and see whether they return.",
+       "s": 0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "P3-Q05",
+   "area": "Awareness of others",
+   "ability": "Recognition",
+   "loop": "architect",
+   "ctx": "Someone else deciding: launching",
+   "text": "Imagine a partner deciding when to launch. In the meeting she says: “Before we pick a date I want the list: what is built, what is tested and what we will measure. Once that is done, let’s hear how customers are likely to react.” She sets the date when every item on the list is ticked.",
+   "ask": "Compared with how you make this kind of decision, how would you describe her?",
+   "opts": [
+    {
+     "t": "She decides the way I do.",
+     "k": "same"
+    },
+    {
+     "t": "She decides differently from me.",
+     "k": "diff"
+    },
+    {
+     "t": "I cannot tell from this.",
+     "k": "NA"
+    },
+    {
+     "t": "Other",
+     "k": "other",
+     "other": true
+    }
+   ],
+   "mixedOpts": [
+    {
+     "t": "She relies on what can be proven, and checks how people feel about it along the way.",
+     "s": 100
+    },
+    {
+     "t": "She relies on her feel for the right moment, and the list is there to confirm it.",
+     "s": 0
+    },
+    {
+     "t": "She relies on both equally and lets whichever is stronger on the day set the date.",
+     "s": 0
+    },
+    {
+     "t": "Other",
+     "s": 0,
+     "other": true
+    }
+   ],
+   "scoring": "Architect: “the way I do” 100 (same-loop recognition). Alchemist: “differently from me” 100 (alternate-loop recognition). Any other answer 0; Other words stored. Mixed: absolute options, best 100."
+  },
+  {
+   "id": "P3-Q06",
+   "area": "Awareness of others",
+   "ability": "Recognition",
+   "loop": "alchemist",
+   "ctx": "Someone else deciding: choosing who to work with",
+   "text": "Imagine a partner deciding whether to work with someone. He says: “I can see the two of us building something here, and the timing feels right.” He then asks for the figures to make sure it holds up, and agrees once it still feels right to him.",
+   "ask": "Compared with how you make this kind of decision, how would you describe him?",
+   "opts": [
+    {
+     "t": "He decides the way I do.",
+     "k": "same"
+    },
+    {
+     "t": "He decides differently from me.",
+     "k": "diff"
+    },
+    {
+     "t": "I cannot tell from this.",
+     "k": "NA"
+    },
+    {
+     "t": "Other",
+     "k": "other",
+     "other": true
+    }
+   ],
+   "mixedOpts": [
+    {
+     "t": "He relies on his sense of the person and the timing, and the figures are there to confirm it.",
+     "s": 100
+    },
+    {
+     "t": "He relies on the figures, and the story is what he tells once they hold.",
+     "s": 0
+    },
+    {
+     "t": "He relies on both equally and lets whichever is stronger on the day decide.",
+     "s": 0
+    },
+    {
+     "t": "Other",
+     "s": 0,
+     "other": true
+    }
+   ],
+   "scoring": "Alchemist: “the way I do” 100 (same-loop recognition). Architect: “differently from me” 100 (alternate-loop recognition). Any other answer 0; Other words stored. Mixed: absolute options, best 100."
+  },
+  {
+   "id": "P3-Q07",
+   "area": "Awareness of others",
+   "ability": "Translation",
+   "ctx": "Launching, with a partner who thinks differently from you",
+   "both": true,
+   "v": {
+    "architect": {
+     "text": "Imagine your partner, who thinks differently from you, says: “This launch has to feel like an event. People should be talking about it before it even opens.”",
+     "ask": "What are they really asking for, put in a way you could act on?",
+     "opts": [
+      {
+       "t": "A target for how many people are signed up or talking about it before the open date, and one moment in the launch built to be talked about.",
+       "s": 100
+      },
+      {
+       "t": "More marketing: add a promotion to the plan.",
+       "s": 25
+      },
+      {
+       "t": "They have not thought about the operations; park it until the plan is ready.",
+       "s": 0
+      },
+      {
+       "t": "A bigger launch.",
+       "s": 0
+      }
+     ]
+    },
+    "alchemist": {
+     "text": "Imagine your partner, who thinks differently from you, says: “Before we commit to the date, I need to know how many people we can handle and at what point we would stop.”",
+     "ask": "What are they really asking for, put in a way you could act on?",
+     "opts": [
+      {
+       "t": "How many people we can look after well before the excitement outgrows us, and the point at which we would pause to protect that.",
+       "s": 100
+      },
+      {
+       "t": "They want to slow it down; agree a later date.",
+       "s": 25
+      },
+      {
+       "t": "They are nervous; reassure them and carry on.",
+       "s": 0
+      },
+      {
+       "t": "A smaller launch.",
+       "s": 0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "P3-Q08",
+   "area": "Awareness of others",
+   "ability": "Working together",
+   "loop": "same",
+   "ctx": "Two people who think alike but work differently",
+   "text": "Imagine two people who understand each other well in how they think, launching an offer together. One plans by working out which moves come first; the other makes things run reliably through routines.",
+   "ask": "Which order of steps works best?",
+   "opts": [
+    {
+     "t": "The planner sets the moves and the stop points; the builder turns them into a procedure and runs it; both review at the checkpoint.",
+     "s": 100
+    },
+    {
+     "t": "The builder standardises the routine first; the planner fits the moves around it.",
+     "s": 25
+    },
+    {
+     "t": "Both plan everything together in one document, then split the work.",
+     "s": 0
+    },
+    {
+     "t": "The planner does both, because planning comes first.",
+     "s": 0
+    }
+   ]
+  },
+  {
+   "id": "P3-Q09",
+   "area": "Awareness of others",
+   "ability": "Working together",
+   "loop": "alternate",
+   "ctx": "Two people who think differently",
+   "text": "Imagine two entrepreneurs building a new offer together who think and operate differently: one goes with their sense of the right thing and the story; the other works it out from the facts and the plan.",
+   "ask": "Which order of steps works best?",
+   "opts": [
+    {
+     "t": "The one who goes with the story shows a working example; they decide together; the one who works from the facts writes the detailed plan and scales it.",
+     "s": 100
+    },
+    {
+     "t": "The one who works from the facts writes the plan; the other tests it, then tells the story so people take it up.",
+     "s": 50
+    },
+    {
+     "t": "Each builds their own version and they merge at the end.",
+     "s": 0
+    },
+    {
+     "t": "The one who works from the facts leads throughout, because it is a plan.",
+     "s": 0
+    }
+   ]
+  },
+  {
+   "id": "P3-Q10",
+   "area": "Awareness of others",
+   "ability": "Shared decision rules",
+   "loop": "alternate",
+   "ctx": "A joint decision on pricing",
+   "text": "Imagine you and a partner who thinks and operates differently from you have 30 days to decide whether to keep a new price.",
+   "ask": "Which rule for the decision works best?",
+   "opts": [
+    {
+     "t": "One measure each of you trusts (sales figures and customer reaction), agreed points to stop or to expand, and a date to decide.",
+     "s": 100
+    },
+    {
+     "t": "Agree a date and decide then.",
+     "s": 25
+    },
+    {
+     "t": "Go with whichever of you feels more strongly on the day.",
+     "s": 0
+    },
+    {
+     "t": "Use the figures only; a reaction is not evidence.",
+     "s": 0
+    }
+   ]
+  },
+  {
+   "id": "P3-Q11",
+   "area": "Awareness of others",
+   "ability": "Conflict repair",
+   "loop": "same",
+   "ctx": "A clash with someone who thinks like you",
+   "text": "Imagine someone who thinks like you reaches a different decision from the same figures: you want to re-plan, they want to tighten the routine.",
+   "ask": "What is your next move?",
+   "opts": [
+    {
+     "t": "Say that you both think alike but work differently, and agree which approach should lead at this stage.",
+     "s": 100
+    },
+    {
+     "t": "Split it: each runs their own version for a week and compare.",
+     "s": 25
+    },
+    {
+     "t": "Show them why your approach is the right one.",
+     "s": 0
+    },
+    {
+     "t": "Let them have it to keep the peace.",
+     "s": 0
+    }
+   ]
+  },
+  {
+   "id": "P3-Q12",
+   "area": "Awareness of others",
+   "ability": "Conflict repair",
+   "loop": "alternate",
+   "ctx": "A clash with someone who thinks differently from you",
+   "both": true,
+   "v": {
+    "architect": {
+     "text": "Imagine a clash over the launch date with your partner, who thinks differently from you. They say it does not feel ready; you say the criteria are met.",
+     "ask": "What is your next move?",
+     "opts": [
+      {
+       "t": "Acknowledge their concern about the story first, then bring the discussion back to the two or three things that must hold.",
+       "s": 100
+      },
+      {
+       "t": "Pause the launch until you both agree on everything.",
+       "s": 25
+      },
+      {
+       "t": "Walk them through the plan to show the criteria are met.",
+       "s": 0
+      },
+      {
+       "t": "Agree with them to end it.",
+       "s": 0
+      }
+     ]
+    },
+    "alchemist": {
+     "text": "Imagine a clash over the launch date with your partner, who thinks differently from you. They say the criteria are not met; you say it feels ready.",
+     "ask": "What is your next move?",
+     "opts": [
+      {
+       "t": "Accept the points you had missed, then keep the heart of the story in a version that can be delivered.",
+       "s": 100
+      },
+      {
+       "t": "Pause the launch until you both agree on everything.",
+       "s": 25
+      },
+      {
+       "t": "Re-tell the story until they feel it.",
+       "s": 0
+      },
+      {
+       "t": "Agree with them to end it.",
+       "s": 0
+      }
+     ]
+    }
+   }
+  }
+ ],
+ "part4": [
+  {
+   "id": "P4-Q01",
+   "domain": "Modality",
+   "ctx": "A new software tool",
+   "ask": "You need to learn a new software tool for your business. What do you do first?",
+   "opts": [
+    {
+     "t": "Watch a short demo or look at screenshots of it.",
+     "r": "Visual"
+    },
+    {
+     "t": "Ask someone to talk me through it.",
+     "r": "Auditory"
+    },
+    {
+     "t": "Read the guide or the help pages.",
+     "r": "Read/Write"
+    },
+    {
+     "t": "Open it and try things until it makes sense.",
+     "r": "Kinaesthetic"
+    }
+   ]
+  },
+  {
+   "id": "P4-Q02",
+   "domain": "Modality",
+   "ctx": "A mentor explains a pricing method",
+   "ask": "A mentor explains a new pricing method. When does it stick best?",
+   "opts": [
+    {
+     "t": "When they draw it as a diagram or a chart.",
+     "r": "Visual"
+    },
+    {
+     "t": "When they talk it through and I can ask questions.",
+     "r": "Auditory"
+    },
+    {
+     "t": "When I have it written down to read and make notes on.",
+     "r": "Read/Write"
+    },
+    {
+     "t": "When I work through a real example with my own numbers.",
+     "r": "Kinaesthetic"
+    }
+   ]
+  },
+  {
+   "id": "P4-Q03",
+   "domain": "Approach",
+   "ctx": "Starting a new topic",
+   "ask": "When you start a new topic, what do you prefer?",
+   "opts": [
+    {
+     "t": "To go step by step, in order, building it up.",
+     "r": "Structured"
+    },
+    {
+     "t": "To get the big picture first, then fill in the detail.",
+     "r": "Global"
+    }
+   ]
+  },
+  {
+   "id": "P4-Q04",
+   "domain": "Approach",
+   "ctx": "A long guide arrives",
+   "ask": "A 60-page guide lands in your inbox. What do you do?",
+   "opts": [
+    {
+     "t": "Start at the beginning and work through it in order.",
+     "r": "Structured"
+    },
+    {
+     "t": "Skim the whole thing first to see how it fits together.",
+     "r": "Global"
+    }
+   ]
+  },
+  {
+   "id": "P4-Q05",
+   "domain": "Concept processing",
+   "ctx": "When an idea makes sense",
+   "ask": "An idea makes sense to you when…",
+   "opts": [
+    {
+     "t": "I see the facts, the details and a real example.",
+     "r": "Concrete"
+    },
+    {
+     "t": "I see the pattern behind it and how it connects to other things.",
+     "r": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "P4-Q06",
+   "domain": "Concept processing",
+   "ctx": "A new way of working is pitched to you",
+   "ask": "Someone pitches you a new way of working. What convinces you?",
+   "opts": [
+    {
+     "t": "A worked case, with numbers, from a business like mine.",
+     "r": "Concrete"
+    },
+    {
+     "t": "The principle: why it works and where else it would apply.",
+     "r": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "P4-Q07",
+   "domain": "Working environment",
+   "ctx": "Learning something difficult",
+   "ask": "You learn something difficult best when…",
+   "opts": [
+    {
+     "t": "I work through it alone, at my own rhythm.",
+     "r": "Individual"
+    },
+    {
+     "t": "I talk it through with other people.",
+     "r": "Collaborative"
+    }
+   ]
+  },
+  {
+   "id": "P4-Q08",
+   "domain": "Working environment",
+   "ctx": "A skill to master in a month",
+   "ask": "You have to master a new skill in a month. What do you do?",
+   "opts": [
+    {
+     "t": "Block out time to study it on my own.",
+     "r": "Individual"
+    },
+    {
+     "t": "Find a group, a course with others or a partner to learn it with.",
+     "r": "Collaborative"
+    }
+   ]
+  },
+  {
+   "id": "P4-Q09",
+   "domain": "Pace",
+   "ctx": "A week to learn something",
+   "ask": "Given a week to learn something, how do you go about it?",
+   "opts": [
+    {
+     "t": "In short, intense bursts to keep the momentum.",
+     "r": "Fast"
+    },
+    {
+     "t": "Steadily, a bit each day, for depth.",
+     "r": "Slow"
+    }
+   ]
+  },
+  {
+   "id": "P4-Q10",
+   "domain": "Pace",
+   "ctx": "A new regulation affects your business",
+   "ask": "A new regulation affects your business. What do you do?",
+   "opts": [
+    {
+     "t": "Get the essentials fast and act, then learn more as I need it.",
+     "r": "Fast"
+    },
+    {
+     "t": "Take the time to understand it fully before I change anything.",
+     "r": "Slow"
+    }
+   ]
+  }
+ ],
+ "part5": [
+  {
+   "id": "P5-S01",
+   "d": "Attention and regulation",
+   "t": "I lose focus during long tasks unless something changes."
+  },
+  {
+   "id": "P5-S02",
+   "d": "Language and processing",
+   "t": "I find dense written text slow or tiring to read."
+  },
+  {
+   "id": "P5-S03",
+   "d": "Structure and routine",
+   "t": "Unexpected changes to a plan unsettle me."
+  },
+  {
+   "id": "P5-S04",
+   "d": "Sensory load",
+   "t": "Noise, bright light or movement around me makes it hard to think."
+  },
+  {
+   "id": "P5-S05",
+   "d": "Body chemistry and diet",
+   "t": "My focus changes depending on what and when I eat or drink."
+  },
+  {
+   "id": "P5-S06",
+   "d": "Strength: depth of focus",
+   "t": "When something interests me, I can work on it for hours without noticing the time.",
+   "str": true
+  },
+  {
+   "id": "P5-S07",
+   "d": "Attention and regulation",
+   "t": "I lose track of time when I am absorbed in something."
+  },
+  {
+   "id": "P5-S08",
+   "d": "Language and processing",
+   "t": "I understand something faster when I hear it or see it than when I read it."
+  },
+  {
+   "id": "P5-S09",
+   "d": "Structure and routine",
+   "t": "I prefer to know the agenda in advance."
+  },
+  {
+   "id": "P5-S10",
+   "d": "Sensory load",
+   "t": "I need a quiet, settled space to do my best work."
+  },
+  {
+   "id": "P5-S11",
+   "d": "Body chemistry and diet",
+   "t": "I eat at regular times.",
+   "rev": true
+  },
+  {
+   "id": "P5-S12",
+   "d": "Strength: pattern recognition",
+   "t": "I see connections between things that other people treat as separate.",
+   "str": true
+  },
+  {
+   "id": "P5-S13",
+   "d": "Attention and regulation",
+   "t": "I can keep my attention on one long task without needing a change.",
+   "rev": true
+  },
+  {
+   "id": "P5-S14",
+   "d": "Language and processing",
+   "t": "I take in a long report comfortably in one sitting.",
+   "rev": true
+  },
+  {
+   "id": "P5-S15",
+   "d": "Structure and routine",
+   "t": "I am comfortable when a day has no fixed plan.",
+   "rev": true
+  },
+  {
+   "id": "P5-S16",
+   "d": "Sensory load",
+   "t": "I can concentrate in a busy, noisy place.",
+   "rev": true
+  },
+  {
+   "id": "P5-S17",
+   "d": "Body chemistry and diet",
+   "t": "I notice a dip in energy or attention after certain foods or drinks."
+  },
+  {
+   "id": "P5-S18",
+   "d": "Strength: creativity",
+   "t": "Ideas come to me quickly, often several at once.",
+   "str": true
+  },
+  {
+   "id": "P5-S19",
+   "d": "Attention and regulation",
+   "t": "I jump between tasks before finishing the one I am on."
+  },
+  {
+   "id": "P5-S20",
+   "d": "Language and processing",
+   "t": "I prefer a diagram or a short summary to a page of text."
+  },
+  {
+   "id": "P5-S21",
+   "d": "Structure and routine",
+   "t": "I work best when the same routine is followed each time."
+  },
+  {
+   "id": "P5-S22",
+   "d": "Sensory load",
+   "t": "Background sounds or screens pull my attention away."
+  },
+  {
+   "id": "P5-S23",
+   "d": "Body chemistry and diet",
+   "t": "Skipping a meal makes little difference to how I work.",
+   "rev": true
+  },
+  {
+   "id": "P5-S24",
+   "d": "Strength: depth of focus",
+   "t": "I notice details in my work that other people miss.",
+   "str": true
+  },
+  {
+   "id": "P5-S25",
+   "d": "Strength: pattern recognition",
+   "t": "I can tell where a trend is going before the numbers show it.",
+   "str": true
+  },
+  {
+   "id": "P5-S26",
+   "d": "Strength: creativity",
+   "t": "I find unusual ways to solve problems that others would not think of.",
+   "str": true
+  }
+ ],
+ "part6": [
+  {
+   "id": "P6-S01",
+   "d": "Mindset",
+   "t": "When I fail at something, I treat it as information for the next attempt."
+  },
+  {
+   "id": "P6-S02",
+   "d": "Confidence",
+   "t": "Once I have decided, I rarely need someone else to confirm it."
+  },
+  {
+   "id": "P6-S03",
+   "d": "Patience",
+   "t": "I wait until I have enough information before I act on a new idea."
+  },
+  {
+   "id": "P6-S04",
+   "d": "Risk style",
+   "t": "I will commit to an opportunity before every risk is clear."
+  },
+  {
+   "id": "P6-S05",
+   "d": "Energy",
+   "t": "After a day of meetings, I feel energised rather than drained."
+  },
+  {
+   "id": "P6-S06",
+   "d": "Mindset",
+   "t": "I avoid tasks I might not be good at.",
+   "rev": true
+  },
+  {
+   "id": "P6-S07",
+   "d": "Confidence",
+   "t": "I often second-guess a decision after I have made it.",
+   "rev": true
+  },
+  {
+   "id": "P6-S08",
+   "d": "Patience",
+   "t": "I act on a new idea the moment it excites me.",
+   "rev": true
+  },
+  {
+   "id": "P6-S09",
+   "d": "Risk style",
+   "t": "I prefer a smaller, certain gain to a larger, uncertain one.",
+   "rev": true
+  },
+  {
+   "id": "P6-S10",
+   "d": "Energy",
+   "t": "I recharge by spending time on my own.",
+   "rev": true
+  },
+  {
+   "id": "P6-S11",
+   "d": "Mindset",
+   "t": "I can get better at almost anything if I work at it."
+  },
+  {
+   "id": "P6-S12",
+   "d": "Confidence",
+   "t": "I trust my own judgement even when others disagree."
+  },
+  {
+   "id": "P6-S13",
+   "d": "Patience",
+   "t": "I can sit with a decision for days without needing to settle it."
+  },
+  {
+   "id": "P6-S14",
+   "d": "Risk style",
+   "t": "Uncertainty is part of the appeal of a new venture for me."
+  },
+  {
+   "id": "P6-S15",
+   "d": "Energy",
+   "t": "I think best when I am talking things through with people."
+  },
+  {
+   "id": "P6-S16",
+   "d": "Mindset",
+   "t": "A mistake in front of other people stays with me for a long time.",
+   "rev": true
+  },
+  {
+   "id": "P6-S17",
+   "d": "Confidence",
+   "t": "I look for approval before I act on a decision.",
+   "rev": true
+  },
+  {
+   "id": "P6-S18",
+   "d": "Patience",
+   "t": "Waiting for more information frustrates me.",
+   "rev": true
+  },
+  {
+   "id": "P6-S19",
+   "d": "Risk style",
+   "t": "I need to see how something could fail before I commit to it.",
+   "rev": true
+  },
+  {
+   "id": "P6-S20",
+   "d": "Energy",
+   "t": "A full day with other people leaves me needing quiet.",
+   "rev": true
+  }
+ ],
+ "part7": [
+  {
+   "id": "P7-Q01",
+   "b": "Success means",
+   "a": "Success is a business that makes good money.",
+   "c": "Success is a business that makes a real difference."
+  },
+  {
+   "id": "P7-Q02",
+   "b": "Build for",
+   "a": "I would rather launch quickly and improve as I go.",
+   "c": "I would rather launch when it is right."
+  },
+  {
+   "id": "P7-Q03",
+   "b": "Progress means",
+   "a": "Progress is trying things nobody has tried.",
+   "c": "Progress is making what already works better."
+  },
+  {
+   "id": "P7-Q04",
+   "b": "Proof is",
+   "a": "I know it is working when the numbers say so.",
+   "c": "I know it is working when customers say so."
+  },
+  {
+   "id": "P7-Q05",
+   "b": "Others are seen as",
+   "a": "Others in my market are people to work with.",
+   "c": "Others in my market are people to beat."
+  },
+  {
+   "id": "P7-Q06",
+   "b": "Opportunity is",
+   "a": "There is enough opportunity to go round.",
+   "c": "Opportunity has to be won and protected."
+  },
+  {
+   "id": "P7-Q07",
+   "b": "Success means",
+   "a": "I would rather double the profit than double the impact.",
+   "c": "I would rather double the impact than double the profit."
+  },
+  {
+   "id": "P7-Q08",
+   "b": "Build for",
+   "a": "Getting it out there matters more than getting it perfect.",
+   "c": "Getting it right matters more than getting it out there."
+  },
+  {
+   "id": "P7-Q09",
+   "b": "Progress means",
+   "a": "I would rather start a new thing than improve an existing one.",
+   "c": "I would rather improve an existing thing than start a new one."
+  },
+  {
+   "id": "P7-Q10",
+   "b": "Proof is",
+   "a": "A result is real when it can be measured.",
+   "c": "A result is real when people can see and feel it."
+  },
+  {
+   "id": "P7-Q11",
+   "b": "Others are seen as",
+   "a": "A rival’s success is good for the market.",
+   "c": "A rival’s success is a loss for me."
+  },
+  {
+   "id": "P7-Q12",
+   "b": "Opportunity is",
+   "a": "If I miss one chance, another will come.",
+   "c": "A missed chance is gone for good."
+  },
+  {
+   "id": "P7-Q13",
+   "b": "Success means",
+   "a": "The best measure of a year is the return it made.",
+   "c": "The best measure of a year is the difference it made."
+  },
+  {
+   "id": "P7-Q14",
+   "b": "Build for",
+   "a": "I would rather reach many people with a good version.",
+   "c": "I would rather reach fewer people with the best version."
+  },
+  {
+   "id": "P7-Q15",
+   "b": "Progress means",
+   "a": "A business moves forward by adding.",
+   "c": "A business moves forward by refining."
+  },
+  {
+   "id": "P7-Q16",
+   "b": "Proof is",
+   "a": "I trust a figure more than a testimonial.",
+   "c": "I trust a testimonial more than a figure."
+  },
+  {
+   "id": "P7-Q17",
+   "b": "Others are seen as",
+   "a": "I would rather share a market than fight for it.",
+   "c": "I would rather win a market than share it."
+  },
+  {
+   "id": "P7-Q18",
+   "b": "Opportunity is",
+   "a": "I would rather give an opportunity away than hold it back.",
+   "c": "I would rather hold an opportunity than give it away."
+  },
+  {
+   "id": "P7-Q19",
+   "b": "Success means",
+   "ctx": "An unexpected sum of money",
+   "text": "Imagine an unexpected sum, about two months of running costs, lands in the business account.",
+   "ask": "What do you do with it?",
+   "a": "Put it where it will bring the best return.",
+   "c": "Put it into the difference the business makes.",
+   "both": "Both: part of it earns, part of it serves."
+  },
+  {
+   "id": "P7-Q20",
+   "b": "Others are seen as",
+   "ctx": "An offer to work together",
+   "text": "Imagine a business in your market offers to work with you on a shared offer.",
+   "ask": "What do you do?",
+   "a": "Take it: we both win.",
+   "c": "Decline: they would learn too much about how we work.",
+   "both": "It depends on the business and the offer."
+  },
+  {
+   "id": "P7-Q21",
+   "b": "stall",
+   "ctx": "A decision that has stalled",
+   "text": "Imagine that last week you decided to raise your prices. You have not told your customers yet.",
+   "ask": "What is holding you back?",
+   "stall": [
+    {
+     "t": "It would feel like putting money before the people we serve.",
+     "k": "Purpose"
+    },
+    {
+     "t": "The offer is not good enough yet to charge more.",
+     "k": "Craft"
+    },
+    {
+     "t": "Someone else in the market could use it against us.",
+     "k": "Competitors"
+    },
+    {
+     "t": "Nothing. I would raise the price.",
+     "k": "none"
+    }
+   ]
+  }
+ ],
+ "SUBTYPES": {
+  "MS": "Master Strategist",
+  "SB": "Systemised Builder",
+  "IA": "Internal Analyser",
+  "UA": "The Ultimate Architect",
+  "VO": "Visionary Oracle",
+  "MP": "Magnetic Perfectionist",
+  "EE": "Energetic Empath",
+  "UAl": "The Ultimate Alchemist"
+ },
+ "ARCH": [
+  "MS",
+  "SB",
+  "IA",
+  "UA"
+ ],
+ "ALCH": [
+  "VO",
+  "MP",
+  "EE",
+  "UAl"
+ ],
+ "MIRROR": [
+  [
+   "MS",
+   "VO"
+  ],
+  [
+   "SB",
+   "EE"
+  ],
+  [
+   "IA",
+   "MP"
+  ],
+  [
+   "UA",
+   "UAl"
+  ]
+ ],
+ "P4_FLAT": {
+  "Modality": "Multimodal",
+  "Approach": "Adaptive",
+  "Concept processing": "Flexible",
+  "Working environment": "Adaptive",
+  "Pace": "Versatile"
+ },
+ "P5_PAGES": [
+  [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  [
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13
+  ],
+  [
+   14,
+   15,
+   16,
+   17,
+   18,
+   19
+  ],
+  [
+   20,
+   21,
+   22,
+   23,
+   24,
+   25
+  ]
+ ],
+ "P5_SCALE": [
+  "Never",
+  "Sometimes",
+  "Often"
+ ],
+ "P6_PAGES": [
+  [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  [
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  [
+   10,
+   11,
+   12,
+   13,
+   14
+  ],
+  [
+   15,
+   16,
+   17,
+   18,
+   19
+  ]
+ ],
+ "P6_SCALE": [
+  "Strongly disagree",
+  "Disagree",
+  "Neither",
+  "Agree",
+  "Strongly agree"
+ ],
+ "EITHER": "Depends on the situation.",
+ "SUBS": [
+  "MS",
+  "SB",
+  "IA"
+ ],
+ "SUB_TXT": {
+  "MS": [
+   "Master Strategist",
+   "Win by sequencing the right bets at the right time.",
+   "Prioritising, managing several bets at once, clear trade-offs, a firm “no”.",
+   "Tighter feedback loops, regular demos, a shorter time from plan to learning."
+  ],
+  "SB": [
+   "Systemised Builder",
+   "Win by making the business run predictably.",
+   "Standard operating procedures, output, reliability, cost control.",
+   "Protect 10–15% of capacity for experiments."
+  ],
+  "IA": [
+   "Internal Analyser",
+   "Win by being right: truth through data and models.",
+   "Spotting real signals, finding cause and effect, putting numbers on risk, decision quality.",
+   "A shorter time to insight, and findings presented as a simple story with the numbers."
+  ],
+  "UA": [
+   "The Ultimate Architect",
+   "Strategy, systems and proof integrated.",
+   "Consistent bets, systems that scale, learning that is proven.",
+   "Keep testing ideas with working prototypes; invite outside challenge to the story."
+  ],
+  "VO": [
+   "Visionary Oracle",
+   "Win by seeing the future pattern first.",
+   "Stories that define a category, sensing where the market is going, unexpected bets.",
+   "Shorter demo cycles and more discipline about constraints."
+  ],
+  "MP": [
+   "Magnetic Perfectionist",
+   "Win by crafting product quality and features that draw people in.",
+   "An eye for product quality, detail, polished user experience, products people want.",
+   "Tie quality standards to business limits and ship every week."
+  ],
+  "EE": [
+   "Energetic Empath",
+   "Win by mobilising people and energy around a cause.",
+   "Community, partnerships, recruiting, momentum.",
+   "Firmer boundaries and exit rules; wins written down and formalised."
+  ],
+  "UAl": [
+   "The Ultimate Alchemist",
+   "Vision, quality and people integrated, with proof.",
+   "A story that converts, a product that pulls, communities that scale.",
+   "Keep operations level with the story; use data to refine the story."
+  ]
+ },
+ "W2": {
+  "0": 1.5,
+  "1": 1.5,
+  "8": 1.5,
+  "9": 1.5
+ },
+ "LV3": [
+  [
+   85,
+   "Mastery"
+  ],
+  [
+   70,
+   "High"
+  ],
+  [
+   50,
+   "Moderate"
+  ],
+  [
+   30,
+   "Low"
+  ],
+  [
+   0,
+   "Very low"
+  ]
+ ],
+ "P4_DESC": {
+  "Visual": "diagrams, charts",
+  "Auditory": "discussion, listening, repetition",
+  "Read/Write": "text, lists, notes",
+  "Kinaesthetic": "hands-on, doing",
+  "Multimodal": "a flexible mix",
+  "Structured": "step by step, outlines and order",
+  "Global": "big picture first, then detail",
+  "Concrete": "facts, details, real examples",
+  "Abstract": "theories, patterns, connections",
+  "Flexible": "moves between the two",
+  "Individual": "alone, at your own rhythm",
+  "Collaborative": "discussion and shared energy",
+  "Fast": "short intense bursts, momentum",
+  "Slow": "steady and methodical, depth",
+  "Versatile": "fast when needed, slow for mastery"
+ },
+ "P4_DOM": [
+  [
+   "Modality",
+   "How information comes in",
+   [
+    "Visual",
+    "Auditory",
+    "Read/Write",
+    "Kinaesthetic",
+    "Multimodal"
+   ],
+   "moves between the two"
+  ],
+  [
+   "Approach",
+   "How information is ordered",
+   [
+    "Structured",
+    "Global",
+    "Adaptive"
+   ],
+   "moves between the two"
+  ],
+  [
+   "Concept processing",
+   "How information is framed",
+   [
+    "Concrete",
+    "Abstract",
+    "Flexible"
+   ],
+   ""
+  ],
+  [
+   "Working environment",
+   "Where information is best absorbed",
+   [
+    "Individual",
+    "Collaborative",
+    "Adaptive"
+   ],
+   "works well in both"
+  ],
+  [
+   "Pace",
+   "How information flows",
+   [
+    "Fast",
+    "Slow",
+    "Versatile"
+   ],
+   ""
+  ]
+ ],
+ "P5_DOMS": [
+  "Attention and regulation",
+  "Language and processing",
+  "Structure and routine",
+  "Sensory load",
+  "Body chemistry and diet"
+ ],
+ "P5_PAT": {
+  "Attention and regulation": [
+   "Fast-switching focus",
+   "Fast idea generation, creative leaps, energy under pressure"
+  ],
+  "Language and processing": [
+   "Visual and spoken processing",
+   "Pattern recognition, storytelling, seeing connections others miss"
+  ],
+  "Structure and routine": [
+   "Structure and clarity",
+   "Precision, sustained focus, deep understanding of systems"
+  ],
+  "Sensory load": [
+   "Sensory sensitivity",
+   "Fine perception, noticing signals early"
+  ]
+ },
+ "P6_DOMS": [
+  [
+   "Mindset",
+   "Fixed",
+   "Situational",
+   "Growth"
+  ],
+  [
+   "Confidence",
+   "Self-doubting",
+   "Situational",
+   "Confident"
+  ],
+  [
+   "Patience",
+   "Impulsive",
+   "Balanced",
+   "Patient"
+  ],
+  [
+   "Risk style",
+   "Risk-averse",
+   "Risk-balanced",
+   "Risk-taking"
+  ],
+  [
+   "Energy",
+   "Inward",
+   "Balanced",
+   "Outward"
+  ]
+ ],
+ "P7_B": [
+  [
+   "Success means",
+   [
+    0,
+    6,
+    12,
+    18
+   ],
+   "Profit",
+   "Purpose",
+   "Profit and purpose"
+  ],
+  [
+   "Build for",
+   [
+    1,
+    7,
+    13
+   ],
+   "Speed",
+   "Craft",
+   "Speed and craft"
+  ],
+  [
+   "Progress means",
+   [
+    2,
+    8,
+    14
+   ],
+   "New",
+   "Proven",
+   "New or proven"
+  ],
+  [
+   "Proof is",
+   [
+    3,
+    9,
+    15
+   ],
+   "Numbers",
+   "Stories",
+   "Numbers and stories"
+  ],
+  [
+   "Others are seen as",
+   [
+    4,
+    10,
+    16,
+    19
+   ],
+   "Collaborators",
+   "Competitors",
+   "Collaborators or competitors"
+  ],
+  [
+   "Opportunity is",
+   [
+    5,
+    11,
+    17
+   ],
+   "Plenty",
+   "Limited",
+   "Plenty or limited"
+  ]
+ ],
+ "PAIR_TXT": {
+  "MS-VO": [
+   "Both set direction",
+   "One plans the future through logic, the other sees it through feeling."
+  ],
+  "IA-MP": [
+   "Both refine the detail until it is right",
+   "One through data, models and testing, the other through quality standards and polish."
+  ],
+  "SB-EE": [
+   "Both keep the business running day to day",
+   "One through systems and routines, the other through people and momentum."
+  ]
+ },
+ "D1_TXT": {
+  "architect": {
+   "stmt": "System first. Meaning emerges after the system makes sense.",
+   "strengths": [
+    "Clarity",
+    "Repeatable results",
+    "Scale through process",
+    "Clear trade-offs"
+   ],
+   "blind": [
+    "Slow to change direction on feeling signals",
+    "Can underweight brand and energy"
+   ],
+   "fail": [
+    "A perfect model that never ships",
+    "Plans that break when conditions change",
+    "Misreading people whose signals are felt rather than stated"
+   ],
+   "best": [
+    "Regulated industries",
+    "Operations-heavy scaling",
+    "Products where reliability leads",
+    "Creating systems and structure"
+   ],
+   "adapt": [
+    [
+     "Order of content",
+     "Overview → Definitions → Constraints → Steps → Examples → Risks → Action",
+     "Everything the app gives you is written in this order: your workbooks, your report pages and every AI Architect answer. You see the whole picture and the limits first, then the steps, then what it looks like done and what could go wrong, and only then what to do. Nothing asks you to act before the system makes sense."
+    ],
+    [
+     "Tools you will be given",
+     "SOPs, checklists, dashboards, “what could go wrong” lists, decision trees, mind maps",
+     "Inside your workbooks: when an exercise asks you to plan, price, hire or launch, it gives you one of these to fill in: a step-by-step procedure, a checklist you tick off, a dashboard page of the numbers that matter, a “what could go wrong” list (you list how the plan could fail before you start), or a decision tree. A structure to fill in, not a blank page."
+    ],
+    [
+     "How AI Architect works with you",
+     "“What evidence would change your mind?” “Which assumption affects the result most?”",
+     "AI Architect challenges you the way you decide. When you bring it a decision, it works through your Decision Intelligence Loop with you: the data you have, how it feels and how people react, the new data that answers that, and the decision. It asks for the evidence and the assumption behind each step, and it tells you when your final decision rests on a feeling instead of the data."
+    ],
+    [
+     "Working rhythm",
+     "Weekly Plan → Do → Check → Act, or Scrum sprints of up to one month",
+     "Your action plans are cut into weekly or sprint-length cycles, each with a stop point (what tells you to stop) and a scale point (what tells you to do more). You know in advance when you review and what you review against."
+    ]
+   ]
+  },
+  "alchemist": {
+   "stmt": "Feeling first. The story must feel right before the numbers line up.",
+   "strengths": [
+    "Vision",
+    "Pattern recognition",
+    "Connecting weak signals",
+    "Brand and story power",
+    "Breakthrough ideas",
+    "Energy",
+    "The bigger picture"
+   ],
+   "blind": [
+    "Passes over constraints",
+    "Skips specifications",
+    "Inconsistent follow-through",
+    "Ignores data"
+   ],
+   "fail": [
+    "Strategy drift",
+    "Frequent changes of direction that unsettle the team",
+    "Experiments that are not measured"
+   ],
+   "best": [
+    "Creating a new category",
+    "Brand-led growth",
+    "Early discovery",
+    "Starting from nothing",
+    "Firefighting"
+   ],
+   "adapt": [
+    [
+     "Order of content",
+     "Story → Why it matters → Pattern → Principles → Guardrails → First moves → Measures",
+     "Everything the app gives you is written in this order: your workbooks, your report pages and every AI Alchemist answer. The story and why it matters come first, then the pattern, the few principles and guardrails to hold, then the first moves. The numbers come last, as measures of whether it worked. Nothing asks you to specify before you can see it."
+    ],
+    [
+     "Tools you will be given",
+     "Story briefs, hypothesis canvases, vision ladders, a working demo first",
+     "Inside your workbooks: when an exercise asks you to plan, price, hire or launch, it gives you a one-page story brief, a hypothesis canvas (what must be true for this to work), a vision ladder (from where you are to where you can see), or asks you to build a rough working example before any specification. Something to see and react to, not a form."
+    ],
+    [
+     "How AI Alchemist works with you",
+     "“What must be true?” “Which two constraints matter now?” “How will we know it worked?”",
+     "AI Alchemist challenges you the way you decide. When you bring it a decision, it works through your Decision Intelligence Loop with you: what feels right and the story, whether the numbers support it, what that does to the feeling, and the decision. It takes the vision as given, asks what must be true and which two constraints you will hold, and it tells you when your final decision rests on data you do not yet believe in."
+    ],
+    [
+     "Working rhythm",
+     "Sense → Test → Show, then blocks of time to write down what worked",
+     "Your action plans run as short sense-test-show cycles: notice the signal, try it, show it to someone. After each cycle the workbook books a block of time to write down what worked, so the breakthroughs become something your team can repeat."
+    ]
+   ]
+  },
+  "mixed": {
+   "stmt": "A Dominant Decision Intelligence Loop cannot be identified yet.",
+   "causes": [
+    "Strong conditioning (for example, years in a corporate role)",
+    "Constant firefighting to the point where it becomes conditioning or causes stress",
+    "Adapting to fit what past roles rewarded",
+    "Prolonged stress"
+   ],
+   "strengths": [
+    "An understanding of both loops",
+    "Aware of either style",
+    "Wide range of experience"
+   ],
+   "risks": [
+    "Inconsistent strategy",
+    "Loss of trust in teams",
+    "Burnout",
+    "A jack of all trades, master of none"
+   ],
+   "adapt": [
+    [
+     "Find the loop",
+     "Workbooks, then retake E-DNA in about 4 weeks",
+     "Your first workbooks are built to find your Dominant Decision Intelligence Loop, not to teach a subject. Each exercise makes you decide something real and records which loop you began and finished with. After about 4 weeks you retake E-DNA and the result confirms your Core Type Decision Intelligence Loop Identity."
+    ],
+    [
+     "Two-track exercises",
+     "One Architect track and one Alchemist track for every exercise",
+     "Every exercise comes in two versions and you do both. Architect track: write down exactly what will be done and how success will be measured, then review progress at a set checkpoint. Alchemist track: describe the result you can see, then build a quick working example to show someone. Which one came easier, and which one you finished, is the evidence."
+    ],
+    [
+     "Guardrails",
+     "Fewer switches, a stated reason for every change of direction, a written record of each decision",
+     "While your loop is unconfirmed the workbooks add three guardrails to your plans: a limit on how many tasks you switch between in a week, a one-line reason you must write before changing direction, and a decision log. These are what stop the strategy drift and the loss of trust that Mixed people report."
+    ],
+    [
+     "How the AI mentors work with you",
+     "AI Architect and AI Alchemist, both, until your Dominant loop is confirmed",
+     "When you bring either mentor a decision, it works through the loop with you box by box (data, feeling, new data, decision) and records which loop you began and finished with, without warning you either way. For important decisions the app shows both mentors' answers side by side. Noticing which answer you act on is part of finding your loop."
+    ]
+   ]
+  }
+ },
+ "D1_LEAN_WHY": {
+  "architect": "Most likely an Architect whose Dominant Decision Intelligence Loop is not yet strong, so you switch constantly.",
+  "alchemist": "Most likely an Alchemist whose Dominant Decision Intelligence Loop is not yet strong, so you switch constantly.",
+  "none": "No Dominant Decision Intelligence Loop can be identified yet: you switch constantly, or your answers do not yet show a loop."
+ },
+ "SUB_X": {
+  "MS": {
+   "is": "A Master Strategist is an Architect who executes by choosing the order of moves. Once a decision is made, you turn it into a sequence: which bets come first, what each one has to show before the next starts, and what you will say no to. You win by timing: the right bet at the right moment, not every bet at once.",
+   "exec": [
+    [
+     "When time is cut",
+     "You protect the plan: the order of the steps and which moves come first. Quality, data and people are adjusted to fit the sequence, not the other way round."
+    ],
+    [
+     "Your rhythm",
+     "You work in blocks. You set a few moves, run them for a stretch, then stop, review and re-plan. Progress is measured at the review, not day to day."
+    ],
+    [
+     "Keeping scope in bounds",
+     "You tie everything to the moves you chose and cut what does not serve them. A good idea that is not on the sequence waits."
+    ],
+    [
+     "The first thing you create",
+     "A roadmap or a map of the options. Before a procedure, a dashboard or a brief, you want to see the moves laid out."
+    ],
+    [
+     "Under pressure",
+     "You step back and re-order the moves. When something breaks, your first act is to re-order the priorities and set the next few moves, then let the fix follow."
+    ]
+   ],
+   "wrong": [
+    [
+     "Over-planning",
+     "The roadmap gets more detailed while the market moves. The plan is checked against the plan, not against what customers did this week."
+    ],
+    [
+     "Missed opportunities",
+     "An opening that was not in the sequence is slow to register, because it does not fit the order you set."
+    ],
+    [
+     "Distance from the ground",
+     "You see the business through the plan. Signals that arrive as a feeling (a team that has gone quiet, a customer who hesitates) register late, because they do not arrive as numbers."
+    ],
+    [
+     "Strategy for show",
+     "A deck that describes the strategy replaces decisions that act on it. Roadmaps go rigid, feedback comes late, and the next review arrives before the lesson does."
+    ]
+   ],
+   "improve": [
+    [
+     "Shorter time from plan to learning",
+     "Every bet gets a midpoint check at week three or four, not only at the end of the block. If the early indicator is not moving, you decide then."
+    ],
+    [
+     "Regular demos",
+     "Show a working version of each bet to real customers inside the block. A demo is feedback you cannot plan around."
+    ],
+    [
+     "A stop or scale rule for every bet",
+     "Write, before the block starts, what would make you stop and what would make you do more. Then the review is a decision, not a debate."
+    ]
+   ],
+   "games": [
+    [
+     "Chess with a clock",
+     "The clock forces a move before the plan is complete."
+    ],
+    [
+     "Connect Four",
+     "Every move shapes what is available three moves later; two minutes a game."
+    ],
+    [
+     "Risk",
+     "The plan meets the dice and the other players; you re-plan every turn."
+    ]
+   ],
+   "exercise": "Give one live bet a stop or scale rule and a week-4 check this week.",
+   "best": [
+    "Several product lines or markets running at once",
+    "Fundraising and investor plans",
+    "Entering a market in stages"
+   ],
+   "avoid": [
+    "A crisis that needs a fix today: re-planning first delays it",
+    "A single product that needs daily operational grip rather than a sequence",
+    "Any plan you have not shown to a customer within the block"
+   ],
+   "ladder": "From here, The Ultimate Architect is reached by adding the other two Architect ways of executing to your own. From the Internal Analyser: prove each bet with a test before you scale it. From the Systemised Builder: once a bet works, make it a routine so it runs without you. The Ultimate Architect holds all three: the sequence, the proof and the system."
+  },
+  "IA": {
+   "is": "An Internal Analyser is an Architect who executes by being right. Once a decision is made, you turn it into a question that data can answer: what has to be true, how you would know, and what the numbers say. You win by precision: fewer wrong moves, because each one was tested first.",
+   "exec": [
+    [
+     "When time is cut",
+     "You protect the accuracy: the data and the assumptions the work rests on. A plan built on a wrong number is not a plan."
+    ],
+    [
+     "Your rhythm",
+     "You work in test cycles. Run a test, check the results, decide the next one. The cycle is short and the reading is weekly."
+    ],
+    [
+     "Keeping scope in bounds",
+     "Nothing is added until the analysis says it should be. Scope grows by evidence, not by enthusiasm."
+    ],
+    [
+     "The first thing you create",
+     "A dashboard or a test plan. You want the measures in place before the work starts."
+    ],
+    [
+     "Under pressure",
+     "You go deeper into the detail and the data. When something breaks, you find out exactly what happened before anything changes."
+    ]
+   ],
+   "wrong": [
+    [
+     "Analysis that slows decisions",
+     "The next test is always one more test. The decision waits for a certainty the data cannot give."
+    ],
+    [
+     "Perfectionism",
+     "A model that is nearly right is treated as wrong. Time goes into the last decimal place, not the decision."
+    ],
+    [
+     "Undervaluing what is not written down",
+     "Experience that arrives as judgement rather than data is discounted, so the people who have it stop offering it."
+    ],
+    [
+     "Results other people do not buy into",
+     "The finding is right and the room does not move, because it was presented as numbers without the story."
+    ]
+   ],
+   "improve": [
+    [
+     "A shorter time to insight",
+     "Set the success criteria and the stopping rule before each test, so the test ends when the answer is good enough, not when it is perfect."
+    ],
+    [
+     "Findings as a simple story",
+     "Present each result as one sentence a non-analyst would repeat, with the numbers underneath it."
+    ],
+    [
+     "Two-week cycles",
+     "Keep each test to two weeks with a weekly reading. If it needs longer, it is two tests."
+    ]
+   ],
+   "games": [
+    [
+     "Wordle",
+     "A fixed number of guesses: commit to the best answer you have."
+    ],
+    [
+     "Articulate",
+     "Explain the word in 30 seconds; the first clue that works beats the perfect one."
+    ]
+   ],
+   "exercise": "Write the stopping rule before your next analysis, and present the result as one sentence with the numbers underneath.",
+   "best": [
+    "Pricing",
+    "Growth analysis and forecasting",
+    "Experiments where the answer is worth the wait"
+   ],
+   "avoid": [
+    "Decisions that have to be made before the data exists",
+    "Presenting a finding without the one-sentence story",
+    "Running a test with no stopping rule"
+   ],
+   "ladder": "From here, The Ultimate Architect is reached by adding the other two Architect ways of executing to your own. From the Master Strategist: put your tests in an order that serves a plan, so proof leads somewhere. From the Systemised Builder: turn a proven result into a routine that runs without you. The Ultimate Architect holds all three: the sequence, the proof and the system."
+  },
+  "VO": {
+   "is": "A Visionary Oracle is an Alchemist who executes by seeing where things are going first. Once a decision is made, you turn it into a direction: the story of what this becomes, why now, and the first proof that it is real. You win by being early: the pattern you saw before others did.",
+   "exec": [
+    [
+     "When time is cut",
+     "You protect the vision: the story and where this is going. Quality, people and plan are shaped to serve the direction."
+    ],
+    [
+     "Your rhythm",
+     "You work in rounds. Show a working version, get reactions, show the next. The reaction is the plan."
+    ],
+    [
+     "Keeping scope in bounds",
+     "You let an idea explore while the pattern becomes clear, then settle it. Scope is open early and closed late."
+    ],
+    [
+     "The first thing you create",
+     "A story brief or a short video of what it will become. Before a checklist or a dashboard, you want people to see it."
+    ],
+    [
+     "Under pressure",
+     "You re-tell the story and test the next step towards it. When something breaks, you make sure the setback does not change where you are going."
+    ]
+   ],
+   "wrong": [
+    [
+     "Constraints passed over",
+     "The direction is right and the budget, the team or the timeline was not in the picture. The story runs ahead of what can be built."
+    ],
+    [
+     "Weak handover",
+     "The people who execute get the vision but not the steps, so they fill the gap with guesses."
+    ],
+    [
+     "Frequent changes of direction",
+     "Each new pattern you see becomes a new direction. The team is unsettled, and the basics are missed while the story moves on."
+    ],
+    [
+     "A big vision with no structure",
+     "The story converts, and there is nothing underneath it to deliver what it promised."
+    ]
+   ],
+   "improve": [
+    [
+     "A working version every few weeks",
+     "Put the date of the next demo in the diary before you tell the next story. Show something that works to real customers every two to four weeks. The demo supplies the structure the story leaves out."
+    ],
+    [
+     "A must-be-true list for every idea",
+     "Before an idea becomes a direction, write the three things that must be true for it to work, and give yourself 30 days to prove them. If they are not true at day 30, the idea waits."
+    ],
+    [
+     "Name the cost of a change of direction",
+     "Before you change direction, write the one constraint it breaks (budget, team or time) and who will carry it. Then hand over the first three steps, not only the vision."
+    ]
+   ],
+   "games": [
+    [
+     "Charades",
+     "The idea only counts when someone else can act on it, under a timer."
+    ],
+    [
+     "Jenga",
+     "Every move is a change under a constraint; over-adjusting brings it down."
+    ]
+   ],
+   "exercise": "Before your next change of direction, write the one constraint it breaks and hand over the first three steps.",
+   "best": [
+    "Starting from nothing",
+    "Creating a brand or a category",
+    "The fundraising story"
+   ],
+   "avoid": [
+    "Changing direction without naming what it costs",
+    "Handing over a vision without the first three steps",
+    "Operating work that needs the same thing done well every day"
+   ],
+   "ladder": "From here, The Ultimate Alchemist is reached by adding the other two Alchemist ways of executing to your own. From the Magnetic Perfectionist: a quality bar the story has to meet before it ships. From the Energetic Empath: the people carried with you, with clear commitments. The Ultimate Alchemist holds all three: the vision, the quality and the people, with proof."
+  },
+  "SB": {
+   "is": "A Systemised Builder is an Architect who executes by making things run. Once a decision is made, you turn it into a routine: the procedure, the checks and the people who own each step, so it happens the same way every time without you. You win by reliability: output that can be counted on.",
+   "exec": [
+    [
+     "When time is cut",
+     "You protect the flow: the routine and the system that keep things running. A plan or a feature can wait; the thing that runs every day cannot."
+    ],
+    [
+     "Your rhythm",
+     "You work continuously. A weekly routine keeps everything moving, with daily checks when something is new or fragile."
+    ],
+    [
+     "Keeping scope in bounds",
+     "You standardise. Once something works, it becomes the way it is done, and what is not in the standard is not done."
+    ],
+    [
+     "The first thing you create",
+     "A checklist or a step-by-step procedure. Before a roadmap or a dashboard, you want the steps written down."
+    ],
+    [
+     "Under pressure",
+     "You add process: more structure, more routine. When something breaks, you put daily checks on it until it runs smoothly again, then write a procedure so it does not happen again."
+    ]
+   ],
+   "wrong": [
+    [
+     "Invents too little",
+     "The routine runs well and nothing new is tried, because new things do not have a procedure yet."
+    ],
+    [
+     "Process where it is not needed",
+     "A one-off gets a checklist. The overhead of the system costs more than the thing it controls."
+    ],
+    [
+     "Resists change",
+     "A better way is turned down because the current way works. Playbooks go out of date while they are still followed."
+    ],
+    [
+     "Improving one area at the expense of the whole",
+     "The part you own runs perfectly and the business around it is starved, because the measure was the part, not the whole."
+    ]
+   ],
+   "improve": [
+    [
+     "Protect capacity for experiments",
+     "Keep 10 to 15% of capacity for things that have no procedure yet, and let them fail without a post-mortem."
+    ],
+    [
+     "Change control with a log",
+     "Record each problem and its fix, and review the log monthly so the playbook changes with the business."
+    ],
+    [
+     "Measure the whole",
+     "Add one measure that belongs to the business, not to your area, to every weekly review."
+    ]
+   ],
+   "games": [
+    [
+     "Tetris",
+     "The routine has to keep running while what arrives keeps changing."
+    ],
+    [
+     "Scrabble",
+     "You play the tiles you are dealt, not the word you planned: a small experiment every turn."
+    ],
+    [
+     "Uno",
+     "The rules of the round change with every card; a fixed routine loses."
+    ]
+   ],
+   "exercise": "Block 10% of next week for something that has no procedure yet.",
+   "best": [
+    "Scaling once the product sells reliably",
+    "Operations, customer service and compliance",
+    "Franchise and repeatable models"
+   ],
+   "avoid": [
+    "Putting a procedure on something you have done once",
+    "Keeping a playbook that the business has outgrown",
+    "Starting from nothing, where there is nothing yet to systemise"
+   ],
+   "ladder": "From here, The Ultimate Architect is reached by adding the other two Architect ways of executing to your own. From the Master Strategist: an order of moves, so the system serves a direction. From the Internal Analyser: a test before a change becomes the standard. The Ultimate Architect holds all three: the sequence, the proof and the system."
+  },
+  "EE": {
+   "is": "An Energetic Empath is an Alchemist who executes through people. Once a decision is made, you turn it into a cause: who is involved, why they care, the shared win, and the next step each person takes. You win by momentum: people move because you moved them.",
+   "exec": [
+    [
+     "When time is cut",
+     "You protect the people: the momentum and the relationships around the work. The plan, the standard and the story bend before the team does."
+    ],
+    [
+     "Your rhythm",
+     "You work in conversations. You talk with the people involved until you are aligned, then move together, in short bursts with clear goals."
+    ],
+    [
+     "Keeping scope in bounds",
+     "You agree the scope with the people involved and hold everyone to it. Scope is a commitment, not a list."
+    ],
+    [
+     "The first thing you create",
+     "A list of the people involved and what each has committed to. Before a roadmap or a brief, you want to know who is in."
+    ],
+    [
+     "Under pressure",
+     "You rally the people around it. When something breaks, you get everyone together, clear the tension and agree the way through."
+    ]
+   ],
+   "wrong": [
+    [
+     "Boundaries slip",
+     "Every ask is a yes, because saying no costs a relationship. Your capacity goes before your commitments do."
+    ],
+    [
+     "Focus spreads",
+     "Many partners, many causes, and no one thing finished. Energy is spent where people are, not where the business needs it."
+    ],
+    [
+     "Waits for everyone to agree",
+     "A decision that needed one person waits for the room. Alignment becomes the goal instead of the result."
+    ],
+    [
+     "Soft commitments and unclear ownership",
+     "Everyone is in and no one owns it. Wins are celebrated and not written down, so they cannot be repeated."
+    ]
+   ],
+   "improve": [
+    [
+     "An exit rule for every partnership",
+     "Before a partnership or pilot starts, write its time limit and the condition that ends it. Review it on that date, not when it starts to feel wrong."
+    ],
+    [
+     "Wins written down within a week",
+     "After each win, write who did what and what it produced. A win that is written down can be repeated without you in the room."
+    ],
+    [
+     "One owner and one decider per task",
+     "For each piece of work, name the one person responsible and the one who decides. Alignment is for the direction; it is not needed for every step."
+    ]
+   ],
+   "games": [
+    [
+     "Monopoly",
+     "Every deal has a price and saying no is a move; bankruptcy is a hard exit rule."
+    ],
+    [
+     "Poker",
+     "Folding is saying no; one decision at a time, on your own read."
+    ]
+   ],
+   "exercise": "Write the exit rule for one current partnership and the single owner for one shared task.",
+   "best": [
+    "Partnerships for going to market",
+    "Communities and advocacy",
+    "Hiring and building a team"
+   ],
+   "avoid": [
+    "A commitment made in the room that the capacity cannot carry",
+    "A partnership with no exit rule",
+    "Deep solo analysis that needs no one else"
+   ],
+   "ladder": "From here, The Ultimate Alchemist is reached by adding the other two Alchemist ways of executing to your own. From the Visionary Oracle: a direction the people are moving towards. From the Magnetic Perfectionist: a quality bar the shared work has to meet. The Ultimate Alchemist holds all three: the vision, the quality and the people, with proof."
+  },
+  "MP": {
+   "is": "A Magnetic Perfectionist is an Alchemist who executes by making the thing right. Once a decision is made, you turn it into a standard: what it has to look and feel like, the details that matter, and the quality bar it must meet. You win by pull: people want what you made because of how it is made.",
+   "exec": [
+    [
+     "When time is cut",
+     "You protect the quality: what it looks and feels like, and the details that matter. Scope and speed give way before the standard does."
+    ],
+    [
+     "Your rhythm",
+     "You work in polish cycles. Refine until it is right, with a date to put it out. The date is the only thing that stops the polishing."
+    ],
+    [
+     "Keeping scope in bounds",
+     "You set the quality bar and cut everything that falls below it. Scope is controlled by standard, not by list."
+    ],
+    [
+     "The first thing you create",
+     "A quality bar: the standard the result must meet. Before a roadmap or a story, you define what good looks like."
+    ],
+    [
+     "Under pressure",
+     "You hold the quality bar, or raise it. When something breaks, you refine the part that failed until it is right, with a date to put it back out."
+    ]
+   ],
+   "wrong": [
+    [
+     "Hesitates to ship",
+     "The date moves because the work is not yet right. Customers wait for a version they would have paid for last month."
+    ],
+    [
+     "Scope grows",
+     "Each refinement reveals another detail that matters. The standard rises and the ship date goes with it."
+    ],
+    [
+     "Overspends",
+     "Quality is bought at a cost the business limits cannot carry."
+    ],
+    [
+     "Polishing what customers do not value",
+     "The detail you refined is one the customer never noticed, while the one they asked for waits."
+    ]
+   ],
+   "improve": [
+    [
+     "One ship day a week",
+     "Pick one day a week on which something goes out, whatever state it is in. Sort the work into red (must be right), amber (should be) and green (can wait). Only red stops the ship."
+    ],
+    [
+     "The quality bar written next to the limits",
+     "Write the quality bar with the budget and the date beside it. If all three cannot be met, the standard is lowered in the open, not the date moved in silence."
+    ],
+    [
+     "Polish only what the customer noticed",
+     "Each month look at activation, retention and willingness to pay. Keep refining the detail that moved one of them; stop refining the detail that moved none."
+    ]
+   ],
+   "games": [
+    [
+     "Pictionary, timed to 60 seconds",
+     "A rough drawing that is understood beats a perfect one that is not finished."
+    ],
+    [
+     "Cluedo",
+     "You lose by waiting: accuse before you are certain, or another player will."
+    ]
+   ],
+   "exercise": "Set a 20-minute timer on one piece of work you would normally polish for an hour, and send what exists when it rings.",
+   "best": [
+    "Premium products",
+    "Brand and design-led growth",
+    "Anything customers judge by feel"
+   ],
+   "avoid": [
+    "A launch where speed matters more than finish",
+    "Refining without a ship date",
+    "Spending on quality the margin cannot carry"
+   ],
+   "ladder": "From here, The Ultimate Alchemist is reached by adding the other two Alchemist ways of executing to your own. From the Visionary Oracle: a direction the quality serves, so the standard points somewhere. From the Energetic Empath: the people carried with you, with clear commitments. The Ultimate Alchemist holds all three: the vision, the quality and the people, with proof."
+  },
+  "UA": {
+   "is": "The Ultimate Architect is an Architect who holds all three Architect ways of executing at once. Once a decision is made, you set the order of moves, prove each one with a test, and turn what works into a system that runs without you. You win by integration: strategy, proof and systems that reinforce each other.",
+   "exec": [
+    [
+     "When time is cut",
+     "You protect all three at once: the plan, the system and the data, adjusted together rather than one sacrificed for another."
+    ],
+    [
+     "Your rhythm",
+     "Moves set in blocks, a weekly routine to run them, and tests to prove them. Strategy sprints alternate with operations sprints."
+    ],
+    [
+     "Keeping scope in bounds",
+     "The chosen moves set the scope, standards hold it, and analysis gates what is added."
+    ],
+    [
+     "The first thing you create",
+     "A one-page map that links the roadmap, the procedures and the tests, so all three can be seen together."
+    ],
+    [
+     "Under pressure",
+     "You re-plan, tighten the process and check the data at once. When something breaks, you re-align the plan, the process and the data behind it together."
+    ]
+   ],
+   "wrong": [
+    [
+     "Overload from switching",
+     "Strategy, systems and proof all need you, and switching between them costs more than any one of them."
+    ],
+    [
+     "An empire for its own sake",
+     "The structure grows because it can, not because a customer asked for it."
+    ],
+    [
+     "A weak story for customers",
+     "Everything inside the business is right and the outside world cannot say what you do."
+    ]
+   ],
+   "improve": [
+    [
+     "Working prototypes",
+     "Keep testing ideas with a working version, not a plan for one. The prototype is the proof."
+    ],
+    [
+     "Outside challenge to the story",
+     "Invite someone outside the business to challenge the customer story every quarter."
+    ],
+    [
+     "One review, two measures",
+     "A monthly strategy and operations review with two measures only: impact and stability."
+    ]
+   ],
+   "gamesIntro": "Do you find you excel at the following games? Keep playing them and improve your scores or levels to help you stay at this level.",
+   "games": [
+    [
+     "Chess with a clock",
+     "Master Strategist"
+    ],
+    [
+     "Connect Four",
+     "Master Strategist"
+    ],
+    [
+     "Risk",
+     "Master Strategist"
+    ],
+    [
+     "Wordle",
+     "Internal Analyser"
+    ],
+    [
+     "Articulate",
+     "Internal Analyser"
+    ],
+    [
+     "Tetris",
+     "Systemised Builder"
+    ],
+    [
+     "Scrabble",
+     "Systemised Builder"
+    ],
+    [
+     "Uno",
+     "Systemised Builder"
+    ]
+   ],
+   "exercise": "Invite one outsider to challenge your customer story this month.",
+   "best": [],
+   "avoid": [
+    "Growing the structure faster than the customer story",
+    "Carrying all three roles yourself as the team grows"
+   ],
+   "ladder": "You are at the top of the Architect ladder. Staying there means keeping the three ways of executing in balance: the Master Strategist’s sequence, the Internal Analyser’s proof and the Systemised Builder’s system. When one of the three goes quiet, the others start to fail with it."
+  },
+  "UAl": {
+   "is": "The Ultimate Alchemist is an Alchemist who holds all three Alchemist ways of executing at once. Once a decision is made, you set the direction, hold the quality bar and carry the people with you, and you prove it with results. You win by integration: a story that converts, a product that pulls and a community that scales, with proof.",
+   "exec": [
+    [
+     "When time is cut",
+     "You protect all three at once: the vision, the quality and the people, kept in step rather than one sacrificed for another."
+    ],
+    [
+     "Your rhythm",
+     "Show it, refine it and bring people with it, in step. Bursts of demos followed by consolidation."
+    ],
+    [
+     "Keeping scope in bounds",
+     "Explore, then set the bar, with everyone agreed on what is in and what is out."
+    ],
+    [
+     "The first thing you create",
+     "A one-page vision that links the story, the standard and the people."
+    ],
+    [
+     "Under pressure",
+     "You re-tell the story, hold the quality and rally the people at once. When something breaks, you re-harmonise the idea, the quality and the people together."
+    ]
+   ],
+   "wrong": [
+    [
+     "Promising more than the systems can deliver",
+     "The story and the product pull people in faster than operations can serve them."
+    ],
+    [
+     "The story outgrows operations",
+     "Each demo raises expectations; the consolidation that should follow is skipped for the next demo."
+    ]
+   ],
+   "improve": [
+    [
+     "Operations level with the story",
+     "After every burst of demos, a consolidation sprint before the next burst. Nothing new is promised until the last promise runs."
+    ],
+    [
+     "Data to refine the story",
+     "Use the numbers (pull and capacity) to change the story, not only to confirm it."
+    ],
+    [
+     "Demo, decide, write down",
+     "Every demo ends with a decision and a written record, with two measures: pull and capacity."
+    ]
+   ],
+   "gamesIntro": "Do you find you excel at the following games? Keep playing them and improve your scores or levels to help you stay at this level.",
+   "games": [
+    [
+     "Charades",
+     "Visionary Oracle"
+    ],
+    [
+     "Jenga",
+     "Visionary Oracle"
+    ],
+    [
+     "Pictionary, timed to 60 seconds",
+     "Magnetic Perfectionist"
+    ],
+    [
+     "Cluedo",
+     "Magnetic Perfectionist"
+    ],
+    [
+     "Monopoly",
+     "Energetic Empath"
+    ],
+    [
+     "Poker",
+     "Energetic Empath"
+    ]
+   ],
+   "exercise": "After your next demo, write the decision and the two measures (pull and capacity) before you plan the next one.",
+   "best": [],
+   "avoid": [
+    "Promising in a demo what operations cannot yet deliver",
+    "Skipping the consolidation sprint for the next burst"
+   ],
+   "ladder": "You are at the top of the Alchemist ladder. Staying there means keeping the three ways of executing in balance: the Visionary Oracle’s direction, the Magnetic Perfectionist’s quality and the Energetic Empath’s people. When one of the three goes quiet, the others start to fail with it."
+  }
+ },
+ "SUB_D": {
+  "MS": {
+   "blind": [
+    "Over-planning",
+    "Slow to catch unexpected opportunities",
+    "Distance from what is happening on the ground"
+   ],
+   "fail": [
+    "Strategy for show",
+    "Rigid roadmaps",
+    "Late feedback"
+   ],
+   "best": [
+    "Several product lines",
+    "Fundraising",
+    "Entering a market in stages"
+   ]
+  },
+  "SB": {
+   "blind": [
+    "Invents too little",
+    "Applies process where it is not needed",
+    "Resists change"
+   ],
+   "fail": [
+    "Bureaucracy",
+    "Improving one area at the expense of the whole",
+    "Out-of-date playbooks"
+   ],
+   "best": [
+    "Scaling once the product sells reliably",
+    "Operations",
+    "Customer service",
+    "Compliance",
+    "Franchise models"
+   ]
+  },
+  "IA": {
+   "blind": [
+    "Analysis that slows decisions",
+    "Perfectionism",
+    "Undervaluing experience that is not written down"
+   ],
+   "fail": [
+    "Late decisions",
+    "Tunnel vision on one measure",
+    "Results other people do not buy into"
+   ],
+   "best": [
+    "Pricing",
+    "Growth analysis",
+    "Forecasting",
+    "Experiments"
+   ]
+  },
+  "UA": {
+   "blind": [
+    "Few; the risk is overload from switching between strategy, systems and proof"
+   ],
+   "fail": [
+    "Building an empire for its own sake",
+    "A weak story for customers"
+   ],
+   "best": []
+  },
+  "VO": {
+   "blind": [
+    "Passes over constraints",
+    "Weak handover to the people who execute"
+   ],
+   "fail": [
+    "A big vision with no structure",
+    "Frequent changes of direction that unsettle the team",
+    "Missed basics"
+   ],
+   "best": [
+    "Starting from nothing",
+    "Creating a brand or category",
+    "The fundraising story"
+   ]
+  },
+  "MP": {
+   "blind": [
+    "Hesitates to ship",
+    "Lets scope grow",
+    "Overspends"
+   ],
+   "fail": [
+    "Stalls on perfection",
+    "Polishes things customers do not value"
+   ],
+   "best": [
+    "Premium products",
+    "Brand",
+    "Design-led growth"
+   ]
+  },
+  "EE": {
+   "blind": [
+    "Boundaries slip",
+    "Focus spreads",
+    "Waits for everyone to agree"
+   ],
+   "fail": [
+    "Burnout",
+    "Unclear ownership",
+    "Soft commitments"
+   ],
+   "best": [
+    "Partnerships for going to market",
+    "Communities",
+    "Advocacy",
+    "Hiring"
+   ]
+  },
+  "UAl": {
+   "blind": [
+    "Few; the risk is promising more than the systems can deliver"
+   ],
+   "fail": [
+    "Growing the story faster than operations"
+   ],
+   "best": []
+  }
+ },
+ "P2_DIMS": [
+  "What you protect when time is short",
+  "Your decision rhythm",
+  "How you control scope",
+  "The tools you reach for first",
+  "What you fall back on under pressure"
+ ],
+ "P2_MEAS": [
+  "What you protect when time is short",
+  "Your decision rhythm",
+  "How you keep scope in bounds",
+  "The first thing you create",
+  "What you reach for under pressure"
+ ],
+ "MIRROR3": {
+  "MS": "VO",
+  "VO": "MS",
+  "IA": "MP",
+  "MP": "IA",
+  "SB": "EE",
+  "EE": "SB",
+  "UA": "UAl",
+  "UAl": "UA"
+ },
+ "D3_MEAN": {
+  "architect": [
+   "Knowing that your decisions begin with logic and are finally validated by logic, and being able to explain how.",
+   "Understanding what a feeling-first decision looks like, noticing when you have decided on feeling alone under pressure without returning to logic, and knowing what caused it.",
+   "Recognising another Architect and working well with them, including an Architect of a different subtype.",
+   "Recognising an Alchemist or a Mixed person, and adapting how you work with them."
+  ],
+  "alchemist": [
+   "Knowing that your decisions begin with feeling and are finally validated by feeling, and being able to explain how.",
+   "Understanding what a logic-first decision looks like, noticing when you have decided on numbers alone under pressure without returning to feeling, and knowing what caused it.",
+   "Recognising another Alchemist and working well with them, including an Alchemist of a different subtype.",
+   "Recognising an Architect or a Mixed person, and adapting how you work with them."
+  ],
+  "mixed": [
+   "How well you understand the Architect loop from the inside: where a logic-first decision begins, how it is checked and what finally validates it.",
+   "How well you understand the Alchemist loop from the inside: where a feeling-first decision begins, how it is checked and what finally validates it.",
+   "Recognising an Architect from what they say and do, translating their plan into something you can use, and working and repairing a clash with them.",
+   "Recognising an Alchemist from what they say and do, translating their story into something you can use, and working and repairing a clash with them."
+  ]
+ },
+ "D3_LEVEL": {
+  "0": {
+   "Very low": "You cannot yet describe how you decide.",
+   "Low": "You partly understand where your decisions begin and what validates them.",
+   "Moderate": "You understand your loop in familiar situations.",
+   "High": "You understand your loop clearly and can explain it.",
+   "Mastery": "You use your Dominant loop deliberately in every situation."
+  },
+  "1": {
+   "Very low": "You are confused between the loops, or have no understanding of your other loop at all; under pressure you lose your own sense of what validates a decision.",
+   "Low": "You often switch without noticing, or rarely switch but do not understand how your other loop works.",
+   "Moderate": "You occasionally switch without noticing and need guardrails.",
+   "High": "You understand your non-dominant loop accurately, but in practice you still sometimes lose your own validation.",
+   "Mastery": "You use the input of your non-dominant loop fully without losing your own identity, and still make the decision with your Dominant loop."
+  },
+  "2": {
+   "Very low": "You do not yet recognise people who decide the same way as you.",
+   "Low": "You assume everyone on your loop decides exactly as you do, and miss subtype differences.",
+   "Moderate": "You recognise people on your loop, but sometimes clash over subtype differences.",
+   "High": "You recognise people on your loop and work well with them.",
+   "Mastery": "You recognise subtype differences on your loop and use them constructively."
+  },
+  "3": {
+   "Very low": "You do not yet recognise how people on the alternate loop decide.",
+   "Low": "You do not recognise alternate loops, and read the difference as a difference in values.",
+   "Moderate": "You occasionally fail to recognise alternate loops and need a second person to co-lead.",
+   "High": "You are aware of alternate loops, but do not always understand or use their decisions constructively.",
+   "Mastery": "You accurately understand alternate loops and use them constructively to your advantage."
+  }
+ },
+ "D3_FAIL": [
+  [
+   "Story against detailed plan",
+   "One person argues from a story, the other from a detailed plan; each dismisses the other."
+  ],
+  [
+   "Wrong timing",
+   "A working example shown before anything is defined, or a full detailed plan written before anything is proven."
+  ],
+  [
+   "One measure only",
+   "Decisions made only by numbers, or only by feel."
+  ],
+  [
+   "Wrong loop leading",
+   "The loop that should lead a meeting ends up left out of it."
+  ],
+  [
+   "Same loop, different subtype",
+   "Two people on the same loop clash because they execute differently, for example a Master Strategist and a Systemised Builder."
+  ],
+  [
+   "Slow repair",
+   "A clash drains speed and trust."
+  ]
+ ],
+ "D3_IMPROVE": {
+  "Very low": [
+   [
+    "Simple guides to both loops",
+    "Read the one-page guide to each loop and how to translate between them, before your next joint decision."
+   ],
+   [
+    "One measure from each loop",
+    "Put one logic measure and one feeling measure on every decision, written before you decide."
+   ],
+   [
+    "A switch check",
+    "After each decision under pressure, ask once: did I switch? If yes, what triggered it?"
+   ],
+   [
+    "Short practice",
+    "Short exercises with examples of both loops, one a week."
+   ]
+  ],
+  "Low": [
+   [
+    "Simple guides to both loops",
+    "Read the one-page guide to each loop and how to translate between them, before your next joint decision."
+   ],
+   [
+    "One measure from each loop",
+    "Put one logic measure and one feeling measure on every decision, written before you decide."
+   ],
+   [
+    "A switch check",
+    "After each decision under pressure, ask once: did I switch? If yes, what triggered it?"
+   ],
+   [
+    "Short practice",
+    "Short exercises with examples of both loops, one a week."
+   ]
+  ],
+  "Moderate": [
+   [
+    "Weeks led by each loop in turn",
+    "Alternate a week led by your loop with a week led by the other loop on one piece of shared work."
+   ],
+   [
+    "“What could go wrong” lists with the other core type",
+    "Before a plan starts, list how it could fail, with someone of the other core type in the room."
+   ],
+   [
+    "A repair routine",
+    "Use the step-by-step guide for repairing a clash the next time a decision splits."
+   ]
+  ],
+  "High": [
+   [
+    "Rotate who leads",
+    "Rotate who leads meetings between the core types, and notice what each leader asks for first."
+   ],
+   [
+    "Practice on real decisions",
+    "Take one live decision a month and run it the other loop’s way before deciding."
+   ],
+   [
+    "A session with your mirror subtype",
+    "A quarterly session with your mirror subtype, the person who executes as you do on the other loop."
+   ]
+  ],
+  "Mastery": [
+   [
+    "Roles shared across both loops",
+    "Share roles across both loops so the right loop leads at each stage."
+   ],
+   [
+    "Dashboards that show both measures",
+    "Keep one logic measure and one feeling measure visible on every dashboard."
+   ],
+   [
+    "Mentor others",
+    "Mentor people on the other loop in reading yours."
+   ]
+  ]
+ },
+ "D3_WORK": {
+  "architect": [
+   [
+    "What to recognise in an Alchemist",
+    "Emerging patterns, momentum in the story, how the market feels."
+   ],
+   [
+    "How to translate",
+    "Turn an Alchemist’s story into a list of what must be true, then into constraints and criteria."
+   ],
+   [
+    "How to work together",
+    "Let the Alchemist show a working example first, decide, then write the detailed plan to scale it."
+   ],
+   [
+    "Agreed measures",
+    "One sign of pull (how many people take it up) and one proof (how many tests pass)."
+   ],
+   [
+    "How to repair a clash",
+    "Acknowledge the other person’s feeling first, then bring the discussion back to the fewest constraints needed."
+   ]
+  ],
+  "alchemist": [
+   [
+    "What to recognise in an Architect",
+    "Constraints, capacity limits, what the system can actually do."
+   ],
+   [
+    "How to translate",
+    "Turn an Architect’s model into a storyline, then a promise, then a working example."
+   ],
+   [
+    "How to work together",
+    "Let the Architect write the plan first, test it, then tell the story so people take it up."
+   ],
+   [
+    "Agreed measures",
+    "One sign of stability (service levels met) and one sign of pull (engagement, recommendation)."
+   ],
+   [
+    "How to repair a clash",
+    "Accept the constraints you missed, then keep the heart of the story in a version that can be delivered."
+   ]
+  ]
+ },
+ "D3_SCEN": {
+  "architect": [
+   [
+    "Launch deadline, weak take-up",
+    "With low alternate-loop awareness you miss the Alchemist’s concern about the story, add more detail and tests, and miss the gap. With high awareness you recognise the concern, review a working example, list what must be true, set the constraints and agree a version that can be delivered."
+   ],
+   [
+    "Strong in one loop only",
+    "With a very strong Dominant loop you rarely switch and make sound decisions alone, but dismiss an Alchemist partner’s concerns as unfounded. With higher alternate-loop awareness you recognise the concern as a valid signal from the other loop and test it before deciding."
+   ]
+  ],
+  "alchemist": [
+   [
+    "Sudden demand, operations under strain",
+    "With low non-dominant-loop awareness you switch to numbers alone under the pressure and lose the story that created the demand. With high awareness you notice the switch, add a capacity model and cut lines, and keep the heart of the story while staying stable."
+   ],
+   [
+    "Launch deadline, criteria not met",
+    "With low alternate-loop awareness you re-tell the story until the Architect feels it, and the launch goes out before it can be delivered. With high awareness you accept the points you had missed and keep the heart of the story in a version that can be delivered."
+   ]
+  ]
+ },
+ "D4_MEAN": {
+  "Visual": [
+   "You take information in best when you can see it: a diagram, a chart, a sketch of how the parts fit. A page of text slows you; the same content as a picture lands at once.",
+   "Ask for the diagram first and the explanation second."
+  ],
+  "Auditory": [
+   "You take information in best when you hear it: a conversation, a talk, something repeated aloud. You learn by asking questions and hearing the answer.",
+   "Talk it through, and keep a recording of any explanation you will need again."
+  ],
+  "Read/Write": [
+   "You take information in best when you can read it and write it down: text, lists, notes. Writing it out is how you think it through.",
+   "Ask for it in writing, and make your own notes before you act on it."
+  ],
+  "Kinaesthetic": [
+   "You take information in best by doing: open the tool, enter your own numbers, try it until it makes sense. A demonstration helps less than a go.",
+   "Ask for a template you can change, not a description of one."
+  ],
+  "Multimodal": [
+   "No single way leads. You use whichever format fits the task, which makes you flexible and means you sometimes have to choose.",
+   "Pick the format by the job: a diagram for a structure, a conversation for a judgement, a template for a method."
+  ],
+  "Structured": [
+   "You learn step by step, in order, each piece built on the last. Skipping ahead costs you; a long guide read from the first page works.",
+   "Ask for the order of the steps before the detail."
+  ],
+  "Global": [
+   "You need the whole first, then the detail. Until you can see how it fits together, no single part makes sense.",
+   "Ask for the overview or the map first; skim before you read."
+  ],
+  "Adaptive": [
+   "You move between the two: an overview for new ground, step by step once you are in it, and you work well alone or with others.",
+   "Decide at the start which the task needs, then switch deliberately."
+  ],
+  "Concrete": [
+   "An idea makes sense to you through facts, details and a real example from a business like yours. A principle on its own does not land until you see it applied.",
+   "Ask for the worked case, with numbers."
+  ],
+  "Abstract": [
+   "An idea makes sense to you through the principle: why it works and where else it applies. Once you have the pattern, the examples follow.",
+   "Ask for the rule first, then one example."
+  ],
+  "Flexible": [
+   "You move between the two: the example when an idea is new, the principle to carry it somewhere else.",
+   "Ask for both, and notice which one you reach for when it is new."
+  ],
+  "Individual": [
+   "You learn something difficult best alone, at your own rhythm. Discussion before you have thought it through costs you focus.",
+   "Prepare alone before any group session, and say so."
+  ],
+  "Collaborative": [
+   "You learn something difficult best with other people: discussion and shared energy. Talking it through is how it becomes clear.",
+   "Find a partner, a group or a course with others for anything hard."
+  ],
+  "Fast": [
+   "You learn in short, intense bursts; momentum carries you. A long, slow module loses you.",
+   "Ask for the key deliverables and sprint through them; add the depth afterwards."
+  ],
+  "Slow": [
+   "You learn steadily and methodically; depth over speed. Under time pressure you ask for a longer timeline to keep accuracy.",
+   "Protect the time. Do not trade accuracy for a deadline that can be moved."
+  ],
+  "Versatile": [
+   "You learn fast when you need to and slowly for mastery.",
+   "Decide which the task is before you start, and do not let urgency decide for you."
+  ]
+ },
+ "D4_SCEN": [
+  [
+   "A new concept, such as a financial model",
+   "A visual, structured learner builds a flowchart; an auditory learner listens to a discussion; a kinaesthetic learner enters data into a template and changes the numbers."
+  ],
+  [
+   "A group workshop",
+   "Collaborative learners do well in breakout groups; individual learners benefit from a solo preparation sheet before sharing."
+  ],
+  [
+   "Time pressure",
+   "Fast-paced learners sprint through the key deliverables; slow-paced learners ask for longer timelines to keep accuracy."
+  ]
+ ],
+ "D5_DOM": {
+  "Attention and regulation": "How focus starts, how long it lasts, and how it moves between tasks.",
+  "Language and processing": "How easily you understand text, speech and symbols, and in which form.",
+  "Structure and routine": "How much you need predictability, stability and clear rules.",
+  "Sensory load": "How your brain filters noise, light, movement and busy settings.",
+  "Body chemistry and diet": "How what you eat and drink affects your focus and behaviour."
+ },
+ "D5_LEVEL": {
+  "Low": "This area works for you as it is. No adaptation is switched on.",
+  "Moderate": "Adaptations in this area help you, and are switched on.",
+  "High": "Adaptations in this area make a real difference to how you work, and are switched on."
+ },
+ "D5_PAT": {
+  "Fast-switching focus": [
+   "Focus that varies; drawn to new things; works best with high stimulation; loses track of time.",
+   "Work in short segments of five to seven minutes with a small goal and a visible tick for each; review in sprints, not in one long sitting."
+  ],
+  "Visual and spoken processing": [
+   "Finds dense text slow or tiring; strong visual and spatial thinking.",
+   "Ask for the audio or the diagram before the document; read the short summary first and the full text only when you need it."
+  ],
+  "Structure and clarity": [
+   "Prefers structure, literal clarity and consistent settings.",
+   "Ask for the agenda in advance and notice of any change; keep the same lesson flow each time: introduction, content, reflection."
+  ],
+  "Sensory sensitivity": [
+   "Strong reaction to sound, light or movement.",
+   "Use focus mode, sound off and reduced motion; choose a quiet, settled space for the work that matters."
+  ],
+  "Layered processing": [
+   "Two or more of the patterns above together.",
+   "Combine the formats (audio, visual, interactive); alternate sprints with deep dives; pace your schedule to your energy."
+  ]
+ },
+ "D5_SCEN": {
+  "Fast-switching focus": [
+   "A long module",
+   "You lose concentration partway through; the module is broken into five short blocks with checkpoints."
+  ],
+  "Visual and spoken processing": [
+   "A workbook with dense text",
+   "You get audio playback and visual summaries instead of the full text."
+  ],
+  "Structure and clarity": [
+   "An unexpected change in a project",
+   "You get a before-and-after map and clear rules for the change."
+  ],
+  "Sensory sensitivity": [
+   "A busy, noisy workspace",
+   "You get focus mode and gentle transitions."
+  ]
+ },
+ "D6_DOM": {
+  "Mindset": "How you frame challenge, effort and mistakes.",
+  "Confidence": "How sure you are of your own judgement when deciding.",
+  "Patience": "How quickly you move from a feeling or idea to action.",
+  "Risk style": "How you engage with uncertainty and possible loss.",
+  "Energy": "How you recharge and sustain focus."
+ },
+ "D6_RES": {
+  "Growth": [
+   "You treat challenges as information and failure as the next attempt, and recover quickly.",
+   "Adaptability, persistence, open to feedback",
+   "Takes on too much without stopping to reflect or consolidate",
+   "After each stretch, stop for one structured review before you take on the next.",
+   "Stretch goals, fast cycles and structured reviews."
+  ],
+  "Situational": [
+   "You are flexible in some areas and rigid in others.",
+   "Judges each context, self-aware",
+   "Responds inconsistently under pressure",
+   "Before a decision under pressure, ask: where can I test, and where do I need certainty?",
+   "Alternates challenge and stability, and asks the same question in the workbook."
+  ],
+  "Fixed": [
+   "You prefer stability, treat ability as fixed and find mistakes threatening.",
+   "High standards, precision, predictability",
+   "Avoids experiments; defensive when given feedback",
+   "Take one low-risk experiment a month, and treat its result as information, not a verdict.",
+   "Low-risk learning paths, gradual wins and predictable milestones."
+  ],
+  "Confident": [
+   "You trust your own judgement and commit to a decision.",
+   "Decisive, reassures others",
+   "Can overlook other views or warning signs",
+   "Before you commit, look for one piece of evidence against the decision and write it down.",
+   "A prompt to look for evidence against the decision before committing."
+  ],
+  "Self-doubting": [
+   "You second-guess decisions and look for approval before acting.",
+   "Careful, open to advice",
+   "Delays or reverses decisions; gives authority to others",
+   "Make small, safe decisions without asking, and keep a record of the ones that worked.",
+   "Small, safe decisions to build a record, and mentor check-ins after each decision."
+  ],
+  "Patient": [
+   "You wait for enough information before acting.",
+   "Considered decisions, steady progress",
+   "Can miss time-limited opportunities",
+   "Give every decision a deadline when you open it, and decide on the date with what you have.",
+   "Decision deadlines and time limits."
+  ],
+  "Balanced": [
+   "You act quickly or wait, depending on the situation.",
+   "Matches speed to the decision",
+   "Can misjudge which situation is which",
+   "Ask one question first: is this decision reversible? If yes, move; if not, wait.",
+   "The same short check before each decision."
+  ],
+  "Impulsive": [
+   "You act on the first feeling or idea.",
+   "Speed, seizes opportunities",
+   "Decisions made before the loop finishes; regret and reversals",
+   "Pause before any large decision and write one reason for it before you act.",
+   "A pause before large decisions and a written reason for each one."
+  ],
+  "Risk-taking": [
+   "You act quickly on the upside and are comfortable with ambiguity.",
+   "Decisive, innovative, first to market",
+   "Over-commits; scales recklessly",
+   "Stage every bet, and write the stop point before you start.",
+   "“What could go wrong” lists, staged bets, stop and scale checkpoints, reviews after each decision."
+  ],
+  "Risk-balanced": [
+   "You balance caution with momentum.",
+   "Measured experiments, steady execution",
+   "Analysis slows decisions; slow to commit",
+   "Set the test and its end date before you start analysing, and commit when it ends.",
+   "Milestone approvals, structured tests and checkpoints before scaling."
+  ],
+  "Risk-averse": [
+   "You look for stability and predictability.",
+   "Consistent, reliable, thorough checks",
+   "Misses windows of opportunity",
+   "Run one experiment that is safe to fail each month, and increase exposure gradually.",
+   "Safety buffers, experiments that are safe to fail, a gradual increase in exposure."
+  ],
+  "Outward": [
+   "You are energised by people, collaboration and momentum.",
+   "Builds momentum through people and collaboration",
+   "Too much time with others; scattered focus",
+   "Protect solo follow-through time after every live session.",
+   "Live sessions balanced with solo follow-through."
+  ],
+  "Inward": [
+   "You are energised by time alone and deep thinking.",
+   "Focus, depth, clear thinking",
+   "Low visibility; ideas not shared",
+   "Share one written idea a week, and send a brief before every meeting.",
+   "Written channels, protected deep-work time, briefs before meetings."
+  ]
+ },
+ "D6_ENERGY_BAL": [
+  "You move between solo and group work by context.",
+  "Flexible, reads social situations well",
+  "Drained if one mode lasts too long",
+  "Check each week what recharged you and what drained you, and rebalance.",
+  "Alternates deep work and group sessions, with a weekly check of what recharges and what drains."
+ ],
+ "D7_BEL": {
+  "Success means": "What you count as success.",
+  "Build for": "What you value in how a business is built.",
+  "Progress means": "What you count as moving forward.",
+  "Proof is": "What you believe shows a business is working.",
+  "Others are seen as": "How you see others in the market.",
+  "Opportunity is": "How much opportunity you believe there is."
+ },
+ "D7_END": {
+  "Profit": [
+   "You count success in money and return.",
+   "Add one line to every goal on what it means for customers.",
+   "Frames goals and progress in money terms first, with a short note on what it means for customers."
+  ],
+  "Purpose": [
+   "You count success as the difference the business makes.",
+   "Link each impact goal to the financial target that funds it.",
+   "Frames goals by the difference made, and links each financial target to the impact it funds."
+  ],
+  "Speed": [
+   "You value building fast and wide.",
+   "Before each stage of scaling, one check that the last stage holds.",
+   "Quick launches, with a check before each stage of scaling."
+  ],
+  "Craft": [
+   "You value building carefully and refining.",
+   "Agree the ready-to-ship standard before you start, and ship when it is met.",
+   "A ready-to-ship standard agreed in advance."
+  ],
+  "New": [
+   "Progress, for you, is trying new things.",
+   "Give every experiment a review point, and keep only what works.",
+   "Experiments with review points to keep what works."
+  ],
+  "Proven": [
+   "Progress, for you, is improving what already works.",
+   "Set a window each quarter to test one new idea.",
+   "Improvement cycles, with set windows to test new ideas."
+  ],
+  "Numbers": [
+   "You believe measured results show a business is working.",
+   "Put one customer story next to every figure you report.",
+   "Reports in figures, with customer stories alongside."
+  ],
+  "Stories": [
+   "You believe what customers and people see and say shows a business is working.",
+   "Put two figures under every story you tell.",
+   "Reports in customer stories, with a short summary of the figures."
+  ],
+  "Collaborators": [
+   "You see others in your market as people to work with.",
+   "Agree roles and boundaries before any partnership starts.",
+   "Partnerships with agreed roles and boundaries."
+  ],
+  "Competitors": [
+   "You see others in your market as people to beat.",
+   "Benchmark against them, and name one thing you would learn from them.",
+   "Benchmarks against others in the market."
+  ],
+  "Plenty": [
+   "You believe there is enough opportunity to go round.",
+   "Add a resource and feasibility check to every plan.",
+   "Plans include resource and feasibility checks."
+  ],
+  "Limited": [
+   "You believe opportunity must be won and protected.",
+   "Run small tests that make more of what you already have.",
+   "Plans include small tests that make more of existing resources."
+  ],
+  "Both": [
+   "You hold both beliefs; which one leads depends on the situation. This is not a lack of view.",
+   "Name which end is leading before you decide, so the choice is deliberate.",
+   "Shows both framings, and uses the one that fits the situation you described."
+  ]
+ },
+ "D7_PAIR": {
+  "Speed + Limited": [
+   "You want to move fast while protecting resources.",
+   "A spending limit for each stage."
+  ],
+  "Purpose + Stories": [
+   "The impact is clear to you but harder to show to investors.",
+   "Each story paired with two figures."
+  ],
+  "Craft + Competitors": [
+   "You want it right and you want to be ahead.",
+   "A ship date and a quality standard agreed together."
+  ],
+  "New + Limited": [
+   "Many new ideas with tight resources.",
+   "A limit on how many new ideas run at once."
+  ]
+ },
+ "D7_SEP": {
+  "Proof is": "Proof is what you believe shows a business is working. Part 1 is the order you think in.",
+  "Build for": "Build for is what you value in how a business is built. Patience (Part 6) is how quickly you act.",
+  "Progress means": "This is what you value as progress, not how much risk you will take. How you handle uncertainty is Risk style in Part 6.",
+  "Opportunity is": "Opportunity is what you believe about the market. Mindset (Part 6) is how you see your own ability to improve."
+ },
+ "D7_STALL": {
+  "Purpose": [
+   "Purpose",
+   "It would feel like putting money before the people you serve."
+  ],
+  "Craft": [
+   "Craft",
+   "The offer is not good enough yet to charge more."
+  ],
+  "Competitors": [
+   "Competitors",
+   "Someone else in the market could use it against you."
+  ]
+ },
+ "EX_P1": {
+  "architect": {
+   "1A": "LFL",
+   "1B": "LFL",
+   "2A": "LFL",
+   "2B": "FLF",
+   "3A": "LFL",
+   "3B": "LFL",
+   "4A": "LDL",
+   "4B": "LFL"
+  },
+  "alchemist": {
+   "1A": "FLF",
+   "1B": "FLF",
+   "2A": "FLF",
+   "2B": "LFL",
+   "3A": "FLF",
+   "3B": "FLF",
+   "4A": "FDF",
+   "4B": "FLF"
+  },
+  "mixedA": {
+   "1A": "LFL",
+   "1B": "FLF",
+   "2A": "LFL",
+   "2B": "FLF",
+   "3A": "LFL",
+   "3B": "LFL",
+   "4A": "FLF",
+   "4B": "LFL"
+  },
+  "mixedR": {
+   "1A": "FLF",
+   "1B": "LFL",
+   "2A": "FLF",
+   "2B": "LFL",
+   "3A": "FLF",
+   "3B": "FLF",
+   "4A": "LFL",
+   "4B": "FLF"
+  },
+  "mixed": {
+   "1A": "LFL",
+   "1B": "LFL",
+   "2A": "FLF",
+   "2B": "FLF",
+   "3A": "LFL",
+   "3B": "FLF",
+   "4A": "FLF",
+   "4B": "LFL"
+  }
+ },
+ "EX_P2": {
+  "architect": [
+   "MS",
+   "MS",
+   "MS",
+   "IA",
+   "MS",
+   "MS",
+   "MS",
+   "SB",
+   "MS",
+   "MS"
+  ],
+  "alchemist": [
+   "VO",
+   "MP",
+   "VO",
+   "MP",
+   "EE",
+   "MP",
+   "VO",
+   "MP",
+   "VO",
+   "EE"
+  ],
+  "mixedA": [
+   "MS",
+   "VO",
+   "IA",
+   "MS",
+   "MP",
+   "MS",
+   "SB",
+   "EE",
+   "MS",
+   "VO"
+  ],
+  "mixedR": [
+   "VO",
+   "MS",
+   "MP",
+   "VO",
+   "IA",
+   "VO",
+   "EE",
+   "SB",
+   "VO",
+   "MS"
+  ],
+  "mixed": [
+   "IA",
+   "MP",
+   "IA",
+   "MS",
+   "MP",
+   "IA",
+   "VO",
+   "MP",
+   "IA",
+   "MP"
+  ]
+ },
+ "EX_P3": {
+  "architect": [
+   0,
+   1,
+   1,
+   1,
+   0,
+   0,
+   1,
+   1,
+   1,
+   0,
+   1,
+   0
+  ],
+  "alchemist": [
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   1,
+   1,
+   1,
+   0,
+   1,
+   0
+  ],
+  "mixed": [
+   0,
+   2,
+   2,
+   1,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   1,
+   0,
+   0,
+   1,
+   0
+  ]
+ },
+ "EX_P4": [
+  2,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0
+ ],
+ "EX_P5": [
+  1,
+  0,
+  2,
+  1,
+  1,
+  2,
+  2,
+  1,
+  2,
+  1,
+  2,
+  1,
+  1,
+  2,
+  0,
+  1,
+  1,
+  1,
+  1,
+  1,
+  2,
+  1,
+  1,
+  2,
+  1,
+  1
+ ],
+ "EX_P6": [
+  4,
+  3,
+  3,
+  1,
+  1,
+  1,
+  1,
+  1,
+  3,
+  4,
+  3,
+  3,
+  3,
+  2,
+  2,
+  2,
+  1,
+  2,
+  3,
+  3
+ ],
+ "EX_P7": [
+  "A",
+  "B",
+  "B",
+  "A",
+  "both",
+  "B",
+  "both",
+  "both",
+  "both",
+  "A",
+  "B",
+  "both",
+  "A",
+  "A",
+  "B",
+  "A",
+  "A",
+  "B",
+  "A",
+  "both",
+  "Craft"
+ ],
+ "EX_P7_MIXED": [
+  "A",
+  "B",
+  "B",
+  "A",
+  "both",
+  "other",
+  "both",
+  "both",
+  "both",
+  "A",
+  "B",
+  "other",
+  "A",
+  "A",
+  "B",
+  "A",
+  "A",
+  "B",
+  "A",
+  "both",
+  "Craft"
+ ]
+}
