@@ -114,6 +114,7 @@ app.get('/', (req, res) => {
 // API Routes
 app.use(`/api/${API_VERSION}/quiz`, quizRoutes);
 app.use('/api/v2/edna', ednaV2Routes); // website E-DNA: server-side scoring, strict Cognito auth
+app.use('/api/webhooks/ghl', require('./routes/ghlWebhookRoutes')); // GHL checkout purchases (19 Nov 2026)
 app.use('/api/user/workbooks', workbooksRoutes);
 app.use(`/api/${API_VERSION}/lms`, lmsRoutes);
 app.use(`/api/${API_VERSION}/zoom`, zoomRoutes);

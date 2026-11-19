@@ -22,6 +22,7 @@
 const { computeReport } = require('../services/edna/scoring');
 const { verifyBearer, sameUser } = require('../middleware/cognitoVerify');
 const quizController = require('./quizController');
+const { query } = require('../config/database'); // held GHL purchases (19 Nov 2026)
 
 /* Subtype display names/lines (SUB_TXT in the reference 02-report.js). */
 const SUB_TXT = {
@@ -177,6 +178,19 @@ exports.completeAssessment = async (req, res) => {
     }
 
     console.log(`✅ [EDNA v2] Stored web assessment for ${uid} (session ${sessionId})`);
+
+    /* A GHL purchase made before this result existed is applied now (ghl_pending_purchases). */
+    try {
+      const buyerEmail = (email || token.email || '').trim().toLowerCase();
+      if (buyerEmail) {
+        const pend = await query('DELETE FROM ghl_pending_purchases WHERE email = $1 RETURNING email', [buyerEmail]);
+        if (pend.rowCount > 0) {
+          await query('UPDATE user_quiz_results SET full_result_purchased = true WHERE UPPER(user_id::text) = UPPER($1)', [uid]);
+          console.log(`💳 [EDNA v2] applied held GHL purchase for ${buyerEmail}`);
+        }
+      }
+    } catch (e) { console.warn('⚠️ [EDNA v2] pending-purchase check failed:', e.message); }
+
     return res.status(201).json({
       success: true,
       sessionId,
