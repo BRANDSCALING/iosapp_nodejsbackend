@@ -115,6 +115,9 @@ app.get('/', (req, res) => {
 app.use(`/api/${API_VERSION}/quiz`, quizRoutes);
 app.use('/api/v2/edna', ednaV2Routes); // website E-DNA: server-side scoring, strict Cognito auth
 app.use('/api/webhooks/ghl', require('./routes/ghlWebhookRoutes')); // GHL checkout purchases (19 Nov 2026)
+app.use('/api/di/admin', require('./routes/diMigrateRoutes')); // one-time 0002 runner (secret-gated); remove after launch
+app.use('/api/di', require('./routes/decisionRoutes')); // Decision Intelligence (BS-AI-004 §3; 20 Nov 2026)
+app.use('/api/di', require('./routes/roomRoutes')); // Decision Rooms (BS-AI-004 §3.3, BS-AI-008; 20 Nov 2026)
 app.use('/api/user/workbooks', workbooksRoutes);
 app.use(`/api/${API_VERSION}/lms`, lmsRoutes);
 app.use(`/api/${API_VERSION}/zoom`, zoomRoutes);
