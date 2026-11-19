@@ -234,10 +234,9 @@ router.post('/decisions/:id/save', async (req, res) => {
   res.json({ decision: r.rows[0] });
 });
 router.post('/decisions/:id/reopen', async (req, res) => {
+  /* a checked decision may be reopened; the second Check is not charged again unless
+     15 further turns have passed (BS-AI-007 §3) — the charge rule lives in /check */
   const d = await ownDecision(req, res); if (!d) return;
-  if (d.status === 'checked' || d.status === 'reviewed') {
-    return res.status(409).json({ error: 'checked', message: 'This decision has been checked. Open it in your log.' });
-  }
   const r = await query("UPDATE decision SET status = 'in_frame', updated_at = now() WHERE id = $1 RETURNING *", [d.id]);
   res.json({ decision: r.rows[0] });
 });
@@ -334,11 +333,22 @@ router.post('/decisions/:id/check', async (req, res) => {
       readKey, j.readiness ? j.readiness.rests_on : null, box4 ? box4.text : null,
       JSON.stringify(j.warning ? [j.warning] : []), reviewDate, d.opened_at]);
 
-    const ledger = await credits.charge(req.userId, { decisionId: d.id, mentorTurnId: out.turnRow.id, reason: 'check' });
-    await query('UPDATE mentor_turn SET charged = true WHERE id = $1', [out.turnRow.id]);
+    /* one credit at the first Check; a re-check after reopening charges again only per
+       further 15 turns (BS-AI-007 §3) */
+    const prior = await query(
+      "SELECT count(*)::int AS n FROM credit_ledger WHERE decision_id = $1 AND reason IN ('check','further_turns')", [d.id]);
+    const owed = 1 + Math.floor(Math.max(0, d.turn_count - 15) / 15);
+    let ledger = null;
+    if (prior.rows[0].n < owed || prior.rows[0].n === 0) {
+      ledger = await credits.charge(req.userId, {
+        decisionId: d.id, mentorTurnId: out.turnRow.id,
+        reason: prior.rows[0].n === 0 ? 'check' : 'further_turns',
+      });
+      await query('UPDATE mentor_turn SET charged = true WHERE id = $1', [out.turnRow.id]);
+    }
     await query("UPDATE decision SET status = 'checked', checked_at = now(), updated_at = now() WHERE id = $1", [d.id]);
     const log = await query('SELECT * FROM decision_log WHERE decision_id = $1', [d.id]);
-    res.json({ mentor: out.mentor, response: j, charged: true, ledger_id: ledger.id, log: log.rows[0] });
+    res.json({ mentor: out.mentor, response: j, charged: !!ledger, ledger_id: ledger ? ledger.id : null, log: log.rows[0] });
   } catch (e) {
     if (e.code === 'out_of_credits') {
       return res.status(402).json({ error: 'out_of_credits', message: 'You have used your decisions. Top up to carry on.' });

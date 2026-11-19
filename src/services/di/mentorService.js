@@ -43,6 +43,21 @@ function mentorFor(typeKey, order) {
   return order === 'logic_first' ? 'architect' : 'alchemist';
 }
 
+/** The EVENT line wordings of BS-AI-005 §3; unknown codes pass through as sent. */
+function eventLine(event) {
+  if (event === 'start') return 'the person sent the Decision box';
+  if (event === 'check') return 'the person pressed Check';
+  if (event === 'round_again') return 'the person pressed Go round again';
+  if (event === 'other_read') return 'the person asked for the other mentor’s read';
+  if (event === 'replied') return 'the person replied';
+  if (event === 'reopened') return 'the person opened a saved decision';
+  var m = /^filled_(box\d|end)$/.exec(event);
+  if (m) return 'the person filled ' + (m[1] === 'end' ? 'End with' : 'Box ' + m[1].slice(3));
+  var r = /^review_(\d)$/.exec(event);
+  if (r) return 'review question ' + r[1];
+  return event;
+}
+
 /** The context block of BS-AI-005 §3, from the server's records only. */
 function buildContext({ mentor, typeKey, result, decision, entries, event, turnNo }) {
   const lines = [];
@@ -76,7 +91,7 @@ function buildContext({ mentor, typeKey, result, decision, entries, event, turnN
   lines.push(`Box 3 (${loopWord(loops.box3)}) round ${decision.rounds}: ${text('box3')}`);
   lines.push(`End with (${loopWord(loops.end)}): ${text('end')}`);
   lines.push(`Box 4: ${text('box4')}`);
-  lines.push(`EVENT: ${event}`);
+  lines.push(`EVENT: ${eventLine(event)}`);
   return lines.join('\n');
 }
 
@@ -185,7 +200,7 @@ async function mentorTurn({ userId, decision, entries, typeKey, result, event, p
     .filter((t) => t.content);
   if (personText) thread.push({ role: 'user', content: personText });
   if (thread.length === 0 || thread[thread.length - 1].role === 'assistant') {
-    thread.push({ role: 'user', content: `EVENT: ${event}` });
+    thread.push({ role: 'user', content: `EVENT: ${eventLine(event)}` });
   }
 
   const turnNo = (decision.turn_count || 0) + 1;
