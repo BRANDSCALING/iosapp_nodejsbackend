@@ -15,6 +15,15 @@ const { query } = require('../config/database');
 const { getAuthMode, verifyBearer } = require('../middleware/cognitoVerify');
 const credits = require('../services/di/creditService');
 const { roomCheck } = require('../services/di/mentorService');
+const { notify, queueGhl } = require('../services/di/notificationService');
+const { guestGate, guestSpend } = require('../services/di/guestService');
+
+/** First name for a message, never box content (BS-AI-009 §2 rule 2). */
+async function firstNameOf(userId) {
+  const r = await query('SELECT first_name, name FROM users WHERE UPPER(id::text) = UPPER($1)', [userId]);
+  const u = r.rows[0] || {};
+  return u.first_name || (u.name ? String(u.name).split(/\s+/)[0] : 'Someone');
+}
 
 const requireAuth = async (req, res, next) => {
   const payload = await verifyBearer(req);
@@ -82,6 +91,9 @@ router.post('/rooms', async (req, res) => {
     const own = await loadOrderAndLoop(req.userId);
     const chosen = order || own.order;
     if (!chosen) return res.status(400).json({ error: 'order_required', message: 'Choose the order the room runs in: Logic first or Feeling first.' });
+    /* a room a guest owns counts as one of their three decisions (BS-AI-008 §6 amendment) */
+    const gate = await guestGate(req.userId);
+    if (gate) return res.status(gate.status).json(gate.body);
     const room = (await query(`
       INSERT INTO decision_room (owner_user_id, kind, decision_text, "order")
       VALUES ($1::uuid, $2, $3, $4) RETURNING *
@@ -90,6 +102,7 @@ router.post('/rooms', async (req, res) => {
       INSERT INTO room_member (room_id, user_id, role, loop, mentor, consent_at, joined_at)
       VALUES ($1, $2::uuid, 'decision_owner', $3, $4, now(), now())
     `, [room.id, req.userId, own.loop, own.mentor]);
+    await guestSpend(req.userId);
     res.status(201).json({ room });
   } catch (e) {
     console.error('[DI] room create failed:', e.message);
@@ -173,7 +186,32 @@ router.post('/rooms/:id/invites', async (req, res) => {
       INSERT INTO room_invite (room_id, token, email, role, expires_at)
       VALUES ($1, $2, $3, $4, now() + interval '7 days') RETURNING *
     `, [req.params.id, token, email ? String(email).toLowerCase() : null, role === 'read_only' ? 'read_only' : 'collaborator'])).rows[0];
-    /* N1 email goes through the notification service (step 7); the link works now */
+    /* N1 — invited to a room: in-app for an existing account, the email through GHL (BS-AI-009 N1) */
+    if (inv.email) {
+      const inviter = await firstNameOf(req.userId);
+      const link = '/app/#invite=' + inv.token;
+      const existing = await query('SELECT id FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1', [inv.email]);
+      if (existing.rows.length) {
+        const invitee = existing.rows[0].id;
+        await notify({
+          userId: invitee, event: 'N1', title: me.decision_text,
+          body: inviter + ' invited you to decide', objectType: 'room', objectId: req.params.id,
+          dedup: 'n1:' + inv.id,
+        });
+        await queueGhl({
+          userId: invitee, event: 'N1', dedup: 'n1:' + inv.id,
+          extra: { inviter_name: inviter, decision: me.decision_text, deep_link: link, is_guest: false, invitation_url: link },
+        });
+      } else {
+        /* no account yet: the guest invitation email is GHL's, started with the email address itself */
+        await query(
+          'INSERT INTO ghl_outbox (event, user_id, payload, site) VALUES ($1, NULL, $2::jsonb, $3)',
+          ['room.invited', JSON.stringify({
+            event: 'room.invited', email: inv.email, inviter_name: inviter,
+            decision: me.decision_text, deep_link: link, is_guest: true, invitation_url: link, site: 'uk',
+          }), 'uk']);
+      }
+    }
     res.status(201).json({ invite: { id: inv.id, token: inv.token, expires_at: inv.expires_at, link: '/app/index.html#invite=' + inv.token } });
   } catch (e) {
     console.error('[DI] invite failed:', e.message);
@@ -200,6 +238,26 @@ router.post('/invites/:token/accept', async (req, res) => {
       VALUES ($1, $2::uuid, $3, $4, $5, now(), $6::uuid, now())
     `, [inv.room_id, req.userId, inv.role, who.loop, who.mentor, (await query('SELECT owner_user_id FROM decision_room WHERE id = $1', [inv.room_id])).rows[0].owner_user_id]);
     await query('UPDATE room_invite SET accepted_at = now(), accepted_user_id = $2::uuid WHERE id = $1', [inv.id, req.userId]);
+
+    /* A joiner with no membership and no purchase is a guest: the seven-day clock and
+       three decisions of their own start now (BS-AI-008 §5; BS-AI-003 §9.5) */
+    const u = (await query('SELECT tier FROM users WHERE UPPER(id::text) = UPPER($1)', [req.userId])).rows[0] || {};
+    const rawTier = (u.tier || '').toLowerCase();
+    const isMember = rawTier && ['free', 'none', ''].indexOf(rawTier) === -1;
+    const bought = (await query(
+      'SELECT 1 FROM user_quiz_results WHERE UPPER(user_id::text) = UPPER($1) AND full_result_purchased = true LIMIT 1',
+      [req.userId])).rows.length > 0;
+    if (!isMember && !bought) {
+      const already = await query(
+        'SELECT 1 FROM guest_access WHERE UPPER(user_id::text) = UPPER($1) LIMIT 1', [req.userId]);
+      if (!already.rows.length) {
+        const owner = (await query('SELECT owner_user_id FROM decision_room WHERE id = $1', [inv.room_id])).rows[0];
+        await query(`
+          INSERT INTO guest_access (user_id, invited_by, room_id, ends_at, decisions_left)
+          VALUES ($1::uuid, $2::uuid, $3, now() + interval '7 days', 3)
+        `, [req.userId, owner ? owner.owner_user_id : null, inv.room_id]);
+      }
+    }
     push(inv.room_id, { type: 'member' });
     res.json({ joined: true, room_id: inv.room_id, needs_edna: !who.loop });
   } catch (e) {
@@ -232,6 +290,29 @@ router.put('/rooms/:id/boxes/:box', async (req, res) => {
       `, [req.params.id, me.id, box, round, loop, String(text).trim()])).rows[0];
     }
     await query("UPDATE decision_room SET status = 'open', updated_at = now() WHERE id = $1", [req.params.id]);
+    /* N4 — a clash: the owner wrote the decision and the rule; the other person confirms */
+    if (me.kind === 'clash' && box === 'rule') {
+      try {
+        const others = (await query(
+          "SELECT user_id FROM room_member WHERE room_id = $1 AND left_at IS NULL AND role <> 'decision_owner'",
+          [req.params.id])).rows;
+        const who = await firstNameOf(req.userId);
+        for (const o of others) {
+          const dedup = 'n4:' + req.params.id + ':' + o.user_id;
+          const fresh = await notify({
+            userId: o.user_id, event: 'N4', title: me.decision_text,
+            body: who + ' wrote the decision: confirm or reply',
+            objectType: 'room', objectId: req.params.id, dedup,
+          });
+          if (fresh) {
+            await queueGhl({
+              userId: o.user_id, event: 'N4', dedup,
+              extra: { inviter_name: who, decision: me.decision_text, deep_link: '/app/#room=' + req.params.id },
+            });
+          }
+        }
+      } catch (e) { console.warn('[DI] N4 notify:', e.message); }
+    }
     push(req.params.id, { type: 'entry', box, round });
     res.json({ entry });
   } catch (e) {
@@ -261,6 +342,23 @@ router.post('/rooms/:id/entries', async (req, res) => {
       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
     `, [req.params.id, me.id, box, me.round, loop, String(text).trim()])).rows[0];
     await query("UPDATE decision_room SET status = 'waiting_owner', updated_at = now() WHERE id = $1 AND status IN ('open','waiting_room')", [req.params.id]);
+    /* N3 — the owner, once per round, not per entry (BS-AI-009 N3 digest rule) */
+    if (me.role !== 'decision_owner') {
+      try {
+        const dedup = 'n3:' + req.params.id + ':' + me.round;
+        const who = await firstNameOf(req.userId);
+        const fresh = await notify({
+          userId: me.owner_user_id, event: 'N3', title: me.decision_text,
+          body: who + ' added to your decision', objectType: 'room', objectId: req.params.id, dedup,
+        });
+        if (fresh) {
+          await queueGhl({
+            userId: me.owner_user_id, event: 'N3', dedup,
+            extra: { inviter_name: who, decision: me.decision_text, deep_link: '/app/#room=' + req.params.id },
+          });
+        }
+      } catch (e) { console.warn('[DI] N3 notify:', e.message); }
+    }
     push(req.params.id, { type: 'entry', box, round: me.round });
     res.status(201).json({ entry });
   } catch (e) {
@@ -276,6 +374,27 @@ router.post('/rooms/:id/rounds', async (req, res) => {
     if (!me) return res.status(404).json({ error: 'not_found', message: 'That room was not found.' });
     if (me.role !== 'decision_owner') return res.status(403).json({ error: 'owner_only', message: 'Only the Decision owner asks for a round.' });
     const r = await query("UPDATE decision_room SET round = round + 1, status = 'waiting_room', updated_at = now() WHERE id = $1 RETURNING *", [req.params.id]);
+    /* N2 — every collaborator who has not yet added in this round (BS-AI-009 N2) */
+    try {
+      const waiting = (await query(`
+        SELECT m.user_id, m.loop FROM room_member m
+        WHERE m.room_id = $1 AND m.left_at IS NULL AND m.role = 'collaborator'
+      `, [req.params.id])).rows;
+      for (const w of waiting) {
+        const dedup = 'n2:' + req.params.id + ':' + r.rows[0].round + ':' + w.user_id;
+        const fresh = await notify({
+          userId: w.user_id, event: 'N2', title: me.decision_text,
+          body: 'Add your ' + (w.loop === 'logic' ? 'Logic' : w.loop === 'feeling' ? 'Feeling' : 'input'),
+          objectType: 'room', objectId: req.params.id, dedup,
+        });
+        if (fresh) {
+          await queueGhl({
+            userId: w.user_id, event: 'N2', dedup,
+            extra: { decision: me.decision_text, deep_link: '/app/#room=' + req.params.id },
+          });
+        }
+      }
+    } catch (e) { console.warn('[DI] N2 notify:', e.message); }
     push(req.params.id, { type: 'round', round: r.rows[0].round });
     res.json({ room: r.rows[0] });
   } catch (e) {
@@ -334,6 +453,17 @@ router.post('/rooms/:id/check', async (req, res) => {
     if (j.split && j.split.box) {
       await query('INSERT INTO room_split (room_id, box, line) VALUES ($1, $2, $3)', [room.id, j.split.box, j.split.line || '']);
     }
+    /* N5 — decided: every participant, push/in-app only (the log is in the app) */
+    try {
+      for (const m of members) {
+        if (String(m.user_id).toUpperCase() === String(req.userId).toUpperCase()) continue;
+        await notify({
+          userId: m.user_id, event: 'N5', title: room.decision_text,
+          body: 'Decided · the room row is in your log',
+          objectType: 'room', objectId: room.id, dedup: 'n5:' + room.id + ':' + m.user_id,
+        });
+      }
+    } catch (e) { console.warn('[DI] N5 notify:', e.message); }
     push(room.id, { type: 'checked' });
     res.json({ mentor: out.mentor, response: j, charged: true, ledger_id: ledger.id });
   } catch (e) {
@@ -368,6 +498,13 @@ router.delete('/rooms/:id/members/:user', async (req, res) => {
   if (!me) return res.status(404).json({ error: 'not_found', message: 'That room was not found.' });
   if (me.role !== 'decision_owner') return res.status(403).json({ error: 'owner_only', message: 'Only the Decision owner removes people.' });
   await query('UPDATE room_member SET left_at = now() WHERE room_id = $1 AND UPPER(user_id::text) = UPPER($2)', [req.params.id, req.params.user]);
+  /* N14 — one email, no content of the room (BS-AI-009 N14) */
+  const dedupR = 'n14r:' + req.params.id + ':' + req.params.user;
+  const freshR = await notify({
+    userId: req.params.user, event: 'N14', title: me.decision_text,
+    body: 'You were removed from a Decision Room', objectType: 'room', objectId: req.params.id, dedup: dedupR,
+  });
+  if (freshR) await queueGhl({ userId: req.params.user, event: 'N14', dedup: dedupR, extra: { decision: me.decision_text, removed: true } });
   push(req.params.id, { type: 'member' });
   res.json({ removed: true });
 });
@@ -384,6 +521,20 @@ router.post('/rooms/:id/close', async (req, res) => {
   if (!me) return res.status(404).json({ error: 'not_found', message: 'That room was not found.' });
   if (me.role !== 'decision_owner') return res.status(403).json({ error: 'owner_only', message: 'Only the Decision owner closes the room.' });
   await query("UPDATE decision_room SET status = 'closed', closed_at = now(), updated_at = now() WHERE id = $1", [req.params.id]);
+  /* N14 — every participant on close */
+  try {
+    const others = (await query(
+      "SELECT user_id FROM room_member WHERE room_id = $1 AND left_at IS NULL AND role <> 'decision_owner'",
+      [req.params.id])).rows;
+    for (const o of others) {
+      const dedup = 'n14c:' + req.params.id + ':' + o.user_id;
+      const fresh = await notify({
+        userId: o.user_id, event: 'N14', title: me.decision_text,
+        body: 'The room was closed', objectType: 'room', objectId: req.params.id, dedup,
+      });
+      if (fresh) await queueGhl({ userId: o.user_id, event: 'N14', dedup, extra: { decision: me.decision_text, removed: false } });
+    }
+  } catch (e) { console.warn('[DI] N14 notify:', e.message); }
   res.json({ closed: true });
 });
 

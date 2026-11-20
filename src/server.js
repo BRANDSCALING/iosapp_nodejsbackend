@@ -118,6 +118,8 @@ app.use('/api/webhooks/ghl', require('./routes/ghlWebhookRoutes')); // GHL check
 app.use('/api/di/admin', require('./routes/diMigrateRoutes')); // one-time 0002 runner (secret-gated); remove after launch
 app.use('/api/di', require('./routes/decisionRoutes')); // Decision Intelligence (BS-AI-004 §3; 20 Nov 2026)
 app.use('/api/di', require('./routes/roomRoutes')); // Decision Rooms (BS-AI-004 §3.3, BS-AI-008; 20 Nov 2026)
+app.use('/api/di', require('./routes/notificationRoutes')); // Needs you, the bell, prefs (BS-AI-009; 20 Nov 2026)
+require('./services/di/scheduler').start(); // reviews due, guest days, GHL outbox (BS-AI-009 §7)
 app.use('/api/user/workbooks', workbooksRoutes);
 app.use(`/api/${API_VERSION}/lms`, lmsRoutes);
 app.use(`/api/${API_VERSION}/zoom`, zoomRoutes);

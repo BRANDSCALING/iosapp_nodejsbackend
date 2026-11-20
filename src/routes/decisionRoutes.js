@@ -15,6 +15,9 @@ const { getAuthMode, verifyBearer } = require('../middleware/cognitoVerify');
 const { fiveWayKey } = require('../services/edna/workbookSelect');
 const { mentorTurn } = require('../services/di/mentorService');
 const credits = require('../services/di/creditService');
+const attachments = require('../services/di/attachmentService');
+const { notify, queueGhl } = require('../services/di/notificationService');
+const { guestState, guestGate, guestSpend } = require('../services/di/guestService');
 
 /* same contract as workbooks.js: verified Bearer first, x-user-id fallback in legacy mode */
 const requireAuth = async (req, res, next) => {
@@ -104,10 +107,14 @@ router.post('/decisions', async (req, res) => {
       });
     }
 
+    const gate = await guestGate(req.userId);
+    if (gate) return res.status(gate.status).json(gate.body);
+
     const r = await query(`
       INSERT INTO decision (user_id, kind, "order", awareness_practice, urgent, text)
       VALUES ($1::uuid, $2, $3, $4, $5, $6) RETURNING *
     `, [req.userId, kind, chosen, !!awareness_practice, !!urgent, String(text).trim()]);
+    await guestSpend(req.userId);
     res.status(201).json({ decision: r.rows[0], type_key: typeKey });
   } catch (e) {
     console.error('[DI] create decision failed:', e.message);
@@ -348,6 +355,21 @@ router.post('/decisions/:id/check', async (req, res) => {
     }
     await query("UPDATE decision SET status = 'checked', checked_at = now(), updated_at = now() WHERE id = $1", [d.id]);
     const log = await query('SELECT * FROM decision_log WHERE decision_id = $1', [d.id]);
+
+    /* N9 (balance under 20 %, in-app only) and N10 (zero: one email) — BS-AI-009 */
+    if (ledger) {
+      const left = await credits.balance(req.userId);
+      const granted = (await query(
+        'SELECT COALESCE(sum(amount),0)::int AS n FROM credit_grant WHERE UPPER(user_id::text) = UPPER($1) AND (expires_at IS NULL OR expires_at > now())',
+        [req.userId])).rows[0].n;
+      if (left === 0) {
+        notify({ userId: req.userId, event: 'N10', title: 'You have used your decisions', body: 'Your log, saved decisions and reviews stay open', dedup: 'n10:' + req.userId + ':' + new Date().toISOString().slice(0, 10) })
+          .then((fresh) => fresh && queueGhl({ userId: req.userId, event: 'N10', dedup: 'n10:' + req.userId + ':' + new Date().toISOString().slice(0, 10), extra: {} }))
+          .catch(() => {});
+      } else if (granted > 0 && left / granted < 0.2) {
+        notify({ userId: req.userId, event: 'N9', title: left + (left === 1 ? ' decision' : ' decisions') + ' left', body: 'Your allowance is getting low', dedup: 'n9:' + req.userId + ':' + granted }).catch(() => {});
+      }
+    }
     res.json({ mentor: out.mentor, response: j, charged: !!ledger, ledger_id: ledger ? ledger.id : null, log: log.rows[0] });
   } catch (e) {
     if (e.code === 'out_of_credits') {
@@ -380,6 +402,7 @@ router.get('/profile', async (req, res) => {
     /* the app's tier states (BS-AI-003): free · di (£99) · entry (membership: rooms open) */
     const rawTier = (row.tier || '').toLowerCase();
     const member = rawTier && ['free', 'none', ''].indexOf(rawTier) === -1;
+    const guest = member || purchased ? null : await guestState(req.userId);
     res.json({
       type_key: typeKey,
       first_name: first,
@@ -389,6 +412,9 @@ router.get('/profile', async (req, res) => {
       first_open: logN.rows[0].n === 0,
       purchased,
       tier: member ? 'entry' : purchased ? 'di' : 'free',
+      guest: guest && !guest.ended
+        ? { days_left: guest.days_left, decisions_left: guest.decisions_left, ends_at: guest.ends_at }
+        : guest ? { ended: true } : null,
     });
   } catch (e) {
     console.error('[DI] profile failed:', e.message);
@@ -603,6 +629,96 @@ router.post('/log/:id/review', async (req, res) => {
     res.json({ row: r.rows[0] });
   } catch (e) {
     console.error('[DI] review failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
+/* ------------------------------------------------- §3.1 Attachments (BS-AI-004 step 5)
+   The adopted default (BS-AI-012 §6 item 19): PDF, Word, text, images; 10 MB; five per
+   decision. The extract enters the box only on confirm (BS-AI-007 §5). The file arrives
+   as JSON base64 ({filename, mime, data}); 10 MB of file is ~13.7 MB of base64. */
+
+const attachmentBody = express.json({ limit: '15mb' });
+
+/** POST /decisions/:id/attachments — {box, filename, mime, data (base64)} */
+router.post('/decisions/:id/attachments', attachmentBody, async (req, res) => {
+  try {
+    const d = await ownDecision(req, res); if (!d) return;
+    const { box = 'box1', filename, mime, data } = req.body || {};
+    if (!filename || !mime || !data) {
+      return res.status(400).json({ error: 'validation', message: 'Send the file name, its type and its content.' });
+    }
+    if (!BOXES.includes(box)) return res.status(400).json({ error: 'validation', message: 'Not a box of the Frame.' });
+    let buffer;
+    try { buffer = Buffer.from(String(data), 'base64'); } catch (e) { buffer = null; }
+    if (!buffer || !buffer.length) return res.status(400).json({ error: 'validation', message: 'That file could not be read.' });
+    const a = await attachments.createAttachment({
+      userId: req.userId, decisionId: d.id, box, filename: String(filename).slice(0, 200), mime, buffer,
+    });
+    res.status(201).json({ attachment: a });
+  } catch (e) {
+    if (['type', 'size', 'cap', 'unreadable'].includes(e.code)) {
+      return res.status(400).json({ error: e.code, message: e.message });
+    }
+    if (e.code === 'unavailable') {
+      return res.status(503).json({ error: 'mentor_unavailable', message: 'The extract could not be made right now. Your file was not kept; try again in a few minutes.' });
+    }
+    console.error('[DI] attach failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
+/** GET /decisions/:id/attachments — the decision's live attachments, without the bytes */
+router.get('/decisions/:id/attachments', async (req, res) => {
+  try {
+    const d = await ownDecision(req, res); if (!d) return;
+    const r = await query(`
+      SELECT id, box, filename, mime, size, extract, confirmed_at, created_at
+      FROM attachment WHERE decision_id = $1 AND deleted_at IS NULL ORDER BY created_at
+    `, [d.id]);
+    res.json({ attachments: r.rows });
+  } catch (e) {
+    console.error('[DI] attachments list failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
+/** POST /attachments/:id/confirm — the extract enters the box */
+router.post('/attachments/:id/confirm', async (req, res) => {
+  try {
+    const a = await attachments.confirmAttachment({ id: req.params.id, userId: req.userId });
+    if (!a) return res.status(404).json({ error: 'not_found', message: 'That attachment was not found.' });
+    res.json({ attachment: { id: a.id, confirmed_at: a.confirmed_at } });
+  } catch (e) {
+    console.error('[DI] attach confirm failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
+/** DELETE /attachments/:id */
+router.delete('/attachments/:id', async (req, res) => {
+  try {
+    const gone = await attachments.deleteAttachment({ id: req.params.id, userId: req.userId });
+    if (!gone) return res.status(404).json({ error: 'not_found', message: 'That attachment was not found.' });
+    res.json({ removed: true });
+  } catch (e) {
+    console.error('[DI] attach delete failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
+/** GET /attachments/:id/file — the stored bytes back to their owner */
+router.get('/attachments/:id/file', async (req, res) => {
+  try {
+    const a = (await query(
+      'SELECT filename, mime, file_data FROM attachment WHERE id = $1 AND UPPER(user_id::text) = UPPER($2) AND deleted_at IS NULL',
+      [req.params.id, req.userId])).rows[0];
+    if (!a || !a.file_data) return res.status(404).json({ error: 'not_found', message: 'That attachment was not found.' });
+    res.setHeader('content-type', a.mime || 'application/octet-stream');
+    res.setHeader('content-disposition', 'attachment; filename="' + String(a.filename || 'file').replace(/"/g, '') + '"');
+    res.send(a.file_data);
+  } catch (e) {
+    console.error('[DI] attach file failed:', e.message);
     res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
   }
 });
