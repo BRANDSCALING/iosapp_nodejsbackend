@@ -308,15 +308,29 @@ router.post('/sync-profile', userScopedAuth, async (req, res) => {
     const result = await query(
       `INSERT INTO users (id, email, name, user_type, created_at, updated_at)
        VALUES ($1::uuid, $2, $3, $4, NOW(), NOW())
-       ON CONFLICT (email) 
+       ON CONFLICT (email)
        DO UPDATE SET
          name = COALESCE(NULLIF(EXCLUDED.name, ''), users.name),
          updated_at = NOW()
-       RETURNING id, email, name, user_type, type_id, tier, created_at, updated_at`,
+       RETURNING id, email, name, user_type, type_id, tier, created_at, updated_at,
+                 (xmax = 0) AS created_now`,
       [req.body.userId, req.body.email, req.body.name || '', userTypeForInsert]
     );
 
     const user = result.rows[0];
+
+    // A NEW account starts GHL workflow W3 (BS-AI-013 §7, event account.created) so the
+    // person gets their sign-up email once the GHL side is wired. One outbox row per
+    // account ever (dedup); nothing sends before GHL_INBOUND_WEBHOOK_URL is configured.
+    if (user.created_now) {
+      const { queueGhl } = require('../services/di/notificationService');
+      queueGhl({
+        userId: user.id,
+        event: 'account.created',
+        extra: { tier: user.tier || 'free' },
+        dedup: `account.created:${String(user.id).toUpperCase()}`,
+      }).catch(() => {});
+    }
 
     const duration = Date.now() - startTime;
     console.log(`✅ [Sync Profile] Success in ${duration}ms`);

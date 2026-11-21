@@ -368,8 +368,20 @@ exports.createSession = async (req, res, next) => {
           VALUES ($1, $2, $3, 'brandscaling', 'free', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
           ON CONFLICT (id) DO NOTHING
         `, [userId, email || null, name || null]);
-        
+
         console.log(`✅ [Quiz] Created new user: ${userId} (email: ${email || 'not provided'})`);
+
+        // Same sign-up event as /api/user/sync-profile (GHL W3); the dedup key makes
+        // the two paths send at most one account.created per account, ever.
+        if (email) {
+          const { queueGhl } = require('../services/di/notificationService');
+          queueGhl({
+            userId,
+            event: 'account.created',
+            extra: { tier: 'free' },
+            dedup: `account.created:${String(userId).toUpperCase()}`,
+          }).catch(() => {});
+        }
       } else {
         console.log(`✅ [Quiz] User already exists: ${userId}`);
       }
