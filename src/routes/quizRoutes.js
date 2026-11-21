@@ -177,6 +177,34 @@ router.get(
   quizController.getUserAnswerHistory
 );
 
+/**
+ * POST /api/v1/quiz/save-progress-email — "Save my progress by email" (BS-AI-009 A1).
+ *
+ * Our side of the email only: one ghl_outbox row with event `edna.save_progress`
+ * (BS-AI-013 §4 W1 — "Send A1 at once"). GHL owns the sending; the row waits as
+ * pending until the GHL team registers the inbound webhook URL and secret
+ * (GHL_INBOUND_WEBHOOK_URL / GHL_INBOUND_WEBHOOK_SECRET), then delivers with retries.
+ * See GHL-EMAIL-HANDOVER.md at the repository root.
+ */
+router.post('/save-progress-email', async (req, res) => {
+  try {
+    const userId = req.verifiedSub || req.headers['x-user-id'] || req.body?.userId;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'No user identified' });
+    }
+    const { queueGhl } = require('../services/di/notificationService');
+    const row = await queueGhl({ userId, event: 'A1' });
+    if (!row) {
+      // No account email, the person switched A1 emails off, or the insert failed.
+      return res.status(422).json({ success: false, error: 'Could not queue the email' });
+    }
+    return res.json({ success: true, queued: true });
+  } catch (e) {
+    console.error('❌ [Quiz] save-progress-email failed:', e);
+    return res.status(500).json({ success: false, error: 'Failed to queue the email' });
+  }
+});
+
 module.exports = router;
 
 

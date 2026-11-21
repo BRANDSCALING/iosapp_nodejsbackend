@@ -18,6 +18,7 @@ const { query } = require('../../config/database');
 
 /* notification event → the GHL workflow event it starts (BS-AI-013 §7) */
 const GHL_EVENT = {
+  A1: 'edna.save_progress',   // "Save my progress by email" → workflow W1 sends A1
   N1: 'room.invited',
   N2: 'room.input_needed',
   N3: 'room.new_input',

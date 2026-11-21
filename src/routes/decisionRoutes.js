@@ -391,7 +391,7 @@ router.get('/profile', async (req, res) => {
   try {
     const { typeKey } = await loadEdna(req.userId);
     const u = await query(
-      'SELECT first_name, last_name, name, email, tier FROM users WHERE UPPER(id::text) = UPPER($1)', [req.userId]);
+      'SELECT first_name, last_name, name, email, tier, photo_url FROM users WHERE UPPER(id::text) = UPPER($1)', [req.userId]);
     const logN = await query(
       'SELECT count(*)::int AS n FROM decision_log WHERE UPPER(user_id::text) = UPPER($1)', [req.userId]);
     const row = u.rows[0] || {};
@@ -409,6 +409,7 @@ router.get('/profile', async (req, res) => {
       last_name: row.last_name || null,
       email: row.email || null,
       credits: await credits.balance(req.userId),
+      photo_url: row.photo_url || null,
       first_open: logN.rows[0].n === 0,
       purchased,
       tier: member ? 'entry' : purchased ? 'di' : 'free',
@@ -513,6 +514,34 @@ router.put('/profile', async (req, res) => {
     res.json({ saved: true });
   } catch (e) {
     console.error('[DI] profile save failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
+/**
+ * PUT /profile/photo — the room-circle photo (BS-AI-003 §7.3: square crop, JPEG or PNG).
+ * The client downscales to ~256px before sending; the image is stored inline on the user
+ * row as a data URL and served back through /profile and the room members, so no file
+ * store is needed for a small avatar. Cap 400 KB after encoding.
+ */
+router.put('/profile/photo', express.json({ limit: '1mb' }), async (req, res) => {
+  try {
+    const { data = null, mime = 'image/jpeg' } = req.body || {};
+    if (data === null) {
+      await query("UPDATE users SET photo_url = NULL WHERE UPPER(id::text) = UPPER($1)", [req.userId]);
+      return res.json({ saved: true, removed: true });
+    }
+    if (!['image/jpeg', 'image/png'].includes(mime)) {
+      return res.status(400).json({ error: 'type', message: 'JPEG or PNG, square crop.' });
+    }
+    if (String(data).length > 400 * 1024) {
+      return res.status(400).json({ error: 'size', message: 'That photo is too large. A square crop around 256 px works best.' });
+    }
+    await query('UPDATE users SET photo_url = $2 WHERE UPPER(id::text) = UPPER($1)',
+      [req.userId, 'data:' + mime + ';base64,' + String(data)]);
+    res.json({ saved: true });
+  } catch (e) {
+    console.error('[DI] photo save failed:', e.message);
     res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
   }
 });
