@@ -83,6 +83,11 @@ router.get('/ios', (req, res) => {
     force_update: process.env.IOS_FORCE_UPDATE === 'true',
     app_store_url: process.env.IOS_APP_STORE_URL || DEFAULT_APP_STORE_URL,
     update_message: process.env.IOS_UPDATE_MESSAGE || null,
+    // The "Meet Your AI Business Advisors" section ships hidden (App Review
+    // guideline 2.1: no placeholder screens). Set AI_MENTORS_VISIBLE=true on
+    // App Runner once the release is live and every client shows it again —
+    // no app update needed. The section is an announcement page only.
+    ai_mentors_visible: process.env.AI_MENTORS_VISIBLE === 'true',
   });
 });
 
@@ -140,6 +145,8 @@ function brandscalingAndroidPayload() {
     update_message:
       process.env.BRANDSCALING_ANDROID_UPDATE_MESSAGE ||
       'This version is no longer supported. Please update from Google Play to continue.',
+    // Same switch as /ios, for when the Android app gains the section.
+    ai_mentors_visible: process.env.AI_MENTORS_VISIBLE === 'true',
   };
 }
 
