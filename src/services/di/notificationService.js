@@ -92,13 +92,22 @@ async function queueGhl({ userId, event, extra = {}, dedup = null }) {
   }
 }
 
+/* Only events whose GHL workflow exists may leave the outbox (Mashab, 21 Nov: GHL would
+ * accept and drop anything else, and the inbound trigger is billed per run). Grow the list
+ * via env as workflows are built — e.g. add purchase.completed after Fariza signs it off. */
+const SENDABLE = () =>
+  new Set((process.env.GHL_SENDABLE_EVENTS || 'account.created,edna.save_progress')
+    .split(',').map((s) => s.trim()).filter(Boolean));
+
 /** Send pending outbox rows when the GHL inbound webhook is configured; otherwise leave them. */
 async function deliverOutbox() {
   const url = process.env.GHL_INBOUND_WEBHOOK_URL;
   if (!url) return { sent: 0, pending: true };
   const secret = process.env.GHL_INBOUND_WEBHOOK_SECRET || '';
+  const sendable = Array.from(SENDABLE());
   const rows = (await query(
-    "SELECT * FROM ghl_outbox WHERE status = 'pending' AND attempts < 5 ORDER BY created_at LIMIT 20")).rows;
+    "SELECT * FROM ghl_outbox WHERE status = 'pending' AND attempts < 5 AND event = ANY($1) ORDER BY created_at LIMIT 20",
+    [sendable])).rows;
   let sent = 0;
   for (const row of rows) {
     try {
