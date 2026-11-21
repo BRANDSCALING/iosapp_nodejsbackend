@@ -16,6 +16,7 @@ Each event writes one row into `ghl_outbox` with the §7 payload: `event`, `even
 | --- | --- | --- | --- |
 | `account.created` | An account is created (app sign-up via `/api/user/sync-profile`, or first quiz session) — once per account | `tier` | W3 — the sign-up confirmation email |
 | `edna.save_progress` | "Save my progress by email" is tapped in the app (BS-AI-009 A1) | — | W1 — email A1 "Carry on with your E-DNA" |
+| `purchase.completed` | The detailed report is bought **in the app** (In-App Purchase, via the RevenueCat webhook) — once per account | `product` ("detailed_report"), `source` ("app_store") | A purchase-confirmation workflow (new — see note below) |
 
 ## What the GHL team needs to do
 
@@ -40,9 +41,12 @@ Each event writes one row into `ghl_outbox` with the §7 payload: `event`, `even
   their absence (or a separate app-welcome template be agreed with Fariza).
 - **Payment confirmation:** website orders go through GHL's own order pages, so the
   purchase event and receipt (W5 / N11) are GHL-native — nothing needed from the
-  backend. App In-App Purchases get Apple's own receipt email; there is no §7 event
-  for them. If Fariza wants a branded email for app purchases too, that needs a new
-  §7 event agreed first.
+  backend. For **app** purchases the backend now sends `purchase.completed` (above)
+  so GHL can send the same purchase email from both platforms; build a workflow that
+  starts on it and sends the purchase-confirmation template. Note: this event is not
+  in BS-AI-013 §7 (the contract predates app purchases) — flag it to Fariza so the
+  document is amended. Apple still sends its own App Store receipt either way, and
+  the backend does NOT grant anything on this event (unlocks stay on the §7 rules).
 - The A1 payload does not yet carry the part number `[n]` or a resume link — on iOS
   progress stays on the phone (BS-AI-003 §9.2). Agree the iOS variant's merge fields
   with Fariza before the template is finalised.

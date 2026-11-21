@@ -37,6 +37,18 @@ const handleWebhook = async (req, res) => {
                 console.warn(`⚠️ [DB] No user_quiz_results row found for user_id ${appUserId} (report unlock not persisted).`);
             }
 
+            // The same purchase email as a website order, for an app purchase too: one
+            // ghl_outbox row the GHL purchase workflow starts from. Website orders are
+            // GHL-native (W5); this event covers the App Store path only, once per account
+            // (dedup), and Apple still sends its own receipt.
+            const { queueGhl } = require('../services/di/notificationService');
+            queueGhl({
+                userId: appUserId,
+                event: 'purchase.completed',
+                extra: { product: 'detailed_report', source: 'app_store' },
+                dedup: `purchase.completed:detailed_report:${String(appUserId).toUpperCase()}`,
+            }).catch(() => {});
+
         } else {
             console.log(`ℹ️ [RevenueCat] Event ${eventType} did not contain the '${entitlementId}' entitlement. No action taken.`);
         }
