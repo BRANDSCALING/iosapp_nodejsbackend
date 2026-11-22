@@ -13,6 +13,7 @@ const router = express.Router();
 const { query } = require('../config/database');
 const { getAuthMode, verifyBearer } = require('../middleware/cognitoVerify');
 const { fiveWayKey } = require('../services/edna/workbookSelect');
+const { legacyResult } = require('../services/edna/legacyResult');
 const { mentorTurn } = require('../services/di/mentorService');
 const credits = require('../services/di/creditService');
 const attachments = require('../services/di/attachmentService');
@@ -46,17 +47,22 @@ function unwrapLayer7(raw) {
   return typeof v === 'object' ? v : null;
 }
 
-/** The person's v2 result record and five-way Part 1 key, or nulls. */
+/** The person's result record and five-way Part 1 key, or nulls: the v2 envelope when
+ *  the run wrote one, else the legacy synthesis (most member accounts, 21 Nov 2026). */
 async function loadEdna(userId) {
   const r = await query(`
-    SELECT layer7_result FROM user_quiz_results
+    SELECT layer7_result, layer1_core_type, layer2_subtype FROM user_quiz_results
     WHERE UPPER(user_id::text) = UPPER($1)
     ORDER BY completed_at DESC LIMIT 1
   `, [userId]);
   if (r.rows.length === 0) return { typeKey: null, result: null };
   const latest = unwrapLayer7(r.rows[0].layer7_result);
-  if (!latest || !latest.ednaV2 || !latest.ednaV2.result) return { typeKey: null, result: null };
-  return { typeKey: fiveWayKey(latest.ednaV2.result), result: latest.ednaV2.result };
+  if (latest && latest.ednaV2 && latest.ednaV2.result) {
+    return { typeKey: fiveWayKey(latest.ednaV2.result), result: latest.ednaV2.result };
+  }
+  const legacy = legacyResult(r.rows[0]);
+  if (!legacy) return { typeKey: null, result: null };
+  return { typeKey: fiveWayKey(legacy), result: legacy };
 }
 async function loadTypeKey(userId) { return (await loadEdna(userId)).typeKey; }
 
@@ -431,11 +437,16 @@ router.get('/edna', async (req, res) => {
   try {
     const { CONTENT } = require('../services/edna/scoring');
     const r = await query(`
-      SELECT layer7_result, full_result_purchased, completed_at FROM user_quiz_results
+      SELECT layer7_result, layer1_core_type, layer2_subtype, full_result_purchased, completed_at
+      FROM user_quiz_results
       WHERE UPPER(user_id::text) = UPPER($1) ORDER BY completed_at DESC
     `, [req.userId]);
-    const unwrap = (raw) => unwrapLayer7(raw);
-    const envs = r.rows.map((row) => ({ env: unwrap(row.layer7_result), row })).filter((x) => x.env && x.env.ednaV2 && x.env.ednaV2.result);
+    const envs = r.rows.map((row) => {
+      const env = unwrapLayer7(row.layer7_result);
+      if (env && env.ednaV2 && env.ednaV2.result) return { env, row };
+      const legacy = legacyResult(row);
+      return legacy ? { env: { ednaV2: { result: legacy } }, row } : null;
+    }).filter(Boolean);
     if (!envs.length) return res.json({ taken: false });
     const R = envs[0].env.ednaV2.result;
     const purchased = r.rows.some((row) => row.full_result_purchased);
@@ -447,10 +458,13 @@ router.get('/edna', async (req, res) => {
     const first = core === 'architect' ? 'logic' : core === 'alchemist' ? 'feeling'
       : lean === 'architect' ? 'logic' : lean === 'alchemist' ? 'feeling' : null;
     const switched = p1.switched || [];
-    const stress = switched.length
-      ? 'Under stress you switched in ' + switched.length + ' context' + (switched.length > 1 ? 's' : '') + ' (' +
-        switched.map((s) => s.ctx + ', ' + s.kind + ' switch').join('; ') + '); your loop held everywhere else.'
-      : 'Under stress your loop held in every context.';
+    /* v1 never measured stress switching: say so rather than claim the loop held */
+    const stress = R.legacy
+      ? 'Stress switching was not part of your earlier assessment. Retake the E-DNA to measure it.'
+      : switched.length
+        ? 'Under stress you switched in ' + switched.length + ' context' + (switched.length > 1 ? 's' : '') + ' (' +
+          switched.map((s) => s.ctx + ', ' + s.kind + ' switch').join('; ') + '); your loop held everywhere else.'
+        : 'Under stress your loop held in every context.';
 
     let p2result = null; let p2second = null;
     if (p2.result) { p2result = SUB[p2.result] || p2.result; p2second = p2.second ? (SUB[p2.second] || p2.second) : null; }

@@ -17,6 +17,7 @@ const credits = require('../services/di/creditService');
 const { roomCheck } = require('../services/di/mentorService');
 const { notify, queueGhl } = require('../services/di/notificationService');
 const { guestGate, guestSpend } = require('../services/di/guestService');
+const { legacyResult } = require('../services/edna/legacyResult');
 
 /** First name for a message, never box content (BS-AI-009 §2 rule 2). */
 async function firstNameOf(userId) {
@@ -61,13 +62,17 @@ async function loadOrderAndLoop(userId) {
   /* the loop a person adds in, from their result; null when they have no E-DNA yet */
   try {
     const r = await query(`
-      SELECT layer7_result FROM user_quiz_results
+      SELECT layer7_result, layer1_core_type, layer2_subtype FROM user_quiz_results
       WHERE UPPER(user_id::text) = UPPER($1) ORDER BY completed_at DESC LIMIT 1
     `, [userId]);
     if (!r.rows.length) return { loop: null, order: null, mentor: null };
     let v = r.rows[0].layer7_result;
     for (let i = 0; i < 3 && typeof v === 'string'; i++) v = JSON.parse(v);
-    const p1 = v && v.ednaV2 && v.ednaV2.result && v.ednaV2.result.p1;
+    let p1 = v && v.ednaV2 && v.ednaV2.result && v.ednaV2.result.p1;
+    if (!p1) {
+      const legacy = legacyResult(r.rows[0]); /* pre-v2 run: most members, 21 Nov 2026 */
+      p1 = legacy && legacy.p1;
+    }
     if (!p1) return { loop: null, order: null, mentor: null };
     const side = p1.core === 'mixed' ? p1.lean : p1.core;
     if (side === 'architect') return { loop: 'logic', order: 'logic_first', mentor: 'architect' };
