@@ -1272,6 +1272,31 @@ exports.saveResults = async (req, res, next) => {
     }
 
     // ============================================
+    // STEP 4.5: Three starter credits on the first completed v2 assessment
+    // (Fariza, 22 Nov: everyone who takes the test gets 3 free decisions in the
+    // Frame; after that the buy-credits/upgrade options come up). One grant per
+    // person ever — a retake does not refill it. Both completion paths (iOS
+    // direct, web via ednaV2Controller) come through here.
+    // ============================================
+    try {
+      const isV2 = (await query(
+        `SELECT 1 FROM user_quiz_results WHERE id = $1 AND layer7_result::text LIKE '%ednaV2%'`,
+        [result.rows[0].id])).rows.length > 0;
+      if (isV2) {
+        const already = (await query(
+          `SELECT 1 FROM credit_grant WHERE UPPER(user_id::text) = UPPER($1) AND source = 'assessment' LIMIT 1`,
+          [userId])).rows.length > 0;
+        if (!already) {
+          const credits = require('../services/di/creditService');
+          await credits.grant(userId, 'assessment', 3);
+          console.log(`🎁 [Quiz] Granted the 3 starter credits to ${userId}`);
+        }
+      }
+    } catch (grantError) {
+      console.error('⚠️ [Quiz] Starter-credit grant failed:', grantError.message);
+    }
+
+    // ============================================
     // STEP 5: Return comprehensive response
     // ============================================
     res.status(201).json({

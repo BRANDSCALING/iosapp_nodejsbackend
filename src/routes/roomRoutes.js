@@ -16,7 +16,7 @@ const { getAuthMode, verifyBearer } = require('../middleware/cognitoVerify');
 const credits = require('../services/di/creditService');
 const { roomCheck } = require('../services/di/mentorService');
 const { notify, queueGhl } = require('../services/di/notificationService');
-const { guestGate, guestSpend } = require('../services/di/guestService');
+const { guestState, guestGate, guestSpend } = require('../services/di/guestService');
 const { legacyResult } = require('../services/edna/legacyResult');
 
 /** First name for a message, never box content (BS-AI-009 §2 rule 2). */
@@ -96,6 +96,21 @@ router.post('/rooms', async (req, res) => {
     const own = await loadOrderAndLoop(req.userId);
     const chosen = order || own.order;
     if (!chosen) return res.status(400).json({ error: 'order_required', message: 'Choose the order the room runs in: Logic first or Feeling first.' });
+    /* Rooms open with Entry membership; an active guest may own one (BS-AI-012 §6.3;
+       Fariza, 22 Nov: everyone sees rooms, only members use them). The app hides the
+       button for others — this enforces it for every client, the website included. */
+    const tierRow = (await query(
+      'SELECT tier FROM users WHERE UPPER(id::text) = UPPER($1)', [req.userId])).rows[0];
+    const rawTier = ((tierRow && tierRow.tier) || '').toLowerCase();
+    const member = rawTier && ['free', 'none', ''].indexOf(rawTier) === -1;
+    const g = member ? null : await guestState(req.userId);
+    if (!member && (!g || g.ended)) {
+      return res.status(403).json({
+        error: 'rooms_membership',
+        message: 'Rooms open with Entry membership. Your decisions and your log stay yours on every tier.',
+      });
+    }
+
     /* a room a guest owns counts as one of their three decisions (BS-AI-008 §6 amendment) */
     const gate = await guestGate(req.userId);
     if (gate) return res.status(gate.status).json(gate.body);

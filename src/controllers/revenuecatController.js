@@ -37,6 +37,22 @@ const handleWebhook = async (req, res) => {
                 console.warn(`⚠️ [DB] No user_quiz_results row found for user_id ${appUserId} (report unlock not persisted).`);
             }
 
+            // The £99 purchase carries 10 decisions (credits) on the web (GHL webhook
+            // grants them); the App Store purchase must grant the same or iOS buyers
+            // get the report with a zero balance. Idempotent on the RevenueCat event id.
+            try {
+                const credits = require('../services/di/creditService');
+                const rcEventId = `rc:${event.id || `${appUserId}:${event.purchased_at_ms || ''}`}`;
+                const dup = await query(
+                    `SELECT 1 FROM credit_grant WHERE stripe_event_id = $1 LIMIT 1`, [rcEventId]);
+                if (dup.rows.length === 0) {
+                    await credits.grant(appUserId, 'purchase_99', 10, { stripeEventId: rcEventId });
+                    console.log(`🎁 [RevenueCat] Granted 10 credits to ${appUserId}`);
+                }
+            } catch (grantError) {
+                console.error('⚠️ [RevenueCat] Credit grant failed:', grantError.message);
+            }
+
             // The same purchase email as a website order, for an app purchase too: one
             // ghl_outbox row the GHL purchase workflow starts from. Website orders are
             // GHL-native (W5); this event covers the App Store path only, once per account
