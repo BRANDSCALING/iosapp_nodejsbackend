@@ -61,4 +61,22 @@ router.post('/migrate-0003', async (req, res) => {
   }
 });
 
+router.post('/migrate-0004', async (req, res) => {
+  const given = req.query.key || req.headers['x-webhook-key'] || '';
+  const expected = process.env.GHL_WEBHOOK_SECRET || '';
+  if (!expected || given !== expected) {
+    return res.status(401).json({ error: 'unauthorised' });
+  }
+  try {
+    const sql = fs.readFileSync(path.join(__dirname, '../migrations/0004_credit_grant_assessment_source.sql'), 'utf8');
+    await query(sql);
+    const def = await query(
+      "SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint WHERE conname = 'credit_grant_source_check'");
+    res.json({ applied: true, constraint: def.rows[0] ? def.rows[0].def : null });
+  } catch (e) {
+    console.error('[DI] migration 0004 failed:', e.message);
+    res.status(500).json({ applied: false, message: e.message });
+  }
+});
+
 module.exports = router;
