@@ -56,6 +56,20 @@ router.post('/purchase', async (req, res) => {
         [u.rows[0].id]
       );
       if (upd.rowCount > 0) {
+        /* the £99 purchase carries its 10 decisions (BS-AI-007 §2) — this endpoint is the
+           one Mashab's live workflow calls, and it granted nothing until 22 Nov. Once per
+           person: the GHL product is one per buyer, and webhook retries must not stack. */
+        try {
+          const has = await query(
+            `SELECT 1 FROM credit_grant WHERE UPPER(user_id::text) = UPPER($1) AND source = 'purchase_99' LIMIT 1`,
+            [u.rows[0].id]);
+          if (!has.rows.length) {
+            await credits.grant(u.rows[0].id, 'purchase_99', 10);
+            console.log(`🎁 [GHL] granted 10 credits to ${norm}`);
+          }
+        } catch (grantErr) {
+          console.error('⚠️ [GHL] credit grant failed:', grantErr.message);
+        }
         console.log(`✅ [GHL] unlocked detailed report for ${norm} (${upd.rowCount} result row/s)`);
         return res.status(200).json({ success: true, unlocked: true });
       }

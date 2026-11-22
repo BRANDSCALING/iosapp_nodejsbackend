@@ -186,6 +186,13 @@ exports.completeAssessment = async (req, res) => {
         const pend = await query('DELETE FROM ghl_pending_purchases WHERE email = $1 RETURNING email', [buyerEmail]);
         if (pend.rowCount > 0) {
           await query('UPDATE user_quiz_results SET full_result_purchased = true WHERE UPPER(user_id::text) = UPPER($1)', [uid]);
+          /* the held £99 purchase carries its 10 decisions too, once per person */
+          const has = await query(
+            `SELECT 1 FROM credit_grant WHERE UPPER(user_id::text) = UPPER($1) AND source = 'purchase_99' LIMIT 1`, [uid]);
+          if (!has.rows.length) {
+            const credits = require('../services/di/creditService');
+            await credits.grant(uid, 'purchase_99', 10);
+          }
           console.log(`💳 [EDNA v2] applied held GHL purchase for ${buyerEmail}`);
         }
       }
