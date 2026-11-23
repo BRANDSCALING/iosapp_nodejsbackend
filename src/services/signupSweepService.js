@@ -78,6 +78,43 @@ async function sweepSignups() {
   }
 }
 
+/**
+ * The instant path: the website calls this (via POST /api/user/registered) the moment a
+ * sign-up is confirmed, so the Welcome email leaves in seconds — the sweep is only the
+ * safety net for a tab closed at exactly the wrong moment. Looks ONE email up in Cognito
+ * and, only when it names a CONFIRMED account created after the cutoff, mirrors it and
+ * queues account.created with the same one-per-account dedup.
+ */
+async function registerConfirmedAccount(email) {
+  const clean = String(email || '').trim().toLowerCase();
+  if (!clean || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) return false;
+  const sanitized = clean.replace(/["\\]/g, '');
+  const result = await cognito.send(new ListUsersCommand({
+    UserPoolId: USER_POOL_ID, Filter: `email = "${sanitized}"`, Limit: 1,
+  }));
+  const u = (result.Users || [])[0];
+  if (!u || u.UserStatus !== 'CONFIRMED') return false;
+  if (!u.UserCreateDate || new Date(u.UserCreateDate) < SINCE) return false;
+  const attr = (n) => ((u.Attributes || []).find((a) => a.Name === n) || {}).Value;
+  const sub = attr('sub');
+  if (!sub) return false;
+  const r = await query(
+    `INSERT INTO users (id, email, name, user_type, created_at, updated_at)
+     VALUES ($1::uuid, $2, $3, 'brandscaling', NOW(), NOW())
+     ON CONFLICT (email) DO UPDATE SET updated_at = users.updated_at
+     RETURNING id, tier, (xmax = 0) AS created_now`,
+    [sub, clean, attr('name') || '']);
+  const user = r.rows[0];
+  await queueGhl({
+    userId: user.id,
+    event: 'account.created',
+    extra: { tier: user.tier || 'free' },
+    dedup: `account.created:${String(user.id).toUpperCase()}`,
+  });
+  if (user.created_now) console.log(`👋 [SIGNUP-SWEEP] Instant registration for ${clean} — account.created queued`);
+  return true;
+}
+
 function startSignupSweepScheduler() {
   const minutes = Math.max(1, parseInt(process.env.SIGNUP_SWEEP_INTERVAL_MINUTES || '3', 10) || 3);
   console.log(`👋 [SIGNUP-SWEEP] Enabled — checking Cognito for new sign-ups every ${minutes} min (since ${SINCE.toISOString()}).`);
@@ -85,4 +122,4 @@ function startSignupSweepScheduler() {
   setInterval(() => { sweepSignups().catch((e) => console.error('👋 [SIGNUP-SWEEP] run failed:', e.message)); }, minutes * 60 * 1000);
 }
 
-module.exports = { sweepSignups, startSignupSweepScheduler };
+module.exports = { sweepSignups, startSignupSweepScheduler, registerConfirmedAccount };

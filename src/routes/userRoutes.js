@@ -262,6 +262,24 @@ router.get('/profile', requireAuth, async (req, res) => {
  *
  * Rule: user_type is always 'brandscaling' on INSERT and NEVER overwritten on UPDATE.
  */
+/**
+ * POST /registered — body { email }. The website calls this the moment a sign-up is
+ * confirmed, BEFORE any session exists, so the Welcome email leaves instantly instead
+ * of on the first sign-in (Munawar, 23 Nov 2026). Unauthenticated by design (there is
+ * no token yet) but safe: the email must name a CONFIRMED Cognito account created
+ * after the sweep cutoff, the GHL event is deduped to one per account ever, and the
+ * response never says whether the email exists. The sign-up sweep remains the safety
+ * net for clients that never make this call.
+ */
+router.post('/registered', existsLimiter, (req, res) => {
+  try {
+    const { registerConfirmedAccount } = require('../services/signupSweepService');
+    registerConfirmedAccount(req.body && req.body.email).catch((e) =>
+      console.warn('[Registered] background registration failed:', e.message));
+  } catch (e) { /* never fail the caller */ }
+  res.json({ success: true });
+});
+
 router.post('/sync-profile', userScopedAuth, async (req, res) => {
   const startTime = Date.now();
 
