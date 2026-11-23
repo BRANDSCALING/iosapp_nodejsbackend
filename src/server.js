@@ -29,6 +29,7 @@ const complianceRoutes = require('./routes/complianceRoutes');
 const appConfigRoutes = require('./routes/appConfigRoutes');
 const zoomRoutes = require('./routes/zoomRoutes');
 const { startVimeoSyncScheduler } = require('./services/vimeoSyncService');
+const { startSignupSweepScheduler } = require('./services/signupSweepService');
 const errorHandler = require('./middleware/errorHandler');
 const rateLimiter = require('./middleware/rateLimiter');
 
@@ -181,6 +182,10 @@ const server = app.listen(PORT, () => {
 
   // Auto-publish new Vimeo uploads into Zoom Recordings (no-op without VIMEO_ACCESS_TOKEN).
   startVimeoSyncScheduler();
+
+  // The sign-up email leaves at sign-up, signed in or not: mirror new CONFIRMED Cognito
+  // accounts into users and queue account.created (dedup keeps it to one per account).
+  startSignupSweepScheduler();
 });
 
 // Graceful shutdown
