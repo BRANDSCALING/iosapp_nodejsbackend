@@ -49,6 +49,29 @@ async function sweepSignups() {
       token = page.PaginationToken;
     } while (token);
 
+    /* The resume nudge (Munawar, 23 Nov 2026): a person who signed up and has no finished
+       result RESUME_NUDGE_MINUTES later gets ONE "Continue with your E-DNA" email — the
+       same edna.save_progress event the in-app button sends, which GHL's published branch D
+       (no resume_url) already answers. Once per account ever, via the dedup. Completion is
+       the only "finished" signal the server has, so this nudges non-starters and
+       mid-assessment leavers alike. */
+    const nudgeMinutes = Math.max(1, parseInt(process.env.RESUME_NUDGE_MINUTES || '10', 10) || 10);
+    const nudgeRows = (await query(
+      `SELECT u.id, u.email FROM users u
+       WHERE u.created_at >= $1 AND u.created_at <= NOW() - ($2 || ' minutes')::interval
+         AND NOT EXISTS (SELECT 1 FROM user_quiz_results q WHERE UPPER(q.user_id::text) = UPPER(u.id::text))
+         AND NOT EXISTS (SELECT 1 FROM ghl_outbox o WHERE o.payload->>'dedup' = 'edna.save_progress:nudge:' || UPPER(u.id::text))`,
+      [SINCE.toISOString(), String(nudgeMinutes)])).rows;
+    for (const n of nudgeRows) {
+      await queueGhl({
+        userId: n.id,
+        event: 'edna.save_progress',
+        extra: { reason: 'resume_nudge' },
+        dedup: `edna.save_progress:nudge:${String(n.id).toUpperCase()}`,
+      });
+      console.log(`⏰ [SIGNUP-SWEEP] Resume nudge queued for ${n.email} (${nudgeMinutes} min, no result)`);
+    }
+
     let queued = 0;
     for (const f of fresh) {
       /* the sync-profile upsert, minus the name overwrite: an existing row (the person
