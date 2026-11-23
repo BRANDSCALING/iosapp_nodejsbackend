@@ -174,7 +174,11 @@ async function callOpenAI({ instruction, context, thread, timeoutMs = 30000 }) {
       },
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL_PRIMARY || 'gpt-6-luna',
-        max_completion_tokens: 700,
+        /* a reasoning model spends max_completion_tokens on its reasoning FIRST: at 700
+           the room cross-check reasoned past the cap and returned empty (23 Nov). Low
+           effort + headroom keeps the visible reply inside the budget. */
+        max_completion_tokens: 4000,
+        reasoning_effort: process.env.OPENAI_REASONING_EFFORT || 'low',
         messages,
       }),
     });

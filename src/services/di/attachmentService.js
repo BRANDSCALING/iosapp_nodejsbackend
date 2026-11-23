@@ -84,7 +84,9 @@ async function extractLive({ kind, buffer, mime, provider }) {
         },
         body: JSON.stringify({
           model: process.env.OPENAI_MODEL_PRIMARY || 'gpt-6-luna',
-          max_completion_tokens: 900,
+          /* reasoning tokens count against the cap; headroom + low effort as in mentorService */
+          max_completion_tokens: 2500,
+          reasoning_effort: process.env.OPENAI_REASONING_EFFORT || 'low',
           messages: [{ role: 'user', content }],
         }),
       });
