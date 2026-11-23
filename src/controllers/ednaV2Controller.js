@@ -206,6 +206,10 @@ exports.completeAssessment = async (req, res) => {
       }
     } catch (e) { console.warn('⚠️ [EDNA v2] pending-purchase check failed:', e.message); }
 
+    /* the run is finished: its server-side progress mirror is done with */
+    await query('DELETE FROM edna_progress WHERE UPPER(user_id::text) = UPPER($1)', [uid])
+      .catch((e) => console.warn('⚠️ [EDNA v2] progress cleanup failed:', e.message));
+
     return res.status(201).json({
       success: true,
       sessionId,
@@ -216,5 +220,54 @@ exports.completeAssessment = async (req, res) => {
   } catch (error) {
     console.error('❌ [EDNA v2] complete failed:', error);
     return res.status(500).json({ success: false, error: 'Internal error storing the assessment.' });
+  }
+};
+
+/**
+ * PUT /api/v2/edna/progress — the browser's unfinished-assessment snapshot, mirrored
+ * server-side so the resume email works on any device (Munawar, 23 Nov 2026). Same strict
+ * Cognito auth as /complete; the row is deleted when the finished result is stored.
+ */
+exports.saveProgressV2 = async (req, res) => {
+  try {
+    const token = await verifyBearer(req);
+    if (!token || !token.sub) {
+      return res.status(401).json({ success: false, error: 'A valid Cognito Bearer token is required.' });
+    }
+    const snapshot = req.body && req.body.snapshot;
+    if (!snapshot || typeof snapshot !== 'object') {
+      return res.status(400).json({ success: false, error: 'snapshot is required' });
+    }
+    const text = JSON.stringify(snapshot);
+    if (text.length > 200000) {
+      return res.status(413).json({ success: false, error: 'snapshot too large' });
+    }
+    const uid = String(token.sub).toUpperCase();
+    await query(
+      `INSERT INTO edna_progress (user_id, snapshot, updated_at) VALUES ($1::uuid, $2::jsonb, now())
+       ON CONFLICT (user_id) DO UPDATE SET snapshot = EXCLUDED.snapshot, updated_at = now()`,
+      [uid, text]);
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('❌ [EDNA v2] progress save failed:', error.message);
+    return res.status(500).json({ success: false, error: 'Internal error saving progress.' });
+  }
+};
+
+/** GET /api/v2/edna/progress — the saved snapshot for the signed-in person, or null. */
+exports.getProgressV2 = async (req, res) => {
+  try {
+    const token = await verifyBearer(req);
+    if (!token || !token.sub) {
+      return res.status(401).json({ success: false, error: 'A valid Cognito Bearer token is required.' });
+    }
+    const uid = String(token.sub).toUpperCase();
+    const r = await query(
+      'SELECT snapshot, updated_at FROM edna_progress WHERE UPPER(user_id::text) = UPPER($1)', [uid]);
+    if (!r.rows.length) return res.json({ success: true, snapshot: null });
+    return res.json({ success: true, snapshot: r.rows[0].snapshot, updatedAt: r.rows[0].updated_at });
+  } catch (error) {
+    console.error('❌ [EDNA v2] progress fetch failed:', error.message);
+    return res.status(500).json({ success: false, error: 'Internal error fetching progress.' });
   }
 };
