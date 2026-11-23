@@ -194,6 +194,14 @@ exports.completeAssessment = async (req, res) => {
             await credits.grant(uid, 'purchase_99', 10);
           }
           console.log(`💳 [EDNA v2] applied held GHL purchase for ${buyerEmail}`);
+          /* the purchase email goes out now that the purchase is applied to an account */
+          const { queueGhl } = require('../services/di/notificationService');
+          queueGhl({
+            userId: uid,
+            event: 'purchase.completed',
+            extra: { product: 'detailed_report', source: 'web' },
+            dedup: `purchase.completed:detailed_report:${String(uid).toUpperCase()}`,
+          }).catch(() => {});
         }
       }
     } catch (e) { console.warn('⚠️ [EDNA v2] pending-purchase check failed:', e.message); }

@@ -81,6 +81,12 @@ async function queueGhl({ userId, event, extra = {}, dedup = null }) {
       ...(dedup ? { dedup } : {}),
       ...extra,
     };
+    /* the purchase email's button: straight to the detailed report (signed-in members
+       land on it; others see the sign-in first). Munawar, 23 Nov 2026. */
+    if (ghlEvent === 'purchase.completed' && !payload.report_url) {
+      payload.report_url = process.env.EDNA_DETAILED_REPORT_URL
+        || 'https://www.brandscaling.co.uk/edna/index.html#detailed';
+    }
     const r = await query(
       'INSERT INTO ghl_outbox (event, user_id, payload, site) VALUES ($1, $2::uuid, $3::jsonb, $4) RETURNING *',
       [ghlEvent, userId, JSON.stringify(payload), payload.site]);
@@ -96,8 +102,13 @@ async function queueGhl({ userId, event, extra = {}, dedup = null }) {
  * accept and drop anything else, and the inbound trigger is billed per run). Grow the list
  * via env as workflows are built — e.g. add purchase.completed after Fariza signs it off. */
 const SENDABLE = () =>
-  new Set((process.env.GHL_SENDABLE_EVENTS || 'account.created,edna.save_progress')
+  new Set((process.env.GHL_SENDABLE_EVENTS || 'account.created,edna.save_progress,purchase.completed')
     .split(',').map((s) => s.trim()).filter(Boolean));
+
+/* purchase.completed has its own GHL workflow ("long form edna report", Fiza Ashraf,
+   23 Nov 2026) with its own inbound trigger; every other event goes to workflow 2. */
+const PURCHASE_WEBHOOK_URL = () => process.env.GHL_PURCHASE_WEBHOOK_URL
+  || 'https://services.leadconnectorhq.com/hooks/dtz5ID9oq7VPM9L9Kl4h/webhook-trigger/2324ed93-7e0e-45da-b122-f0bd1181a826';
 
 /** Send pending outbox rows when the GHL inbound webhook is configured; otherwise leave them. */
 async function deliverOutbox() {
@@ -111,7 +122,7 @@ async function deliverOutbox() {
   let sent = 0;
   for (const row of rows) {
     try {
-      const res = await fetch(url, {
+      const res = await fetch(row.event === 'purchase.completed' ? PURCHASE_WEBHOOK_URL() : url, {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-webhook-key': secret },
         body: JSON.stringify({ ...row.payload, event_id: row.event_id }),

@@ -71,6 +71,15 @@ router.post('/purchase', async (req, res) => {
           console.error('⚠️ [GHL] credit grant failed:', grantErr.message);
         }
         console.log(`✅ [GHL] unlocked detailed report for ${norm} (${upd.rowCount} result row/s)`);
+        /* the purchase email with the report link — same event and dedup as an App Store
+           purchase, so one email per account whichever platform the £99 was paid on */
+        const { queueGhl } = require('../services/di/notificationService');
+        queueGhl({
+          userId: u.rows[0].id,
+          event: 'purchase.completed',
+          extra: { product: 'detailed_report', source: 'web' },
+          dedup: `purchase.completed:detailed_report:${String(u.rows[0].id).toUpperCase()}`,
+        }).catch(() => {});
         return res.status(200).json({ success: true, unlocked: true });
       }
     }
@@ -135,6 +144,15 @@ router.post('/di', async (req, res) => {
       }
       if (amount > 0) {
         await credits.grant(userId, isPack ? 'pack' : 'purchase_99', amount, { stripeEventId: b.stripe_payment_id || eventId });
+      }
+      if (!isPack) {
+        const { queueGhl } = require('../services/di/notificationService');
+        queueGhl({
+          userId,
+          event: 'purchase.completed',
+          extra: { product: 'detailed_report', source: 'web' },
+          dedup: `purchase.completed:detailed_report:${String(userId).toUpperCase()}`,
+        }).catch(() => {});
       }
       await convertGuest(userId);
       console.log(`✅ [GHL·DI] order.completed for ${userId}: ${isPack ? amount + '-credit pack' : 'report + 10 decisions'}`);
