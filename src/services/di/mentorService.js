@@ -5,8 +5,11 @@
  * 30 s, one retry on timeout or invalid JSON, then the unavailable state; a failed call
  * is never charged.
  *
- * Providers: MODEL_PROVIDER=anthropic calls the API with DI_MODEL (default Haiku);
- * anything else runs the deterministic stub so local builds and tests never bill.
+ * Providers: MODEL_PROVIDER=anthropic calls Anthropic with DI_MODEL (default Haiku);
+ * MODEL_PROVIDER=openai calls OpenAI with OPENAI_MODEL_PRIMARY (23 Nov 2026 — the key
+ * Mashab supplied for the demo); anything else runs the deterministic stub so local
+ * builds and tests never bill. Both paths return the same shape and are validated the
+ * same way, so the provider is an env switch, not a code change.
  */
 const { query } = require('../../config/database');
 const { VERSION, INSTRUCTIONS } = require('./instructions');
@@ -153,6 +156,50 @@ async function callAnthropic({ instruction, context, thread, timeoutMs = 30000 }
   }
 }
 
+async function callOpenAI({ instruction, context, thread, timeoutMs = 30000 }) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const messages = [
+      { role: 'system', content: instruction.text },
+      { role: 'user', content: context },
+    ];
+    (thread || []).forEach((t) => messages.push({ role: t.role, content: t.content }));
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: process.env.OPENAI_MODEL_PRIMARY || 'gpt-6-luna',
+        max_completion_tokens: 700,
+        messages,
+      }),
+    });
+    if (!res.ok) { const e = new Error(`provider ${res.status}`); e.code = 'provider'; throw e; }
+    const data = await res.json();
+    const raw = (((data.choices || [])[0] || {}).message || {}).content || '';
+    const jsonText = raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1);
+    return {
+      json: JSON.parse(jsonText),
+      model: data.model,
+      input_tokens: data.usage ? data.usage.prompt_tokens : null,
+      output_tokens: data.usage ? data.usage.completion_tokens : null,
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** The live provider by env, or null for the stub. */
+function liveCall() {
+  if (process.env.MODEL_PROVIDER === 'anthropic' && process.env.ANTHROPIC_API_KEY) return callAnthropic;
+  if (process.env.MODEL_PROVIDER === 'openai' && process.env.OPENAI_API_KEY) return callOpenAI;
+  return null;
+}
+
 /** Deterministic stub: valid §5 JSON per event, so local builds never bill (labelled). */
 function stubReply({ mentor, decision, entries, event }) {
   const loops = boxLoops(decision.order);
@@ -206,13 +253,13 @@ async function mentorTurn({ userId, decision, entries, typeKey, result, event, p
   const turnNo = (decision.turn_count || 0) + 1;
   const context = buildContext({ mentor, typeKey, result, decision, entries, event, turnNo });
 
-  const live = process.env.MODEL_PROVIDER === 'anthropic' && process.env.ANTHROPIC_API_KEY;
+  const live = liveCall();
   const started = Date.now();
   let out = null;
   for (let attempt = 0; attempt < 2 && !out; attempt++) {
     try {
       const got = live
-        ? await callAnthropic({ instruction, context, thread })
+        ? await live({ instruction, context, thread })
         : stubReply({ mentor, decision, entries, event });
       got.json = validateReply(got.json);
       out = got;
@@ -264,13 +311,13 @@ async function roomCheck({ userId, room, entries, mentor }) {
   const context = lines.join('\n');
   const thread = [{ role: 'user', content: 'EVENT: check' }];
 
-  const live = process.env.MODEL_PROVIDER === 'anthropic' && process.env.ANTHROPIC_API_KEY;
+  const live = liveCall();
   const started = Date.now();
   let out = null;
   for (let attempt = 0; attempt < 2 && !out; attempt++) {
     try {
       let got;
-      if (live) got = await callAnthropic({ instruction, context, thread });
+      if (live) got = await live({ instruction, context, thread });
       else {
         const today = new Date(); const review = new Date(today.getTime() + 90 * 86400000);
         got = {
