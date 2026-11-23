@@ -71,6 +71,10 @@ async function queueGhl({ userId, event, extra = {}, dedup = null }) {
       'SELECT id, email, first_name, last_name, name, site FROM users WHERE UPPER(id::text) = UPPER($1)',
       [userId])).rows[0];
     if (!u || !u.email) return null;
+    /* whether this person has a finished E-DNA, for GHL's own routing and contact
+       fields (Fiza Ashraf, 23 Nov 2026) — on every event, as of queue time */
+    const takenRow = await query(
+      'SELECT 1 FROM user_quiz_results WHERE UPPER(user_id::text) = UPPER($1) LIMIT 1', [userId]);
     const payload = {
       event: ghlEvent,
       bs_user_id: u.id,
@@ -78,6 +82,7 @@ async function queueGhl({ userId, event, extra = {}, dedup = null }) {
       first_name: u.first_name || (u.name ? String(u.name).split(/\s+/)[0] : null),
       last_name: u.last_name || null,
       site: u.site || 'uk',
+      edna_status: takenRow.rows.length ? 'taken' : 'not_taken',
       ...(dedup ? { dedup } : {}),
       ...extra,
     };
