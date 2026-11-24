@@ -289,7 +289,9 @@ async function mentorTurn({ userId, decision, entries, typeKey, result, event, p
   const live = liveCall();
   const started = Date.now();
   let out = null;
-  for (let attempt = 0; attempt < 2 && !out; attempt++) {
+  /* three attempts (24 Nov): one transient API error must never reach the member as
+     "mentor unavailable" — transport errors pause and retry, invalid replies retry at once */
+  for (let attempt = 0; attempt < 3 && !out; attempt++) {
     try {
       const got = live
         ? await live({ instruction, context, thread })
@@ -303,10 +305,12 @@ async function mentorTurn({ userId, decision, entries, typeKey, result, event, p
       }
       out = got;
     } catch (e) {
-      if (attempt === 1) { const err = new Error('mentor unavailable'); err.code = 'unavailable'; throw err; }
-      if (event === 'check') {
+      console.error(`[DI] mentor attempt ${attempt + 1} failed:`, e.message);
+      if (attempt === 2) { const err = new Error('mentor unavailable'); err.code = 'unavailable'; throw err; }
+      if (event === 'check' && e.code === 'invalid_json') {
         thread.push({ role: 'user', content: 'Give the readiness read now, in the JSON field readiness: what the decision rests on, what is missing, and your read.' });
       }
+      if (e.code !== 'invalid_json') await new Promise((r) => setTimeout(r, 1200));
     }
   }
 
@@ -358,7 +362,7 @@ async function roomCheck({ userId, room, entries, mentor }) {
   const live = liveCall();
   const started = Date.now();
   let out = null;
-  for (let attempt = 0; attempt < 2 && !out; attempt++) {
+  for (let attempt = 0; attempt < 3 && !out; attempt++) {
     try {
       let got;
       if (live) got = await live({ instruction, context, thread });
@@ -384,8 +388,13 @@ async function roomCheck({ userId, room, entries, mentor }) {
       }
       out = got;
     } catch (e) {
-      if (attempt === 1) { const err = new Error('mentor unavailable'); err.code = 'unavailable'; throw err; }
-      thread.push({ role: 'user', content: 'Give the readiness read now, in the JSON field readiness: what the decision rests on, what is missing, and your read.' });
+      console.error(`[DI] room check attempt ${attempt + 1} failed:`, e.message);
+      if (attempt === 2) { const err = new Error('mentor unavailable'); err.code = 'unavailable'; throw err; }
+      if (e.code === 'invalid_json') {
+        thread.push({ role: 'user', content: 'Give the readiness read now, in the JSON field readiness: what the decision rests on, what is missing, and your read.' });
+      } else {
+        await new Promise((r) => setTimeout(r, 1200));
+      }
     }
   }
   const turnRow = (await query(`
