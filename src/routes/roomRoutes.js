@@ -243,6 +243,31 @@ router.post('/rooms/:id/invites', async (req, res) => {
   }
 });
 
+/** GET /invites/:token — what the consent screen shows before joining (BS-AI-008 §5; the
+ *  approved "Join Dan's room?" card): the decision, the owner's name, how many are in the
+ *  room, and whether the link still works. Nothing else about the room leaves before consent. */
+router.get('/invites/:token', async (req, res) => {
+  try {
+    const inv = (await query('SELECT * FROM room_invite WHERE token = $1', [req.params.token])).rows[0];
+    if (!inv) return res.status(404).json({ error: 'not_found', message: 'This invitation was not found. Ask for a new one.' });
+    const room = (await query('SELECT decision_text, owner_user_id FROM decision_room WHERE id = $1', [inv.room_id])).rows[0];
+    if (!room) return res.status(404).json({ error: 'not_found', message: 'This room no longer exists.' });
+    const expired = !!inv.accepted_at || new Date(inv.expires_at) < new Date();
+    const already = !!(await membership(inv.room_id, req.userId));
+    res.json({
+      decision_text: room.decision_text,
+      owner_name: await firstNameOf(room.owner_user_id),
+      people: await memberCount(inv.room_id),
+      expired: expired && !already,
+      already_member: already,
+      room_id: already ? inv.room_id : undefined,
+    });
+  } catch (e) {
+    console.error('[DI] invite preview failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
 /** POST /invites/:token/accept — joining records consent and the person's loop */
 router.post('/invites/:token/accept', async (req, res) => {
   try {
