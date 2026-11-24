@@ -179,6 +179,9 @@ async function callOpenAI({ instruction, context, thread, timeoutMs = 30000 }) {
            effort + headroom keeps the visible reply inside the budget. */
         max_completion_tokens: 4000,
         reasoning_effort: process.env.OPENAI_REASONING_EFFORT || 'low',
+        /* about 1 turn in 8 came back as prose, failing §5 validation and reading as
+           "mentor unavailable" (measured 24 Nov); JSON mode pins the output shape */
+        response_format: { type: 'json_object' },
         messages,
       }),
     });
