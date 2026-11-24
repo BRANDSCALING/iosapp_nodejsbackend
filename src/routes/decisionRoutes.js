@@ -334,6 +334,7 @@ router.post('/decisions/:id/check', async (req, res) => {
     const finished = (box4 && box4.loop) || (endEntry && endEntry.loop) || loops.end;
     const readMap = { Ready: 'ready', 'One more round': 'one_more_round', 'Not yet': 'not_yet' };
     const readKey = j.readiness ? (readMap[Object.keys(readMap).find((k) => j.readiness.read.startsWith(k))] || null) : null;
+    const notYet = readKey === 'not_yet';
     const reviewDate = (req.body && req.body.review_date) || null; /* default three months (BS-AI-004 §10.3) */
     /* dates come from the backend, never the model (BS-AI-005 v1.1 DATES; glue per
        Fariza, 24 Nov): the model writes the tokens {today} and {review} in log_line and
@@ -363,8 +364,15 @@ router.post('/decisions/:id/check', async (req, res) => {
         time_to_decide = now() - $11::timestamptz, written_by = 'mentor', updated_at = now()
       WHERE decision_id = $1
     `, [d.id, loops.began, finished, loops.began !== finished, d.rounds,
-      readKey, j.readiness ? j.readiness.rests_on : null, box4 ? box4.text : null,
+      readKey, j.readiness ? j.readiness.rests_on : null, notYet ? null : (box4 ? box4.text : null),
       JSON.stringify(j.warning ? [j.warning] : []), reviewDate, d.opened_at]);
+    if (notYet) {
+      /* 'Not yet' (BS-AI-005: "Not yet: Box X is empty") means the Frame is not finished: the
+         decision is not logged as decided and has no review date; it stays In the Frame with the
+         read beside it, to fill the box and Check again (Munawar, 24 Nov: a 'Decided' row with a
+         'Not yet' read showed no real decision) */
+      await query('UPDATE decision_log SET review_date = NULL, updated_at = now() WHERE decision_id = $1', [d.id]);
+    }
 
     /* one credit at the first Check; a re-check after reopening charges again only per
        further 15 turns (BS-AI-007 §3) */
@@ -380,7 +388,7 @@ router.post('/decisions/:id/check', async (req, res) => {
       });
       await query('UPDATE mentor_turn SET charged = true WHERE id = $1', [out.turnRow.id]);
     }
-    await query("UPDATE decision SET status = 'checked', checked_at = now(), updated_at = now() WHERE id = $1", [d.id]);
+    if (!notYet) await query("UPDATE decision SET status = 'checked', checked_at = now(), updated_at = now() WHERE id = $1", [d.id]);
     const log = await query('SELECT * FROM decision_log WHERE decision_id = $1', [d.id]);
 
     /* N9 (balance under 20 %, in-app only) and N10 (zero: one email) — BS-AI-009 */
@@ -397,7 +405,7 @@ router.post('/decisions/:id/check', async (req, res) => {
         notify({ userId: req.userId, event: 'N9', title: left + (left === 1 ? ' decision' : ' decisions') + ' left', body: 'Your allowance is getting low', dedup: 'n9:' + req.userId + ':' + granted }).catch(() => {});
       }
     }
-    res.json({ mentor: out.mentor, response: j, charged: !!ledger, ledger_id: ledger ? ledger.id : null, log: log.rows[0] });
+    res.json({ mentor: out.mentor, response: j, charged: !!ledger, ledger_id: ledger ? ledger.id : null, log: log.rows[0], still_open: notYet });
   } catch (e) {
     if (e.code === 'out_of_credits') {
       return res.status(402).json({ error: 'out_of_credits', message: 'You have used your decisions. Top up to carry on.' });

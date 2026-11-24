@@ -225,15 +225,51 @@ async function needsYou(userId) {
 
 /** "You are [n] of 7 parts in" (Fariza's Continue email, 24 Nov): the highest E-DNA part
  *  the person's mirrored snapshot has touched. 0 when they have not started. */
-async function ednaPartsIn(userId) {
+/**
+ * Where an unfinished E-DNA stopped, from the server copy of the run (edna_progress): the parts
+ * completed and the exact place to resume, for the resume email (A1 / the resume nudge).
+ * 24 Nov: the old count took the highest "pN" key, but every saved run carries p1–p7 (empty
+ * until answered), so it said "7 of 7 parts in" for nearly everyone.
+ */
+const EDNA_PART_NAMES = ['Core Type Decision Intelligence Loop Identity', 'Subtype Refinement Identity',
+  'Alternate Decision Intelligence Loop Awareness', 'Learning Style Preferences',
+  'Neurodiversity & Accessibility', 'Mindset & Personality', 'Meta-Beliefs & Values'];
+function ednaProgressOf(ans) {
+  let C = {};
+  try { C = require('../edna/scoring').CONTENT || {}; } catch (e) { C = {}; }
+  const filled = (v) => v !== null && v !== undefined && v !== '';
+  const mainScen = (C.scenarios || []).filter((s) => !s.reserve).map((s) => s.id);
+  const p1Total = mainScen.length || 8;
+  const counts = [
+    [Object.keys(ans.p1 || {}).filter((k) => !mainScen.length || mainScen.includes(k)).length, p1Total],
+    [(ans.p2 || []).filter(filled).length, (C.part2 || []).length || 10],
+    [Object.values(ans.p3 || {}).filter((v) => v && filled(v.a)).length, (C.part3 || []).length || 12],
+    [(ans.p4 || []).filter(filled).length, (C.part4 || []).length || 10],
+    [(ans.p5 || []).filter(filled).length, (C.part5 || []).length || 26],
+    [(ans.p6 || []).filter(filled).length, (C.part6 || []).length || 20],
+    [(ans.p7 || []).filter((v) => v && filled(v.k)).length, (C.part7 || []).length || 21],
+  ];
+  let done = 0;
+  while (done < 7 && counts[done][0] >= counts[done][1]) done += 1;
+  const out = { parts_in: done, parts_total: 7 };
+  if (done < 7) {
+    out.resume_part = done + 1;
+    out.resume_part_name = EDNA_PART_NAMES[done];
+    out.resume_question = Math.min(counts[done][0] + 1, counts[done][1]);
+    out.resume_part_questions = counts[done][1];
+  }
+  out.resume_url = process.env.EDNA_RESUME_URL || 'https://www.brandscaling.co.uk/edna/index.html';
+  return out;
+}
+async function ednaResume(userId) {
   try {
     const r = await query('SELECT snapshot FROM edna_progress WHERE UPPER(user_id::text) = UPPER($1)', [userId]);
-    if (!r.rows.length) return 0;
-    const ans = (r.rows[0].snapshot || {}).answers || {};
-    let maxPart = 0;
-    Object.keys(ans).forEach((k) => { const m = /^P(\d)/i.exec(k); if (m) maxPart = Math.max(maxPart, Number(m[1])); });
-    return Math.min(7, maxPart);
-  } catch (e) { return 0; }
+    if (!r.rows.length) return ednaProgressOf({});
+    let snap = r.rows[0].snapshot || {};
+    while (typeof snap === 'string') snap = JSON.parse(snap);
+    return ednaProgressOf(snap.answers || {});
+  } catch (e) { return ednaProgressOf({}); }
 }
+async function ednaPartsIn(userId) { return (await ednaResume(userId)).parts_in; }
 
-module.exports = { notify, queueGhl, deliverOutbox, needsYou, GHL_EVENT, ednaPartsIn };
+module.exports = { notify, queueGhl, deliverOutbox, needsYou, GHL_EVENT, ednaPartsIn, ednaResume, ednaProgressOf };
