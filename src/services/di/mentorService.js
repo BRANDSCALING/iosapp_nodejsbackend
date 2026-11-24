@@ -75,22 +75,63 @@ function eventLine(event) {
  *  REVIEW DATE: — the backend writes both; the model copies them, never computes one. */
 function todayLine() { return 'TODAY: ' + new Date().toISOString().slice(0, 10); }
 function reviewLine(reviewDate) {
-  return 'REVIEW DATE: ' + (reviewDate ? String(reviewDate instanceof Date ? reviewDate.toISOString() : reviewDate).slice(0, 10) : '(not set)');
+  /* no date chosen yet: the date the Check routes will log (three months, BS-AI-004 §10.3), so
+     the reply and the log line agree — '(not set)' made the model invent "two weeks" (24 Nov) */
+  const d = reviewDate || (function (x) { x.setMonth(x.getMonth() + 3); return x; })(new Date());
+  return 'REVIEW DATE: ' + String(d instanceof Date ? d.toISOString() : d).slice(0, 10);
 }
-function buildContext({ mentor, typeKey, result, decision, entries, event, turnNo, reviewDate }) {
+/* The stress and Part 2 lines in the words My E-DNA shows the member (decisionRoutes GET /edna).
+   24 Nov: these read p1.stress / p2.subtype / R.commitment, none of which exist on the v2
+   result, so every turn said "unknown" — and urgent turns told the member so. */
+function stressText(R) {
+  const p1 = R.p1 || {};
+  if (!p1.core) return 'no E-DNA result yet';
+  if (R.legacy) return 'not measured (an earlier version of the E-DNA)';
+  const sw = p1.switched || [];
+  return sw.length
+    ? `under stress they switched in ${sw.length} context${sw.length > 1 ? 's' : ''} (${sw.map((s) => s.ctx + ', ' + s.kind + ' switch').join('; ')}); the loop held everywhere else`
+    : 'under stress the loop held in every context';
+}
+function subtypeText(R) {
+  const p2 = R.p2 || {};
+  let SUB = {};
+  try { SUB = (require('../edna/scoring').CONTENT || {}).SUBTYPES || {}; } catch (e) { SUB = {}; }
+  if (p2.result) return SUB[p2.result] || p2.result;
+  if (p2.likely) return 'likely ' + (SUB[p2.likely] || p2.likely);
+  if (p2.pair) return 'likely mirror pair ' + p2.pair.map((k) => SUB[k] || k).join(' or ');
+  return 'not known yet';
+}
+/** The person's own Workbook 1 commitment line, when they have written one. */
+async function workbookCommitment(userId) {
+  try {
+    const r = await query(`
+      SELECT wa.value FROM workbook_answers wa
+      JOIN workbook_instances wi ON wi.id = wa.instance_id
+      JOIN workbooks w ON w.id = wi.workbook_id
+      WHERE UPPER(wi.user_id::text) = UPPER($1) AND w.workbook = 1 AND wa.field_key ILIKE '%commit%'
+      ORDER BY wa.updated_at DESC NULLS LAST LIMIT 1
+    `, [userId]);
+    if (!r.rows.length) return null;
+    let v = r.rows[0].value;
+    try { v = JSON.parse(v); } catch (e) { /* stored as plain text */ }
+    v = typeof v === 'string' ? v.trim() : '';
+    return v || null;
+  } catch (e) { return null; }
+}
+function buildContext({ mentor, typeKey, result, decision, entries, event, turnNo, reviewDate, commitment = null }) {
   const lines = [];
   const mixed = !typeKey || typeKey === 'mixed' || typeKey.endsWith('-leaning');
   lines.push(`YOU ARE: ${mentor === 'architect' ? 'AI Architect' : 'AI Alchemist'}` +
     (mixed ? `; this person is ${typeKey === 'mixed' || !typeKey ? 'Mixed' : typeKey.replace('-', ' ')}; both mentors are equal; they chose the ${decision.order === 'logic_first' ? 'Architect' : 'Alchemist'} order` : ''));
 
   const R = result || {};
-  const p1 = R.p1 || {}; const p2 = R.p2 || {};
-  lines.push(`THE PERSON'S E-DNA: Part 1: ${p1.core || 'unknown'}${p1.lean ? ` (leaning ${p1.lean})` : ''}; ` +
+  const p1 = R.p1 || {};
+  lines.push(`THE PERSON'S E-DNA: Part 1: ${p1.core || 'unknown'}${p1.lean && p1.lean !== 'none' ? ` (leaning ${p1.lean})` : ''}; ` +
     `Dominant loop ${decision.order === 'logic_first' ? 'Logic → Feeling → Logic' : 'Feeling → Logic → Feeling'}, ` +
     `${p1.core === 'mixed' ? 'NOT yet confirmed' : 'confirmed'}. ` +
-    `Stress result: ${p1.stress ? JSON.stringify(p1.stress) : 'unknown'}. ` +
-    `Workbook 1 commitment: "${R.commitment || 'unknown'}". ` +
-    `Part 2: ${p2.subtype || p2.likely || 'unknown'}. Part 3: ${R.p3 ? JSON.stringify(R.p3).slice(0, 120) : 'unknown'}. ` +
+    `Stress result: ${stressText(R)}. ` +
+    `Workbook 1 commitment: ${commitment ? `"${commitment}"` : 'none written yet (do not mention it)'}. ` +
+    `Part 2: ${subtypeText(R)}. Part 3: ${R.p3 ? JSON.stringify(R.p3).slice(0, 120) : 'unknown'}. ` +
     `Part 6 disposition: ${R.p6 ? JSON.stringify(R.p6).slice(0, 120) : 'unknown'}. ` +
     `Part 7 beliefs: ${R.p7 ? JSON.stringify(R.p7).slice(0, 160) : 'unknown'}.`);
 
@@ -137,6 +178,24 @@ function validateReply(obj) {
 
 /* ---------------------------------------------------------------- providers */
 
+/** The JSON object in a model reply. It starts at the first "{" that opens a key — not the
+ *  first "{" of any kind: v1.1 has the model write {today}/{review}, so a reply with prose
+ *  before the JSON began at "{today}" and failed to parse (24 Nov). A reply with no JSON
+ *  object throws invalid_json, which retries with an explicit correction. */
+const JSON_ONLY = 'Your last reply could not be used: reply again with only the JSON object described in OUTPUT, starting with { and ending with }, nothing before or after it.';
+function parseReplyJson(raw) {
+  const text = String(raw || '');
+  const m = /\{\s*"/.exec(text);
+  const start = m ? m.index : -1;
+  const end = text.lastIndexOf('}');
+  if (start < 0 || end <= start) {
+    const e = new Error('reply was not a JSON object'); e.code = 'invalid_json'; throw e;
+  }
+  try { return JSON.parse(text.slice(start, end + 1)); } catch (x) {
+    const e = new Error('reply JSON did not parse: ' + x.message); e.code = 'invalid_json'; throw e;
+  }
+}
+
 async function callAnthropic({ instruction, context, thread, timeoutMs = 30000 }) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -165,9 +224,8 @@ async function callAnthropic({ instruction, context, thread, timeoutMs = 30000 }
     if (!res.ok) { const e = new Error(`provider ${res.status}`); e.code = 'provider'; throw e; }
     const data = await res.json();
     const raw = (data.content || []).map((c) => c.text || '').join('');
-    const jsonText = raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1);
     return {
-      json: JSON.parse(jsonText),
+      json: parseReplyJson(raw),
       model: data.model,
       input_tokens: data.usage ? data.usage.input_tokens : null,
       output_tokens: data.usage ? data.usage.output_tokens : null,
@@ -209,9 +267,8 @@ async function callOpenAI({ instruction, context, thread, timeoutMs = 30000 }) {
     if (!res.ok) { const e = new Error(`provider ${res.status}`); e.code = 'provider'; throw e; }
     const data = await res.json();
     const raw = (((data.choices || [])[0] || {}).message || {}).content || '';
-    const jsonText = raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1);
     return {
-      json: JSON.parse(jsonText),
+      json: parseReplyJson(raw),
       model: data.model,
       input_tokens: data.usage ? data.usage.prompt_tokens : null,
       output_tokens: data.usage ? data.usage.completion_tokens : null,
@@ -284,6 +341,7 @@ async function mentorTurn({ userId, decision, entries, typeKey, result, event, p
   const context = buildContext({
     mentor, typeKey, result, decision, entries, event, turnNo,
     reviewDate: rv.rows.length ? rv.rows[0].review_date : null,
+    commitment: await workbookCommitment(userId),
   });
 
   const live = liveCall();
@@ -307,10 +365,11 @@ async function mentorTurn({ userId, decision, entries, typeKey, result, event, p
     } catch (e) {
       console.error(`[DI] mentor attempt ${attempt + 1} failed:`, e.message);
       if (attempt === 2) { const err = new Error('mentor unavailable'); err.code = 'unavailable'; throw err; }
-      if (event === 'check' && e.code === 'invalid_json') {
-        thread.push({ role: 'user', content: 'Give the readiness read now, in the JSON field readiness: what the decision rests on, what is missing, and your read.' });
+      if (e.code === 'invalid_json') {
+        thread.push({ role: 'user', content: JSON_ONLY + (event === 'check' ? ' Give the readiness read in the field readiness: what the decision rests on, what is missing, and your read.' : '') });
+      } else {
+        await new Promise((r) => setTimeout(r, 1200));
       }
-      if (e.code !== 'invalid_json') await new Promise((r) => setTimeout(r, 1200));
     }
   }
 
@@ -391,7 +450,7 @@ async function roomCheck({ userId, room, entries, mentor }) {
       console.error(`[DI] room check attempt ${attempt + 1} failed:`, e.message);
       if (attempt === 2) { const err = new Error('mentor unavailable'); err.code = 'unavailable'; throw err; }
       if (e.code === 'invalid_json') {
-        thread.push({ role: 'user', content: 'Give the readiness read now, in the JSON field readiness: what the decision rests on, what is missing, and your read.' });
+        thread.push({ role: 'user', content: JSON_ONLY + ' Give the readiness read in the field readiness: what the decision rests on, what is missing, and your read.' });
       } else {
         await new Promise((r) => setTimeout(r, 1200));
       }
