@@ -151,12 +151,16 @@ async function callAnthropic({ instruction, context, thread, timeoutMs = 30000 }
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
       }, process.env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': process.env.ANTHROPIC_WORKSPACE_ID } : {}),
-      body: JSON.stringify({
+      body: JSON.stringify(Object.assign({
         model: process.env.DI_MODEL || 'claude-haiku-4-5-20251001',
-        max_tokens: 700,
+        /* a thinking model spends max_tokens on its reasoning first: at 700 the Check
+           reasoned past the cap and returned empty, reading as "mentor unavailable"
+           (measured 24 Nov, claude-sonnet-5-5). Headroom plus ANTHROPIC_THINKING
+           (e.g. between_tools) keeps the reply inside the budget at ~4s a turn. */
+        max_tokens: 4000,
         system: instruction.text,
         messages,
-      }),
+      }, process.env.ANTHROPIC_THINKING ? { thinking: { type: process.env.ANTHROPIC_THINKING } } : {})),
     });
     if (!res.ok) { const e = new Error(`provider ${res.status}`); e.code = 'provider'; throw e; }
     const data = await res.json();
