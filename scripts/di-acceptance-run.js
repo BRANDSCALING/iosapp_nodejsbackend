@@ -332,7 +332,7 @@ function writePack() {
   const byScript = {};
   transcripts.forEach((t) => { (byScript[t.script] = byScript[t.script] || []).push(t); });
   let md = '# BS-AI-006 acceptance run — blinded transcripts\n\n';
-  md += 'Run date: ' + new Date().toISOString().slice(0, 10) + ' · BS-AI-005 v1.0 · model name withheld (blinded per §2.2)\n\n';
+  md += 'Run date: ' + new Date().toISOString().slice(0, 10) + ' · ' + (process.env.MENTOR_INSTRUCTION_VERSION || 'BS-AI-005 v1.0') + ' · model name withheld (blinded per §2.2)\n\n';
   md += 'For the scorers: read each transcript beside its journey in BS-AI-002 §7 and score the seven measures of BS-AI-006 §4.2; mark any hard failure of §4.1. The JSON fields follow each mentor turn.\n\n';
   Object.keys(byScript).sort().forEach((s) => {
     md += '\n---\n\n## Script ' + s + '\n\n';

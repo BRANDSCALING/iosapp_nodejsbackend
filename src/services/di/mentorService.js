@@ -12,15 +12,24 @@
  * same way, so the provider is an env switch, not a code change.
  */
 const { query } = require('../../config/database');
-const { VERSION, INSTRUCTIONS } = require('./instructions');
+const { VERSION, INSTRUCTIONS, VERSION_1_1, INSTRUCTIONS_1_1 } = require('./instructions');
 
 const KINDS = ['decision', 'several', 'not_decision', 'small', 'personal', 'regulated',
   'harm_self', 'harm_others', 'decide_for_me', 'hostile', 'clash'];
 const BOXES = ['decision', 'box1', 'box2', 'box3', 'end', 'box4'];
 const READS = ['Ready', 'One more round', 'Not yet'];
 
-/** The current instruction text; the table is seeded once from BS-AI-005 v1.0. */
+/** The current instruction text; the table is seeded once from BS-AI-005 v1.0.
+ *  MENTOR_INSTRUCTION_VERSION overrides which stored version is used — the BS-AI-006
+ *  re-run harness runs v1.1 this way while v1.0 stays current in production (Fariza,
+ *  24 Nov: "v1.0 stays in production until the re-run passes"). */
 async function currentInstruction() {
+  const want = process.env.MENTOR_INSTRUCTION_VERSION;
+  if (want) {
+    const o = await query('SELECT version, text FROM mentor_instruction WHERE version = $1 LIMIT 1', [want]);
+    if (o.rows.length) return o.rows[0];
+    if (want === VERSION_1_1) return { version: VERSION_1_1, text: INSTRUCTIONS_1_1 };
+  }
   const r = await query('SELECT version, text FROM mentor_instruction WHERE current = true LIMIT 1');
   if (r.rows.length) return r.rows[0];
   await query(`
@@ -61,8 +70,14 @@ function eventLine(event) {
   return event;
 }
 
-/** The context block of BS-AI-005 §3, from the server's records only. */
-function buildContext({ mentor, typeKey, result, decision, entries, event, turnNo }) {
+/** The context block of BS-AI-005 §3, from the server's records only.
+ *  v1.1 (§3 change, Fariza 24 Nov): two lines after THE FRAME NOW — TODAY: and
+ *  REVIEW DATE: — the backend writes both; the model copies them, never computes one. */
+function todayLine() { return 'TODAY: ' + new Date().toISOString().slice(0, 10); }
+function reviewLine(reviewDate) {
+  return 'REVIEW DATE: ' + (reviewDate ? String(reviewDate instanceof Date ? reviewDate.toISOString() : reviewDate).slice(0, 10) : '(not set)');
+}
+function buildContext({ mentor, typeKey, result, decision, entries, event, turnNo, reviewDate }) {
   const lines = [];
   const mixed = !typeKey || typeKey === 'mixed' || typeKey.endsWith('-leaning');
   lines.push(`YOU ARE: ${mentor === 'architect' ? 'AI Architect' : 'AI Alchemist'}` +
@@ -83,6 +98,8 @@ function buildContext({ mentor, typeKey, result, decision, entries, event, turnN
     : decision.kind === 'made' ? 'an EXISTING decision being checked' : 'a NEW decision';
   lines.push(`THE FRAME NOW: ${kindLine}; order=${decision.order}; urgent=${decision.urgent}; ` +
     `rounds=${decision.rounds}; turn=${turnNo} of 15; awareness practice=${decision.awareness_practice}`);
+  lines.push(todayLine());
+  lines.push(reviewLine(reviewDate));
 
   const loops = boxLoops(decision.order);
   const byBox = {};
@@ -258,7 +275,12 @@ async function mentorTurn({ userId, decision, entries, typeKey, result, event, p
   }
 
   const turnNo = (decision.turn_count || 0) + 1;
-  const context = buildContext({ mentor, typeKey, result, decision, entries, event, turnNo });
+  const rv = await query(
+    'SELECT review_date FROM decision_log WHERE decision_id = $1 LIMIT 1', [decision.id]);
+  const context = buildContext({
+    mentor, typeKey, result, decision, entries, event, turnNo,
+    reviewDate: rv.rows.length ? rv.rows[0].review_date : null,
+  });
 
   const live = liveCall();
   const started = Date.now();
@@ -313,6 +335,8 @@ async function roomCheck({ userId, room, entries, mentor }) {
   const lines = [];
   lines.push(`YOU ARE: ${mentor === 'architect' ? 'AI Architect' : 'AI Alchemist'}`);
   lines.push(`THE FRAME NOW: a Decision Room: role Decision owner, kind ${room.kind}; order=${room.order}; rounds=${room.round}`);
+  lines.push(todayLine());
+  lines.push(reviewLine(room.review_date));
   lines.push(`Decision box: ${room.decision_text}`);
   const tag = (e) => {
     const name = e.first_name || e.author_name || 'Member';

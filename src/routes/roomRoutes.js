@@ -450,13 +450,19 @@ router.post('/rooms/:id/check', async (req, res) => {
 
     const out = await roomCheck({ userId: req.userId, room, entries, mentor: me.mentor || (room.order === 'logic_first' ? 'architect' : 'alchemist') });
     const j = out.json;
-    /* the log line members see is composed here with the server's dates; the model never
-       writes a date (BS-AI-006 change 9, Fariza, 24 Nov) */
-    j.log_line = serverLogLine({
-      decisionText: room.decision_text, order: room.order, rounds: room.round, warning: j.warning,
-      decidedText: box4.text, restsOn: j.readiness ? j.readiness.rests_on : null,
-      reviewDate: (function (x) { x.setMonth(x.getMonth() + 3); return x; })(new Date()),
-    });
+    /* dates come from the backend, never the model (BS-AI-005 v1.1 DATES): replace the
+       {today} and {review} tokens, or compose the whole line when the model gave none */
+    const roomRev = (function (x) { x.setMonth(x.getMonth() + 3); return x; })(new Date());
+    if (j.log_line && typeof j.log_line === 'string') {
+      j.log_line = j.log_line.split('{today}').join(new Date().toISOString().slice(0, 10))
+        .split('{review}').join(roomRev.toISOString().slice(0, 10));
+    } else {
+      j.log_line = serverLogLine({
+        decisionText: room.decision_text, order: room.order, rounds: room.round, warning: j.warning,
+        decidedText: box4.text, restsOn: j.readiness ? j.readiness.rests_on : null,
+        reviewDate: roomRev,
+      });
+    }
 
     /* the room row in every member's log (BS-AI-008 §6) */
     const members = (await query('SELECT * FROM room_member WHERE room_id = $1 AND left_at IS NULL', [req.params.id])).rows;
