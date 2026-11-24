@@ -342,6 +342,10 @@ router.post('/decisions/:id/check', async (req, res) => {
     const revShown = reviewDate ? new Date(reviewDate) : (function (x) { x.setMonth(x.getMonth() + 3); return x; })(new Date());
     const todayIso = new Date().toISOString().slice(0, 10);
     const revIso = revShown.toISOString().slice(0, 10);
+    /* the model may also repeat the log line (tokens included) inside the reply it shows */
+    if (typeof j.reply === 'string') {
+      j.reply = j.reply.split('{today}').join(todayIso).split('{review}').join(revIso);
+    }
     if (j.log_line && typeof j.log_line === 'string') {
       j.log_line = j.log_line.split('{today}').join(todayIso).split('{review}').join(revIso);
     } else {

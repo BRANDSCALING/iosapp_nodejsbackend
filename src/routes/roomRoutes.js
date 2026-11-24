@@ -457,6 +457,11 @@ router.post('/rooms/:id/check', async (req, res) => {
     /* dates come from the backend, never the model (BS-AI-005 v1.1 DATES): replace the
        {today} and {review} tokens, or compose the whole line when the model gave none */
     const roomRev = (function (x) { x.setMonth(x.getMonth() + 3); return x; })(new Date());
+    /* the model may also repeat the log line (tokens included) inside the reply it shows */
+    if (typeof j.reply === 'string') {
+      j.reply = j.reply.split('{today}').join(new Date().toISOString().slice(0, 10))
+        .split('{review}').join(roomRev.toISOString().slice(0, 10));
+    }
     if (j.log_line && typeof j.log_line === 'string') {
       j.log_line = j.log_line.split('{today}').join(new Date().toISOString().slice(0, 10))
         .split('{review}').join(roomRev.toISOString().slice(0, 10));
