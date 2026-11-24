@@ -213,7 +213,7 @@ router.post('/rooms/:id/invites', async (req, res) => {
     /* N1 — invited to a room: in-app for an existing account, the email through GHL (BS-AI-009 N1) */
     if (inv.email) {
       const inviter = await firstNameOf(req.userId);
-      const link = '/app/#invite=' + inv.token;
+      const link = '/?invite=' + inv.token; /* the dashboard's invite route (24 Nov) */
       const existing = await query('SELECT id FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1', [inv.email]);
       if (existing.rows.length) {
         const invitee = existing.rows[0].id;
@@ -236,7 +236,7 @@ router.post('/rooms/:id/invites', async (req, res) => {
           }), 'uk']);
       }
     }
-    res.status(201).json({ invite: { id: inv.id, token: inv.token, expires_at: inv.expires_at, link: '/app/index.html#invite=' + inv.token } });
+    res.status(201).json({ invite: { id: inv.id, token: inv.token, expires_at: inv.expires_at, link: '/?invite=' + inv.token } });
   } catch (e) {
     console.error('[DI] invite failed:', e.message);
     res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
