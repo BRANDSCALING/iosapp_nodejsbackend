@@ -146,11 +146,11 @@ async function callAnthropic({ instruction, context, thread, timeoutMs = 30000 }
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       signal: controller.signal,
-      headers: {
+      headers: Object.assign({
         'content-type': 'application/json',
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
-      },
+      }, process.env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': process.env.ANTHROPIC_WORKSPACE_ID } : {}),
       body: JSON.stringify({
         model: process.env.DI_MODEL || 'claude-haiku-4-5-20251001',
         max_tokens: 700,

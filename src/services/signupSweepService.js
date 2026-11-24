@@ -62,11 +62,13 @@ async function sweepSignups() {
          AND NOT EXISTS (SELECT 1 FROM user_quiz_results q WHERE UPPER(q.user_id::text) = UPPER(u.id::text))
          AND NOT EXISTS (SELECT 1 FROM ghl_outbox o WHERE o.payload->>'dedup' = 'edna.save_progress:nudge:' || UPPER(u.id::text))`,
       [SINCE.toISOString(), String(nudgeMinutes)])).rows;
+    const { ednaPartsIn } = require('./di/notificationService');
     for (const n of nudgeRows) {
+      const partsIn = await ednaPartsIn(n.id);
       await queueGhl({
         userId: n.id,
         event: 'edna.save_progress',
-        extra: { reason: 'resume_nudge' },
+        extra: { reason: 'resume_nudge', parts_in: partsIn, parts_total: 7 },
         dedup: `edna.save_progress:nudge:${String(n.id).toUpperCase()}`,
       });
       console.log(`⏰ [SIGNUP-SWEEP] Resume nudge queued for ${n.email} (${nudgeMinutes} min, no result)`);

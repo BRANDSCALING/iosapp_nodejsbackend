@@ -192,8 +192,9 @@ router.post('/save-progress-email', async (req, res) => {
     if (!userId) {
       return res.status(401).json({ success: false, error: 'No user identified' });
     }
-    const { queueGhl } = require('../services/di/notificationService');
-    const row = await queueGhl({ userId, event: 'A1' });
+    const { queueGhl, ednaPartsIn } = require('../services/di/notificationService');
+    const partsIn = await ednaPartsIn(userId);
+    const row = await queueGhl({ userId, event: 'A1', extra: { parts_in: partsIn, parts_total: 7 } });
     if (!row) {
       // No account email, the person switched A1 emails off, or the insert failed.
       return res.status(422).json({ success: false, error: 'Could not queue the email' });

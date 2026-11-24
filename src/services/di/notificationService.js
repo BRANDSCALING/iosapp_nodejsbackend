@@ -222,4 +222,18 @@ async function needsYou(userId) {
   return items;
 }
 
-module.exports = { notify, queueGhl, deliverOutbox, needsYou, GHL_EVENT };
+
+/** "You are [n] of 7 parts in" (Fariza's Continue email, 24 Nov): the highest E-DNA part
+ *  the person's mirrored snapshot has touched. 0 when they have not started. */
+async function ednaPartsIn(userId) {
+  try {
+    const r = await query('SELECT snapshot FROM edna_progress WHERE UPPER(user_id::text) = UPPER($1)', [userId]);
+    if (!r.rows.length) return 0;
+    const ans = (r.rows[0].snapshot || {}).answers || {};
+    let maxPart = 0;
+    Object.keys(ans).forEach((k) => { const m = /^P(\d)/i.exec(k); if (m) maxPart = Math.max(maxPart, Number(m[1])); });
+    return Math.min(7, maxPart);
+  } catch (e) { return 0; }
+}
+
+module.exports = { notify, queueGhl, deliverOutbox, needsYou, GHL_EVENT, ednaPartsIn };

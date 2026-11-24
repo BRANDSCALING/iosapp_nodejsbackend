@@ -307,7 +307,7 @@ router.post('/decisions/:id/check', async (req, res) => {
       return res.status(409).json({ error: 'checked', message: 'This decision has been checked. Open it in your log.' });
     }
     /* credit state before the model is called (BS-AI-004 §4 step 3) */
-    if ((await credits.balance(req.userId)) <= 0) {
+    if (process.env.DI_OPEN_ALL !== 'true' && (await credits.balance(req.userId)) <= 0) {
       return res.status(402).json({ error: 'out_of_credits', message: 'You have used your decisions. Top up to carry on. Your log, saved decisions and reviews stay open.' });
     }
     if ((await credits.checksToday(req.userId)) >= 10) {
@@ -368,7 +368,8 @@ router.post('/decisions/:id/check', async (req, res) => {
       "SELECT count(*)::int AS n FROM credit_ledger WHERE decision_id = $1 AND reason IN ('check','further_turns')", [d.id]);
     const owed = 1 + Math.floor(Math.max(0, d.turn_count - 15) / 15);
     let ledger = null;
-    if (prior.rows[0].n < owed || prior.rows[0].n === 0) {
+    if (process.env.DI_OPEN_ALL === 'true') { /* open day: nothing charged */ }
+    else if (prior.rows[0].n < owed || prior.rows[0].n === 0) {
       ledger = await credits.charge(req.userId, {
         decisionId: d.id, mentorTurnId: out.turnRow.id,
         reason: prior.rows[0].n === 0 ? 'check' : 'further_turns',
@@ -434,7 +435,7 @@ router.get('/profile', async (req, res) => {
       photo_url: row.photo_url || null,
       first_open: logN.rows[0].n === 0,
       purchased,
-      tier: member ? 'entry' : purchased ? 'di' : 'free',
+      tier: process.env.DI_OPEN_ALL === 'true' ? 'entry' : member ? 'entry' : purchased ? 'di' : 'free',
       guest: guest && !guest.ended
         ? { days_left: guest.days_left, decisions_left: guest.decisions_left, ends_at: guest.ends_at }
         : guest ? { ended: true } : null,

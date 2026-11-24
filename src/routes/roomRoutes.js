@@ -99,21 +99,25 @@ router.post('/rooms', async (req, res) => {
     /* Rooms open with Entry membership; an active guest may own one (BS-AI-012 §6.3;
        Fariza, 22 Nov: everyone sees rooms, only members use them). The app hides the
        button for others — this enforces it for every client, the website included. */
-    const tierRow = (await query(
-      'SELECT tier FROM users WHERE UPPER(id::text) = UPPER($1)', [req.userId])).rows[0];
-    const rawTier = ((tierRow && tierRow.tier) || '').toLowerCase();
-    const member = rawTier && ['free', 'none', ''].indexOf(rawTier) === -1;
-    const g = member ? null : await guestState(req.userId);
-    if (!member && (!g || g.ended)) {
-      return res.status(403).json({
-        error: 'rooms_membership',
-        message: 'Rooms open with Entry membership. Your decisions and your log stay yours on every tier.',
-      });
-    }
+    /* DI_OPEN_ALL (Fariza, 24 Nov huddle): every gate open for the event; the tier and
+       guest gates return before launch. */
+    if (process.env.DI_OPEN_ALL !== 'true') {
+      const tierRow = (await query(
+        'SELECT tier FROM users WHERE UPPER(id::text) = UPPER($1)', [req.userId])).rows[0];
+      const rawTier = ((tierRow && tierRow.tier) || '').toLowerCase();
+      const member = rawTier && ['free', 'none', ''].indexOf(rawTier) === -1;
+      const g = member ? null : await guestState(req.userId);
+      if (!member && (!g || g.ended)) {
+        return res.status(403).json({
+          error: 'rooms_membership',
+          message: 'Rooms open with Entry membership. Your decisions and your log stay yours on every tier.',
+        });
+      }
 
-    /* a room a guest owns counts as one of their three decisions (BS-AI-008 §6 amendment) */
-    const gate = await guestGate(req.userId);
-    if (gate) return res.status(gate.status).json(gate.body);
+      /* a room a guest owns counts as one of their three decisions (BS-AI-008 §6 amendment) */
+      const gate = await guestGate(req.userId);
+      if (gate) return res.status(gate.status).json(gate.body);
+    }
     const room = (await query(`
       INSERT INTO decision_room (owner_user_id, kind, decision_text, "order")
       VALUES ($1::uuid, $2, $3, $4) RETURNING *
@@ -435,7 +439,7 @@ router.post('/rooms/:id/check', async (req, res) => {
     if (['decided', 'reviewed', 'closed'].includes(me.status)) {
       return res.status(409).json({ error: 'checked', message: 'This room has been checked. Open it in your log.' });
     }
-    if ((await credits.balance(req.userId)) <= 0) {
+    if (process.env.DI_OPEN_ALL !== 'true' && (await credits.balance(req.userId)) <= 0) {
       return res.status(402).json({ error: 'out_of_credits', message: 'You have used your decisions. Top up to carry on.' });
     }
     const room = (await query('SELECT * FROM decision_room WHERE id = $1', [req.params.id])).rows[0];
@@ -479,8 +483,11 @@ router.post('/rooms/:id/check', async (req, res) => {
         j.readiness ? j.readiness.rests_on : null, box4.text, reviewDate, room.id, m.role,
         j.rule ? JSON.stringify(j.rule) : null]);
     }
-    const ledger = await credits.charge(req.userId, { roomId: room.id, mentorTurnId: out.turnRow.id, reason: 'check' });
-    await query('UPDATE mentor_turn SET charged = true WHERE id = $1', [out.turnRow.id]);
+    let ledger = null;
+    if (process.env.DI_OPEN_ALL !== 'true') {
+      ledger = await credits.charge(req.userId, { roomId: room.id, mentorTurnId: out.turnRow.id, reason: 'check' });
+      await query('UPDATE mentor_turn SET charged = true WHERE id = $1', [out.turnRow.id]);
+    }
     await query("UPDATE decision_room SET status = 'decided', checked_at = now(), review_date = (CURRENT_DATE + interval '3 months')::date, rule = $2::jsonb, updated_at = now() WHERE id = $1",
       [room.id, j.rule ? JSON.stringify(j.rule) : null]);
     if (j.split && j.split.box) {
@@ -498,7 +505,7 @@ router.post('/rooms/:id/check', async (req, res) => {
       }
     } catch (e) { console.warn('[DI] N5 notify:', e.message); }
     push(room.id, { type: 'checked' });
-    res.json({ mentor: out.mentor, response: j, charged: true, ledger_id: ledger.id });
+    res.json({ mentor: out.mentor, response: j, charged: !!ledger, ledger_id: ledger ? ledger.id : null });
   } catch (e) {
     if (e.code === 'out_of_credits') return res.status(402).json({ error: 'out_of_credits', message: 'You have used your decisions. Top up to carry on.' });
     if (e.code === 'unavailable') return res.status(503).json({ error: 'mentor_unavailable', message: 'Your mentor is not available right now. Everyone’s entries are saved.' });
