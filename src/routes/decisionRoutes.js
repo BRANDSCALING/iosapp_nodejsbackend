@@ -14,7 +14,7 @@ const { query } = require('../config/database');
 const { getAuthMode, verifyBearer } = require('../middleware/cognitoVerify');
 const { fiveWayKey } = require('../services/edna/workbookSelect');
 const { legacyResult } = require('../services/edna/legacyResult');
-const { mentorTurn } = require('../services/di/mentorService');
+const { mentorTurn, serverLogLine } = require('../services/di/mentorService');
 const credits = require('../services/di/creditService');
 const attachments = require('../services/di/attachmentService');
 const { notify, queueGhl } = require('../services/di/notificationService');
@@ -335,6 +335,14 @@ router.post('/decisions/:id/check', async (req, res) => {
     const readMap = { Ready: 'ready', 'One more round': 'one_more_round', 'Not yet': 'not_yet' };
     const readKey = j.readiness ? (readMap[Object.keys(readMap).find((k) => j.readiness.read.startsWith(k))] || null) : null;
     const reviewDate = (req.body && req.body.review_date) || null; /* default three months (BS-AI-004 §10.3) */
+    /* the member-facing log line is composed here, with the server's dates: the model
+       never writes a date (BS-AI-006 change 9, Fariza, 24 Nov) */
+    const revShown = reviewDate ? new Date(reviewDate) : (function (x) { x.setMonth(x.getMonth() + 3); return x; })(new Date());
+    j.log_line = serverLogLine({
+      decisionText: d.text, order: d.order, rounds: d.rounds, warning: j.warning,
+      decidedText: box4 ? box4.text : null, restsOn: j.readiness ? j.readiness.rests_on : null,
+      reviewDate: revShown,
+    });
     await query(`
       UPDATE decision_log SET
         began_loop = $2, finished_loop = $3, switched = $4, rounds = $5,

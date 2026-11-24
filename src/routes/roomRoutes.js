@@ -14,7 +14,7 @@ const router = express.Router();
 const { query } = require('../config/database');
 const { getAuthMode, verifyBearer } = require('../middleware/cognitoVerify');
 const credits = require('../services/di/creditService');
-const { roomCheck } = require('../services/di/mentorService');
+const { roomCheck, serverLogLine } = require('../services/di/mentorService');
 const { notify, queueGhl } = require('../services/di/notificationService');
 const { guestState, guestGate, guestSpend } = require('../services/di/guestService');
 const { legacyResult } = require('../services/edna/legacyResult');
@@ -450,6 +450,13 @@ router.post('/rooms/:id/check', async (req, res) => {
 
     const out = await roomCheck({ userId: req.userId, room, entries, mentor: me.mentor || (room.order === 'logic_first' ? 'architect' : 'alchemist') });
     const j = out.json;
+    /* the log line members see is composed here with the server's dates; the model never
+       writes a date (BS-AI-006 change 9, Fariza, 24 Nov) */
+    j.log_line = serverLogLine({
+      decisionText: room.decision_text, order: room.order, rounds: room.round, warning: j.warning,
+      decidedText: box4.text, restsOn: j.readiness ? j.readiness.rests_on : null,
+      reviewDate: (function (x) { x.setMonth(x.getMonth() + 3); return x; })(new Date()),
+    });
 
     /* the room row in every member's log (BS-AI-008 §6) */
     const members = (await query('SELECT * FROM room_member WHERE room_id = $1 AND left_at IS NULL', [req.params.id])).rows;

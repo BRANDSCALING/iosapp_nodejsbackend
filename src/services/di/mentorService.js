@@ -269,9 +269,18 @@ async function mentorTurn({ userId, decision, entries, typeKey, result, event, p
         ? await live({ instruction, context, thread })
         : stubReply({ mentor, decision, entries, event });
       got.json = validateReply(got.json);
+      /* BS-AI-006 change 7 (Fariza, 24 Nov): at Check the readiness read is GIVEN, not
+         offered. A check reply without it is treated as invalid and retried once with
+         the instruction made explicit. */
+      if (event === 'check' && !got.json.readiness) {
+        const e = new Error('check reply without the readiness read'); e.code = 'invalid_json'; throw e;
+      }
       out = got;
     } catch (e) {
       if (attempt === 1) { const err = new Error('mentor unavailable'); err.code = 'unavailable'; throw err; }
+      if (event === 'check') {
+        thread.push({ role: 'user', content: 'Give the readiness read now, in the JSON field readiness: what the decision rests on, what is missing, and your read.' });
+      }
     }
   }
 
@@ -342,9 +351,13 @@ async function roomCheck({ userId, room, entries, mentor }) {
         };
       }
       got.json = validateReply(got.json);
+      if (!got.json.readiness) { /* the room's cross-check must carry the readiness read too */
+        const e = new Error('room check without the readiness read'); e.code = 'invalid_json'; throw e;
+      }
       out = got;
     } catch (e) {
       if (attempt === 1) { const err = new Error('mentor unavailable'); err.code = 'unavailable'; throw err; }
+      thread.push({ role: 'user', content: 'Give the readiness read now, in the JSON field readiness: what the decision rests on, what is missing, and your read.' });
     }
   }
   const turnRow = (await query(`
@@ -356,4 +369,22 @@ async function roomCheck({ userId, room, entries, mentor }) {
   return { json: out.json, turnRow, mentor };
 }
 
-module.exports = { mentorTurn, mentorFor, buildContext, validateReply, currentInstruction, boxLoops, roomCheck };
+/**
+ * BS-AI-006 change 9 (Fariza, 24 Nov): dates come from the backend; the model never
+ * writes one. The routes compose the member-facing log line from the server's own
+ * records and dates, replacing whatever the model wrote (scripts 18–20 invented
+ * "2025-01" dates). The raw model output stays in mentor_turn for the audit trail.
+ */
+function serverLogLine({ decisionText, order, rounds, warning, decidedText, restsOn, reviewDate }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const rev = reviewDate instanceof Date ? reviewDate.toISOString().slice(0, 10) : String(reviewDate).slice(0, 10);
+  return today + ' · ' + String(decisionText || '').slice(0, 60) +
+    ' · ' + (order === 'logic_first' ? 'Logic first' : 'Feeling first') +
+    ' · ' + rounds + (rounds === 1 ? ' round' : ' rounds') +
+    ' · ' + (warning ? '1 warning' : 'no warnings') +
+    (decidedText ? ' · decided: ' + String(decidedText).slice(0, 60) : '') +
+    (restsOn ? ' · rests on ' + restsOn : '') +
+    ' · review ' + rev;
+}
+
+module.exports = { mentorTurn, mentorFor, buildContext, validateReply, currentInstruction, boxLoops, roomCheck, serverLogLine };
