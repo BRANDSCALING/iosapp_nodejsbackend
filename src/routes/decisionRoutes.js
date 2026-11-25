@@ -438,8 +438,23 @@ router.get('/profile', async (req, res) => {
     const rawTier = (row.tier || '').toLowerCase();
     const member = rawTier && ['free', 'none', ''].indexOf(rawTier) === -1;
     const guest = member || purchased ? null : await guestState(req.userId);
+    /* the Settings profile fields (0006); a separate read so /profile keeps working on a
+       database the migration has not reached yet */
+    let extra = {};
+    try {
+      extra = (await query(
+        'SELECT phone, country, time_zone, business_name FROM users WHERE UPPER(id::text) = UPPER($1)',
+        [req.userId])).rows[0] || {};
+    } catch (e) { extra = {}; }
     res.json({
       type_key: typeKey,
+      phone: extra.phone || null,
+      country: extra.country || null,
+      time_zone: extra.time_zone || null,
+      business_name: extra.business_name || null,
+      /* what the member actually holds, for Settings; `tier` below is the app's gate and
+         reads 'entry' for everyone while DI_OPEN_ALL is on */
+      membership: member ? rawTier : purchased ? 'di' : 'free',
       first_name: first,
       last_name: row.last_name || null,
       email: row.email || null,
@@ -554,6 +569,28 @@ router.put('/profile', async (req, res) => {
     await query(
       'UPDATE users SET first_name = $2, last_name = $3 WHERE UPPER(id::text) = UPPER($1)',
       [req.userId, String(first_name).trim(), last_name ? String(last_name).trim() : null]);
+    /* Settings · Profile (0006): only the fields the client sent, so the older clients that
+       send names alone leave the rest as they are */
+    const b = req.body || {};
+    const clean = (v, n) => (v == null || String(v).trim() === '' ? null : String(v).trim().slice(0, n));
+    const sets = []; const vals = [req.userId];
+    if ('phone' in b) {
+      const ph = clean(b.phone, 32);
+      if (ph && !/^\+?[0-9 ()-]{6,32}$/.test(ph)) {
+        return res.status(400).json({ error: 'validation', message: 'Write the phone number with digits only, for example +44 7700 900000.' });
+      }
+      vals.push(ph); sets.push('phone = $' + vals.length);
+    }
+    if ('country' in b) { vals.push(clean(b.country, 64)); sets.push('country = $' + vals.length); }
+    if ('time_zone' in b) {
+      const tz = clean(b.time_zone, 64);
+      if (tz) { try { new Intl.DateTimeFormat('en-GB', { timeZone: tz }); } catch (e) { return res.status(400).json({ error: 'validation', message: 'Choose a time zone from the list.' }); } }
+      vals.push(tz); sets.push('time_zone = $' + vals.length);
+    }
+    if ('business_name' in b) { vals.push(clean(b.business_name, 120)); sets.push('business_name = $' + vals.length); }
+    if (sets.length) {
+      await query('UPDATE users SET ' + sets.join(', ') + ' WHERE UPPER(id::text) = UPPER($1)', vals);
+    }
     res.json({ saved: true });
   } catch (e) {
     console.error('[DI] profile save failed:', e.message);
@@ -796,6 +833,62 @@ router.get('/attachments/:id/file', async (req, res) => {
 });
 
 /** GET /log/reviews/due — rows whose review date has come (Needs you) */
+/**
+ * Settings · Security (25 Nov): the devices this person signs in from. The web app reports
+ * itself once per load; the list is what auth_device has seen, newest first.
+ */
+router.post('/devices/seen', async (req, res) => {
+  try {
+    const name = String((req.body && req.body.name) || 'Browser').slice(0, 80);
+    const platform = String((req.body && req.body.platform) || 'web').slice(0, 20);
+    const up = await query(`
+      UPDATE auth_device SET last_seen_at = now()
+      WHERE UPPER(user_id::text) = UPPER($1) AND device_name = $2 AND platform = $3 RETURNING id
+    `, [req.userId, name, platform]);
+    if (!up.rows.length) {
+      await query('INSERT INTO auth_device (user_id, device_name, platform) VALUES ($1::uuid, $2, $3)', [req.userId, name, platform]);
+    }
+    res.json({ saved: true });
+  } catch (e) {
+    console.error('[DI] device seen failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+router.get('/devices', async (req, res) => {
+  try {
+    const r = await query(`
+      SELECT device_name, platform, first_seen_at, last_seen_at FROM auth_device
+      WHERE UPPER(user_id::text) = UPPER($1) ORDER BY last_seen_at DESC LIMIT 10
+    `, [req.userId]);
+    res.json({ devices: r.rows });
+  } catch (e) {
+    console.error('[DI] devices failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
+/**
+ * Settings · Subscription (25 Nov): the person's completed orders, as GHL reported them
+ * (order.completed on /api/ghl/di, stored in ghl_inbound_event). Product and date only —
+ * card details are held by the checkout, never here.
+ */
+router.get('/purchases', async (req, res) => {
+  try {
+    const u = (await query('SELECT email FROM users WHERE UPPER(id::text) = UPPER($1)', [req.userId])).rows[0] || {};
+    const r = await query(`
+      SELECT payload->>'product' AS product, payload->>'pack' AS pack, received_at
+      FROM ghl_inbound_event
+      WHERE event = 'order.completed'
+        AND (UPPER(payload->>'bs_user_id') = UPPER($1) OR (payload->>'email' IS NOT NULL AND LOWER(payload->>'email') = LOWER($2)))
+      ORDER BY received_at DESC LIMIT 20
+    `, [req.userId, u.email || '']);
+    res.json({ purchases: r.rows });
+  } catch (e) {
+    console.error('[DI] purchases failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
 router.get('/log/reviews/due', async (req, res) => {
   try {
     const r = await query(`
