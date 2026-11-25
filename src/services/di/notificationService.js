@@ -251,7 +251,13 @@ function ednaProgressOf(ans) {
   ];
   let done = 0;
   while (done < 7 && counts[done][0] >= counts[done][1]) done += 1;
-  const out = { parts_in: done, parts_total: 7 };
+  /* 25 Nov (Munawar): the reminder email names how many parts are left and which ones, so
+     GHL gets the count and both lists as plain strings it can drop into the email */
+  const out = {
+    parts_in: done, parts_total: 7, parts_left: 7 - done,
+    parts_done_names: EDNA_PART_NAMES.slice(0, done).join(', '),
+    parts_left_names: EDNA_PART_NAMES.slice(done).join(', '),
+  };
   if (done < 7) {
     out.resume_part = done + 1;
     out.resume_part_name = EDNA_PART_NAMES[done];
