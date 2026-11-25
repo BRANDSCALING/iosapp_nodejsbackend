@@ -446,7 +446,20 @@ router.get('/profile', async (req, res) => {
         'SELECT phone, country, time_zone, business_name FROM users WHERE UPPER(id::text) = UPPER($1)',
         [req.userId])).rows[0] || {};
     } catch (e) { extra = {}; }
+    /* the subscription state GHL last reported (0007), read on its own for the same reason */
+    let sub = {};
+    try {
+      sub = (await query(
+        'SELECT subscription_state, subscription_state_at, subscription_ends_at, subscription_next_retry FROM users WHERE UPPER(id::text) = UPPER($1)',
+        [req.userId])).rows[0] || {};
+    } catch (e) { sub = {}; }
     res.json({
+      subscription: sub.subscription_state ? {
+        state: sub.subscription_state,
+        since: sub.subscription_state_at || null,
+        ends_at: sub.subscription_ends_at || null,
+        next_retry: sub.subscription_next_retry || null,
+      } : null,
       type_key: typeKey,
       phone: extra.phone || null,
       country: extra.country || null,

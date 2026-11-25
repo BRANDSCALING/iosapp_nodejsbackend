@@ -159,7 +159,21 @@ router.post('/di', async (req, res) => {
       return res.status(200).json({ success: true });
     }
 
+    /* Settings · Subscription shows the latest of these (0007); a database without the
+       columns yet keeps working, the state is just not shown */
+    const subState = async (state, extra) => {
+      try {
+        await query(`
+          UPDATE users SET subscription_state = $2, subscription_state_at = now(),
+            subscription_ends_at = $3, subscription_next_retry = $4
+          WHERE UPPER(id::text) = UPPER($1)
+        `, [userId, state, (extra && extra.ends_at) || null, (extra && extra.next_retry) || null]);
+      } catch (e) { console.warn('[GHL·DI] subscription state not saved:', e.message); }
+    };
+    const dateOrNull = (v) => { const d = v ? new Date(v) : null; return d && !isNaN(d) ? d.toISOString() : null; };
+
     if (event === 'membership.payment_failed') {
+      await subState('payment_failed', { next_retry: dateOrNull(b.next_retry) });
       await notify({
         userId, event: 'A8', title: 'Your payment did not go through',
         body: 'We try your card again; update it to keep your decisions running',
@@ -169,10 +183,12 @@ router.post('/di', async (req, res) => {
     }
 
     if (event === 'membership.paid') {
+      await subState('active');
       return res.status(200).json({ success: true });
     }
 
     if (event === 'membership.cancelled') {
+      await subState('cancelled', { ends_at: dateOrNull(b.ends_at) });
       await notify({
         userId, event: 'A10', title: 'Your membership is cancelled',
         body: b.ends_at ? 'It runs until ' + String(b.ends_at).slice(0, 10) : 'Your log and reports stay open',

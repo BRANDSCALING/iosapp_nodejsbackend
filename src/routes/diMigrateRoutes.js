@@ -99,4 +99,25 @@ router.post('/migrate-0006', async (req, res) => {
   }
 });
 
+/** POST /migrate-0007 — Settings · Subscription state (0007). Same key gate as above. */
+router.post('/migrate-0007', async (req, res) => {
+  const given = req.query.key || req.headers['x-webhook-key'] || '';
+  const expected = process.env.GHL_WEBHOOK_SECRET || '';
+  if (!expected || given !== expected) {
+    return res.status(401).json({ error: 'unauthorised' });
+  }
+  try {
+    const sql = fs.readFileSync(path.join(__dirname, '../migrations/0007_subscription_state.sql'), 'utf8');
+    await query(sql);
+    const cols = await query(`
+      SELECT count(*)::int AS n FROM information_schema.columns
+      WHERE table_name = 'users' AND column_name LIKE 'subscription_%'
+    `);
+    res.json({ applied: true, users_columns: cols.rows[0].n });
+  } catch (e) {
+    console.error('[DI] migration 0007 failed:', e.message);
+    res.status(500).json({ applied: false, message: e.message });
+  }
+});
+
 module.exports = router;
