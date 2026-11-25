@@ -834,6 +834,38 @@ router.get('/attachments/:id/file', async (req, res) => {
 
 /** GET /log/reviews/due — rows whose review date has come (Needs you) */
 /**
+ * Settings · Profile · Change email (25 Nov): after Cognito has confirmed the new address
+ * (the member typed the code it emailed), the client calls this with its refreshed ID
+ * token. Only a VERIFIED Cognito ID token is accepted — never x-user-id — and only an
+ * email Cognito marks verified is copied to the member's row. The account id (the Cognito
+ * sub) does not change, so results, decisions, rooms and credits stay exactly as they are.
+ */
+router.post('/account/email-sync', async (req, res) => {
+  try {
+    const p = await verifyBearer(req);
+    if (!p || p.token_use !== 'id' || !p.sub) {
+      return res.status(401).json({ error: 'verified_token_required', message: 'Sign in again, then try once more.' });
+    }
+    const email = String(p.email || '').trim().toLowerCase();
+    if (!email || (p.email_verified !== true && p.email_verified !== 'true')) {
+      return res.status(409).json({ error: 'not_verified', message: 'The new address is not confirmed yet. Enter the code from the email.' });
+    }
+    const taken = await query(
+      'SELECT 1 FROM users WHERE LOWER(email) = $1 AND UPPER(id::text) <> UPPER($2) LIMIT 1', [email, p.sub]);
+    if (taken.rows.length) {
+      return res.status(409).json({ error: 'email_in_use', message: 'Another account already uses that email.' });
+    }
+    const r = await query('UPDATE users SET email = $2 WHERE UPPER(id::text) = UPPER($1) RETURNING email', [p.sub, email]);
+    if (!r.rows.length) return res.status(404).json({ error: 'not_found', message: 'Your account was not found.' });
+    console.log(`✉️ [DI] email changed for ${p.sub}`);
+    res.json({ saved: true, email });
+  } catch (e) {
+    console.error('[DI] email sync failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
+/**
  * Settings · Security (25 Nov): the devices this person signs in from. The web app reports
  * itself once per load; the list is what auth_device has seen, newest first.
  */
