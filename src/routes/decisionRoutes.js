@@ -19,6 +19,7 @@ const credits = require('../services/di/creditService');
 const attachments = require('../services/di/attachmentService');
 const { notify, queueGhl } = require('../services/di/notificationService');
 const { guestState, guestGate, guestSpend } = require('../services/di/guestService');
+const accountDeletion = require('../services/di/accountDeletion');
 
 /* same contract as workbooks.js: verified Bearer first, x-user-id fallback in legacy mode */
 const requireAuth = async (req, res, next) => {
@@ -453,7 +454,18 @@ router.get('/profile', async (req, res) => {
         'SELECT subscription_state, subscription_state_at, subscription_ends_at, subscription_next_retry FROM users WHERE UPPER(id::text) = UPPER($1)',
         [req.userId])).rows[0] || {};
     } catch (e) { sub = {}; }
+    /* Screen settings kept on the account (0008) and a pending deletion; signing in again
+       during the 14 days cancels the deletion (BS-AI-003 §9.2) */
+    let acct = {};
+    try {
+      acct = (await query('SELECT screen_settings FROM users WHERE UPPER(id::text) = UPPER($1)', [req.userId])).rows[0] || {};
+    } catch (e) { acct = {}; }
+    let deletion = { pending: null, cancelled: false };
+    try { deletion = await accountDeletion.cancelOnSignIn(req.userId, await verifyBearer(req)); } catch (e) { /* 0008 not applied yet */ }
     res.json({
+      screen: acct.screen_settings || null,
+      deletion_after: deletion.pending || null,
+      deletion_cancelled: deletion.cancelled || undefined,
       subscription: sub.subscription_state ? {
         state: sub.subscription_state,
         since: sub.subscription_state_at || null,
@@ -874,6 +886,58 @@ router.post('/account/email-sync', async (req, res) => {
     res.json({ saved: true, email });
   } catch (e) {
     console.error('[DI] email sync failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
+/* Settings · Screen (25 Nov): the six settings, kept on the account so they follow the person
+   to every browser and the iOS app. Only the known keys and values are stored. */
+const SCREEN_VALUES = {
+  font: ['inter', 'verdana', 'arial'], size: [100, 125, 150, 200], spacing: ['standard', 'extra'],
+  motion: ['standard', 'reduced'], theme: ['light', 'dark', 'contrast'], transparency: ['standard', 'reduced'],
+};
+router.put('/profile/screen', async (req, res) => {
+  try {
+    const given = (req.body && req.body.screen) || {};
+    const clean = {};
+    Object.keys(SCREEN_VALUES).forEach((k) => {
+      const v = k === 'size' ? Number(given[k]) : given[k];
+      if (SCREEN_VALUES[k].indexOf(v) >= 0) clean[k] = v;
+    });
+    await query('UPDATE users SET screen_settings = $2::jsonb WHERE UPPER(id::text) = UPPER($1)', [req.userId, JSON.stringify(clean)]);
+    res.json({ saved: true, screen: clean });
+  } catch (e) {
+    console.error('[DI] screen save failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+
+/**
+ * Settings · Account · Delete my account (BS-AI-004 §3.4): a verified sign-in, the password
+ * (checked by Cognito in the app before this call) and the word DELETE; then 14 days in which
+ * signing in cancels it. POST /account/delete/cancel cancels it from the app.
+ */
+router.post('/account/delete', async (req, res) => {
+  try {
+    const p = await verifyBearer(req);
+    if (!p || !p.sub) return res.status(401).json({ error: 'verified_token_required', message: 'Sign in again, then try once more.' });
+    if (String((req.body && req.body.confirm) || '') !== 'DELETE') {
+      return res.status(400).json({ error: 'validation', message: 'Type DELETE to confirm.' });
+    }
+    const after = await accountDeletion.request(p.sub);
+    if (!after) return res.status(404).json({ error: 'not_found', message: 'Your account was not found.' });
+    console.log(`🗑️ [DI] deletion requested for ${p.sub}, on ${new Date(after).toISOString().slice(0, 10)}`);
+    res.json({ requested: true, deletion_after: after });
+  } catch (e) {
+    console.error('[DI] deletion request failed:', e.message);
+    res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
+  }
+});
+router.post('/account/delete/cancel', async (req, res) => {
+  try {
+    res.json({ cancelled: await accountDeletion.cancel(req.userId) });
+  } catch (e) {
+    console.error('[DI] deletion cancel failed:', e.message);
     res.status(500).json({ error: 'server', message: 'Something went wrong on our side.' });
   }
 });

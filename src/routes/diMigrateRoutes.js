@@ -120,4 +120,26 @@ router.post('/migrate-0007', async (req, res) => {
   }
 });
 
+/** POST /migrate-0008 — Screen settings on the account; Delete my account. Same key gate. */
+router.post('/migrate-0008', async (req, res) => {
+  const given = req.query.key || req.headers['x-webhook-key'] || '';
+  const expected = process.env.GHL_WEBHOOK_SECRET || '';
+  if (!expected || given !== expected) {
+    return res.status(401).json({ error: 'unauthorised' });
+  }
+  try {
+    const sql = fs.readFileSync(path.join(__dirname, '../migrations/0008_screen_and_deletion.sql'), 'utf8');
+    await query(sql);
+    const cols = await query(`
+      SELECT count(*)::int AS n FROM information_schema.columns
+      WHERE (table_name = 'users' AND column_name IN ('screen_settings','delete_requested_at','delete_after'))
+         OR (table_name = 'room_member' AND column_name = 'left_name')
+    `);
+    res.json({ applied: true, columns: cols.rows[0].n });
+  } catch (e) {
+    console.error('[DI] migration 0008 failed:', e.message);
+    res.status(500).json({ applied: false, message: e.message });
+  }
+});
+
 module.exports = router;

@@ -87,6 +87,7 @@ async function guestDays() {
 async function tick() {
   try { await reviewsDue(); } catch (e) { console.warn('[DI] scheduler reviews:', e.message); }
   try { await guestDays(); } catch (e) { console.warn('[DI] scheduler guests:', e.message); }
+  try { await require('./accountDeletion').runDue(); } catch (e) { console.warn('[DI] scheduler deletions:', e.message); }
   try { await deliverOutbox(); } catch (e) { console.warn('[DI] scheduler outbox:', e.message); }
 }
 

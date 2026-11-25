@@ -182,13 +182,13 @@ router.get('/rooms/:id', async (req, res) => {
     const room = (await query('SELECT * FROM decision_room WHERE id = $1', [req.params.id])).rows[0];
     const members = (await query(`
       SELECT m.id, m.user_id, m.role, m.loop, m.mentor, m.joined_at, m.left_at,
-             u.first_name, u.last_name, u.name, u.photo_url
+             COALESCE(u.first_name, m.left_name) AS first_name, u.last_name, u.name, u.photo_url
       FROM room_member m LEFT JOIN users u ON UPPER(u.id::text) = UPPER(m.user_id::text)
       WHERE m.room_id = $1 ORDER BY m.created_at
     `, [req.params.id])).rows;
     const entries = (await query(`
       SELECT e.*, m.user_id AS author_user_id, m.role AS author_role,
-             u.first_name, u.name AS author_name
+             COALESCE(u.first_name, m.left_name) AS first_name, COALESCE(u.name, m.left_name) AS author_name
       FROM room_entry e JOIN room_member m ON m.id = e.member_id
       LEFT JOIN users u ON UPPER(u.id::text) = UPPER(m.user_id::text)
       WHERE e.room_id = $1 ORDER BY e.round, e.created_at
