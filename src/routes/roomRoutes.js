@@ -15,11 +15,33 @@ const { query } = require('../config/database');
 const { getAuthMode, verifyBearer } = require('../middleware/cognitoVerify');
 const credits = require('../services/di/creditService');
 const { roomCheck, serverLogLine } = require('../services/di/mentorService');
-const { notify, queueGhl } = require('../services/di/notificationService');
+const { notify, queueGhl, deliverOutbox } = require('../services/di/notificationService');
 const { guestState, guestGate, guestSpend } = require('../services/di/guestService');
 const { legacyResult } = require('../services/edna/legacyResult');
 
 /** First name for a message, never box content (BS-AI-009 §2 rule 2). */
+/* what the invitee holds, for GHL's N1 member/guest routing (Fiza Ashraf, 25 Nov): the same
+   reading as /profile.membership, plus the last subscription state GHL reported (0007) */
+async function membershipOf(userId) {
+  const u = (await query('SELECT tier FROM users WHERE UPPER(id::text) = UPPER($1)', [userId])).rows[0] || {};
+  const raw = String(u.tier || '').toLowerCase();
+  if (raw && ['free', 'none'].indexOf(raw) === -1) {
+    let state = null;
+    try {
+      state = ((await query('SELECT subscription_state FROM users WHERE UPPER(id::text) = UPPER($1)', [userId])).rows[0] || {}).subscription_state || null;
+    } catch (e) { state = null; }
+    return { membership: raw, subscription_status: state || 'active' };
+  }
+  const bought = (await query(
+    'SELECT 1 FROM user_quiz_results WHERE UPPER(user_id::text) = UPPER($1) AND full_result_purchased = true LIMIT 1',
+    [userId])).rows.length > 0;
+  return { membership: bought ? 'di' : 'free', subscription_status: 'none' };
+}
+
+/* the address an invitation email's button opens: the dashboard's invite route (24 Nov),
+   absolute because it leaves the site inside an email */
+const INVITE_BASE = () => (process.env.APP_PUBLIC_URL || 'https://www.brandscaling.co.uk').replace(/\/+$/, '');
+
 async function firstNameOf(userId) {
   const r = await query('SELECT first_name, name FROM users WHERE UPPER(id::text) = UPPER($1)', [userId]);
   const u = r.rows[0] || {};
@@ -213,7 +235,13 @@ router.post('/rooms/:id/invites', async (req, res) => {
     /* N1 — invited to a room: in-app for an existing account, the email through GHL (BS-AI-009 N1) */
     if (inv.email) {
       const inviter = await firstNameOf(req.userId);
-      const link = '/?invite=' + inv.token; /* the dashboard's invite route (24 Nov) */
+      const link = INVITE_BASE() + '/?invite=' + inv.token;
+      const inviterSite = ((await query('SELECT site FROM users WHERE UPPER(id::text) = UPPER($1)', [req.userId])).rows[0] || {}).site || 'uk';
+      /* the same fields on both versions of N1, so one GHL workflow can branch on is_guest */
+      const common = {
+        inviter_name: inviter, decision: me.decision_text, deep_link: link, invitation_url: link,
+        role: inv.role === 'read_only' ? 'read_only' : 'can_contribute', expires_at: inv.expires_at,
+      };
       const existing = await query('SELECT id FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1', [inv.email]);
       if (existing.rows.length) {
         const invitee = existing.rows[0].id;
@@ -224,16 +252,19 @@ router.post('/rooms/:id/invites', async (req, res) => {
         });
         await queueGhl({
           userId: invitee, event: 'N1', dedup: 'n1:' + inv.id,
-          extra: { inviter_name: inviter, decision: me.decision_text, deep_link: link, is_guest: false, invitation_url: link },
+          extra: { ...common, is_guest: false, invitee_type: 'member', ...(await membershipOf(invitee)) },
         });
       } else {
-        /* no account yet: the guest invitation email is GHL's, started with the email address itself */
+        /* no account yet: the guest invitation email is GHL's, started with the email address
+           itself; a guest takes the free E-DNA, then has 7 days and 3 decisions (BS-AI-008 §5) */
         await query(
           'INSERT INTO ghl_outbox (event, user_id, payload, site) VALUES ($1, NULL, $2::jsonb, $3)',
           ['room.invited', JSON.stringify({
-            event: 'room.invited', email: inv.email, inviter_name: inviter,
-            decision: me.decision_text, deep_link: link, is_guest: true, invitation_url: link, site: 'uk',
-          }), 'uk']);
+            event: 'room.invited', email: inv.email, ...common, is_guest: true, invitee_type: 'guest',
+            membership: 'none', subscription_status: 'none', edna_status: 'not_taken', site: inviterSite,
+            dedup: 'n1:' + inv.id,
+          }), inviterSite]);
+        deliverOutbox().catch(() => {}); /* best effort now; the scheduler retries */
       }
     }
     res.status(201).json({ invite: { id: inv.id, token: inv.token, expires_at: inv.expires_at, link: '/?invite=' + inv.token } });

@@ -107,13 +107,20 @@ async function queueGhl({ userId, event, extra = {}, dedup = null }) {
  * accept and drop anything else, and the inbound trigger is billed per run). Grow the list
  * via env as workflows are built — e.g. add purchase.completed after Fariza signs it off. */
 const SENDABLE = () =>
-  new Set((process.env.GHL_SENDABLE_EVENTS || 'account.created,edna.save_progress,purchase.completed')
+  new Set((process.env.GHL_SENDABLE_EVENTS || 'account.created,edna.save_progress,purchase.completed,room.invited')
     .split(',').map((s) => s.trim()).filter(Boolean));
 
 /* purchase.completed has its own GHL workflow ("long form edna report", Fiza Ashraf,
    23 Nov 2026) with its own inbound trigger; every other event goes to workflow 2. */
 const PURCHASE_WEBHOOK_URL = () => process.env.GHL_PURCHASE_WEBHOOK_URL
   || 'https://services.leadconnectorhq.com/hooks/dtz5ID9oq7VPM9L9Kl4h/webhook-trigger/2324ed93-7e0e-45da-b122-f0bd1181a826';
+
+/* room.invited has its own GHL trigger for the Decision Room invitation emails, N1 member and
+   N1 guest (Fiza Ashraf, 25 Nov 2026; Mashab's access note §5.3 and §5.4). */
+const ROOMS_WEBHOOK_URL = () => process.env.GHL_ROOMS_WEBHOOK_URL
+  || 'https://services.leadconnectorhq.com/hooks/dtz5ID9oq7VPM9L9Kl4h/webhook-trigger/1af9eb84-de2c-486b-aa8d-a54555b7f91d';
+const urlFor = (event, inbound) => event === 'purchase.completed' ? PURCHASE_WEBHOOK_URL()
+  : event === 'room.invited' ? ROOMS_WEBHOOK_URL() : inbound;
 
 /** Send pending outbox rows when the GHL inbound webhook is configured; otherwise leave them. */
 async function deliverOutbox() {
@@ -126,8 +133,14 @@ async function deliverOutbox() {
     [sendable])).rows;
   let sent = 0;
   for (const row of rows) {
+    /* invitations queued before 25 Nov carry a relative link ("/?invite=…") that cannot work
+       from an email; they are never sent, so nobody gets a stale invitation from testing */
+    if (row.event === 'room.invited' && !/^https:\/\//.test(String((row.payload || {}).invitation_url || ''))) {
+      await query("UPDATE ghl_outbox SET status = 'skipped', last_attempt_at = now() WHERE id = $1", [row.id]);
+      continue;
+    }
     try {
-      const res = await fetch(row.event === 'purchase.completed' ? PURCHASE_WEBHOOK_URL() : url, {
+      const res = await fetch(urlFor(row.event, url), {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-webhook-key': secret },
         body: JSON.stringify({ ...row.payload, event_id: row.event_id }),
